@@ -37,10 +37,11 @@ struct sparse {
     sparse(int dimX, int dimY) : DimX(dimX), DimY(dimY) { };
     sparse Scale(complex<double> alpha);
     sparse Add(sparse A);
-    sparse Subtract(sparse A);
-    sparse RightMult(sparse A);
+    sparse RightMult(const sparse& A) const;
     sparse Transpose() const;
     sparse HermitianC(const sparse& A);
+
+    dense ToDense();
 
     void SortByRow();
 };
@@ -49,5 +50,6 @@ sparse ToSparseCOO(dense d);
 vector<compressedRow> SparseRowsCOO(const sparse& s);
 vector<compressedRow> SparseColsCOO(const sparse& s);
 compressedRow SparseVectorSum(const compressedRow& A, const compressedRow& B);
+complex<double> SparseDot(const compressedRow& A, const compressedRow& B);
 
 #endif //MAIN_SPARSE_H

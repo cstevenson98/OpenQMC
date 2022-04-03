@@ -18,6 +18,70 @@ sparse sparse::Scale(complex<double> alpha) {
     return out;
 }
 
+sparse sparse::Add(sparse A) {
+    sparse out(A.DimX, A.DimY);
+
+    auto rowsA = SparseRowsCOO(*this);
+    auto rowsB = SparseRowsCOO(*this);
+
+    unsigned int i = 0, j = 0;
+    unsigned int I = rowsA.size();
+    unsigned int J = rowsB.size();
+
+    while (true) {
+        if (i > I-1 || j > J-1) {
+            break;
+        }
+
+        if (rowsA[i].Index == rowsB[j].Index) {
+            auto sumRow = SparseVectorSum(rowsA[i], rowsB[j]);
+            for (auto &elem : sumRow.RowData) {
+                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+            }
+            i++;
+            j++;
+            continue;
+        }
+
+        if (rowsA[i].Index < rowsB[j].Index) {
+            for (auto &elem : rowsA[i].RowData) {
+                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+            }
+            i++;
+            continue;
+        }
+
+        if (rowsA[i].Index > rowsB[j].Index) {
+            for (auto &elem : rowsB[j].RowData) {
+                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+            }
+            j++;
+            continue;
+        }
+
+    }
+
+    return out;
+}
+
+sparse sparse::RightMult(const sparse& A) const {
+    sparse out(DimX, A.DimY);
+
+    auto thisRows = SparseRowsCOO(*this);
+    auto ACols = SparseColsCOO(A);
+
+    for (auto &row : thisRows) {
+        int i = row.Index;
+        for (auto &col : ACols) {
+            int j = col.Index;
+            out.Data.emplace_back(i, j, SparseDot(row, col));
+        }
+    }
+
+    return out;
+}
+
+
 sparse sparse::Transpose() const {
     sparse out(DimX, DimY);
     out.Data.resize(Data.size(), cooTuple(0, 0, 0));
@@ -139,6 +203,48 @@ compressedRow SparseVectorSum(const compressedRow &rowA, const compressedRow &ro
             j++;
             continue;
         }
+    }
+
+    return out;
+}
+
+complex<double> SparseDot(const compressedRow& A, const compressedRow& B) {
+    unsigned int i = 0, j = 0;
+    unsigned int I = A.RowData.size();
+    unsigned int J = B.RowData.size();
+
+    complex<double> out = 0;
+    while (true) {
+        if (i > I-1 || j > J-1) {
+            break;
+        }
+
+        if (A.RowData[i].Coords[1] == B.RowData[j].Coords[1]) {
+            out += A.RowData[i].Val * B.RowData[j].Val;
+            i++;
+            j++;
+            continue;
+        }
+
+        if (A.RowData[i].Coords[1] < B.RowData[j].Coords[1]) {
+            i++;
+            continue;
+        }
+
+        if (A.RowData[i].Coords[1] > B.RowData[j].Coords[1]) {
+            j++;
+            continue;
+        }
+    }
+
+    return out;
+}
+
+dense sparse::ToDense() {
+    dense out(DimX, DimY);
+
+    for (auto &elem : Data) {
+        out.Data[elem.Coords[0]][elem.Coords[1]] = elem.Val;
     }
 
     return out;

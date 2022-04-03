@@ -5,7 +5,7 @@ project(main)
 
 add_subdirectory(la)
 
-set(source_files main.cpp)
+set(source_files main.cpp ode/integrator.cpp ode/integrator.h)
 add_executable(main ${source_files})
 
 target_link_libraries(main la)
