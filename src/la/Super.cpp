@@ -19,3 +19,13 @@ Sparse Kronecker(const Sparse& A, const Sparse& B) {
 
     return out;
 }
+
+Sparse Tensor(const vector<Sparse>& matrices) {
+    Sparse out(matrices[0].DimX, matrices[0].DimY);
+
+    for (int i = 1; i < matrices.size(); ++i) {
+        out = Kronecker(out, matrices[i]);
+    }
+
+    return out;
+}

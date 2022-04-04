@@ -8,6 +8,6 @@
 #include "Sparse.h"
 
 Sparse Kronecker(const Sparse& A, const Sparse& B);
-Sparse Tensor(const Sparse& matrices...);
+Sparse Tensor(const vector<Sparse>& matrices);
 
 #endif //MAIN_SUPER_H

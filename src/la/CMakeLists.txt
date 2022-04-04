@@ -5,6 +5,7 @@ set(la_source_files
         Vect.h
         Sparse.cpp
         Sparse.h
+        Super.cpp
         Super.h
-        Super.cpp)
+        )
 add_library(la ${la_source_files})
