@@ -4,23 +4,27 @@
 
 #include<iostream>
 
-#include "la/dense.h"
-#include "la/sparse.h"
-#include "la/vect.h"
+#include "la/Dense.h"
+#include "la/Sparse.h"
+#include "ode/Euler.h"
 
 int main() {
     cout << "Hello" << endl;
 
-    dense denseMat1(2, 2);
+    Dense denseMat1(2, 2);
 
-    denseMat1.Data = {
-            {0, 2},
-            {1, 0}
+    auto myFunc = [](Vect& dx, double t, const Vect& x) {
+        dx.Data[0] = x.Data[1];
+        dx.Data[1] = -x.Data[0];
     };
 
-    sparse sparse1 = ToSparseCOO(denseMat1);
-    sparse mult = sparse1.RightMult(sparse1);
-    dense d = mult.ToDense();
+    Vect x0(2);
+    x0.Data = {1., 0.};
+
+    IVP ballProblem(0., x0, myFunc);
+    Euler solver(ballProblem, 10e-3);
+
+    SolveIVP(ballProblem, solver, 0.1, 1.);
 
     return 0;
 }

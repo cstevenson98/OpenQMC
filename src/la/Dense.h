@@ -9,12 +9,12 @@
 #include <vector>
 #include <complex>
 
-struct dense {
+struct Dense {
     int DimX;
     int DimY;
     std::vector<std::vector<std::complex<double> > > Data;
 
-    dense(int dimX, int dimY);
+    Dense(int dimX, int dimY);
 
     struct matrix_row {
         std::vector<std::complex<double> >& row;

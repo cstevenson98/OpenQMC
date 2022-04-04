@@ -2,10 +2,10 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#include "vect.h"
+#include "Vect.h"
 
-vect vect::Add(vect &A) {
-    vect out(Data.size());
+Vect Vect::Add(Vect &A) {
+    Vect out(Data.size());
     out.Data.resize(Data.size());
 
     for (int i = 0; i < A.Data.size(); ++i) {
@@ -15,8 +15,8 @@ vect vect::Add(vect &A) {
     return out;
 }
 
-vect vect::Subtract(vect &A) {
-    vect out(Data.size());
+Vect Vect::Subtract(Vect &A) {
+    Vect out(Data.size());
     out.Data.resize(Data.size());
 
     for (int i = 0; i < A.Data.size(); ++i) {
@@ -26,8 +26,8 @@ vect vect::Subtract(vect &A) {
     return out;
 }
 
-vect vect::Scale(complex<double> alpha) {
-    vect out(Data.size());
+Vect Vect::Scale(complex<double> alpha) {
+    Vect out(Data.size());
     out.Data.resize(Data.size());
 
     for (int i = 0; i < Data.size(); ++i) {
@@ -37,8 +37,8 @@ vect vect::Scale(complex<double> alpha) {
     return out;
 }
 
-vect vect::AddScaledVect(complex<double> alpha, vect &A) {
-    vect out(Data.size());
+Vect Vect::AddScaledVect(complex<double> alpha, Vect &A) {
+    Vect out(Data.size());
     out.Data.resize(Data.size());
 
     for (int i = 0; i < A.Data.size(); ++i) {
@@ -48,10 +48,19 @@ vect vect::AddScaledVect(complex<double> alpha, vect &A) {
     return out;
 }
 
-vect::vect(unsigned int size) {
+Vect::Vect(unsigned int size) {
     Data.resize(size);
 }
 
-vect::vect(vector<complex<double> > &in) {
+Vect::Vect(vector<complex<double> > &in) {
     Data = in;
+}
+
+double Vect::Norm() {
+    double out = 0;
+
+    for (auto elem : Data) {
+        out += abs(elem);
+    }
+    return sqrt(out);
 }

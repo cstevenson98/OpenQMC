@@ -2,15 +2,16 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#include "dense.h"
-#include "sparse.h"
+#include <algorithm>
+#include "Dense.h"
+#include "Sparse.h"
 
-sparse sparse::Scale(complex<double> alpha) {
-    sparse out(DimX, DimY);
-    out.Data.resize(Data.size(), cooTuple(0, 0, 0));
+Sparse Sparse::Scale(complex<double> alpha) {
+    Sparse out(DimX, DimY);
+    out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
     for (int i = 0; i < Data.size(); ++i) {
-        out.Data[i] = cooTuple(
+        out.Data[i] = COOTuple(
                 Data[i].Coords[0], Data[i].Coords[0],
                 alpha * Data[i].Val
                 );
@@ -18,8 +19,8 @@ sparse sparse::Scale(complex<double> alpha) {
     return out;
 }
 
-sparse sparse::Add(sparse A) {
-    sparse out(A.DimX, A.DimY);
+Sparse Sparse::Add(Sparse A) {
+    Sparse out(A.DimX, A.DimY);
 
     auto rowsA = SparseRowsCOO(*this);
     auto rowsB = SparseRowsCOO(*this);
@@ -64,8 +65,8 @@ sparse sparse::Add(sparse A) {
     return out;
 }
 
-sparse sparse::RightMult(const sparse& A) const {
-    sparse out(DimX, A.DimY);
+Sparse Sparse::RightMult(const Sparse& A) const {
+    Sparse out(DimX, A.DimY);
 
     auto thisRows = SparseRowsCOO(*this);
     auto ACols = SparseColsCOO(A);
@@ -81,10 +82,9 @@ sparse sparse::RightMult(const sparse& A) const {
     return out;
 }
 
-
-sparse sparse::Transpose() const {
-    sparse out(DimX, DimY);
-    out.Data.resize(Data.size(), cooTuple(0, 0, 0));
+Sparse Sparse::Transpose() const {
+    Sparse out(DimX, DimY);
+    out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
     for (int i = 0; i < Data.size(); i++) {
         out.Data[i].Coords[0] = Data[i].Coords[1];
@@ -97,9 +97,9 @@ sparse sparse::Transpose() const {
     return out;
 }
 
-sparse sparse::HermitianC(const sparse& A) {
-    sparse out(DimX, DimY);
-    out.Data.resize(Data.size(), cooTuple(0, 0, 0));
+Sparse Sparse::HermitianC(const Sparse& A) {
+    Sparse out(DimX, DimY);
+    out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
     for (int i = 0; i < Data.size(); i++) {
         out.Data[i].Coords[0] = Data[i].Coords[1];
@@ -112,19 +112,19 @@ sparse sparse::HermitianC(const sparse& A) {
     return out;
 }
 
-bool CompareCOORows(cooTuple L, cooTuple R) {
+bool CompareCOORows(COOTuple L, COOTuple R) {
     if (L.Coords[0] == R.Coords[0]) {
         return L.Coords[1] < R.Coords[1];
     }
     return L.Coords[0] < R.Coords[0];
 };
 
-void sparse::SortByRow() {
+void Sparse::SortByRow() {
     std::sort(Data.begin(), Data.end(), CompareCOORows);
 }
 
-sparse ToSparseCOO(dense d) {
-    sparse out(d.DimX, d.DimY);
+Sparse ToSparseCOO(Dense d) {
+    Sparse out(d.DimX, d.DimY);
 
     for (int i = 0; i < d.DimX; i++) {
         for (int j = 0; j < d.DimY; j++) {
@@ -137,15 +137,15 @@ sparse ToSparseCOO(dense d) {
     return out;
 }
 
-vector<compressedRow> SparseRowsCOO(const sparse& s) {
-    vector<compressedRow> sRows;
-    vector<cooTuple> rowData;
+vector<CompressedRow> SparseRowsCOO(const Sparse& s) {
+    vector<CompressedRow> sRows;
+    vector<COOTuple> rowData;
 
     int index = 0;
     for (auto data : s.Data) {
         if (data.Coords[0] != index) {
             if (!rowData.empty()) {
-                sRows.emplace_back(compressedRow(index, rowData));
+                sRows.emplace_back(CompressedRow(index, rowData));
 
                 rowData.erase(rowData.begin(), rowData.end());
             }
@@ -153,37 +153,37 @@ vector<compressedRow> SparseRowsCOO(const sparse& s) {
             index = data.Coords[0];
         }
 
-        rowData.emplace_back(cooTuple(
+        rowData.emplace_back(COOTuple(
                 data.Coords[0], data.Coords[1],
                 data.Val
                 ));
 
     }
 
-    sRows.emplace_back(compressedRow(index, rowData));
+    sRows.emplace_back(CompressedRow(index, rowData));
 
     return sRows;
 }
 
-vector<compressedRow> SparseColsCOO(const sparse& s) {
-    sparse sT = s.Transpose();
+vector<CompressedRow> SparseColsCOO(const Sparse& s) {
+    Sparse sT = s.Transpose();
 
     return SparseRowsCOO(sT);
 }
 
-compressedRow SparseVectorSum(const compressedRow &rowA, const compressedRow &rowB) {
+CompressedRow SparseVectorSum(const CompressedRow &rowA, const CompressedRow &rowB) {
     unsigned int i = 0, j = 0;
     unsigned int I = rowA.RowData.size();
     unsigned int J = rowB.RowData.size();
 
-    compressedRow out(rowA.Index);
+    CompressedRow out(rowA.Index);
     while (true) {
         if (i > I-1 || j > J-1) {
             break;
         }
 
         if (rowA.RowData[i].Coords[1] == rowB.RowData[j].Coords[1]) {
-            out.RowData.emplace_back(cooTuple(
+            out.RowData.emplace_back(COOTuple(
                     rowA.Index, rowA.RowData[i].Coords[1],
                     rowA.RowData[i].Val + rowB.RowData[j].Val
                     ));
@@ -208,7 +208,7 @@ compressedRow SparseVectorSum(const compressedRow &rowA, const compressedRow &ro
     return out;
 }
 
-complex<double> SparseDot(const compressedRow& A, const compressedRow& B) {
+complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B) {
     unsigned int i = 0, j = 0;
     unsigned int I = A.RowData.size();
     unsigned int J = B.RowData.size();
@@ -240,8 +240,8 @@ complex<double> SparseDot(const compressedRow& A, const compressedRow& B) {
     return out;
 }
 
-dense sparse::ToDense() {
-    dense out(DimX, DimY);
+Dense Sparse::ToDense() {
+    Dense out(DimX, DimY);
 
     for (auto &elem : Data) {
         out.Data[elem.Coords[0]][elem.Coords[1]] = elem.Val;

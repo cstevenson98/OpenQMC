@@ -1,3 +1,3 @@
 set(la_source_files
-        dense.cpp dense.h vect.cpp vect.h sparse.cpp sparse.h)
+        Dense.cpp Dense.h Vect.cpp Vect.h Sparse.cpp Sparse.h)
 add_library(la ${la_source_files})
