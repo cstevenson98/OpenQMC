@@ -7,6 +7,8 @@
 
 #include "la/Dense.h"
 #include "la/Sparse.h"
+#include "ode/Euler.h"
+#include "models/ElasticChain1D.h"
 #include "ode/RK4.h"
 
 void ToCSV(const string& filename, const vector<State>& results) {
@@ -24,20 +26,29 @@ void ToCSV(const string& filename, const vector<State>& results) {
 }
 
 int main() {
-    const int N = 16 * 16;
+    const int N = 4;
 
-    Vect x0(2);
-    x0.Data = {1., 0};
-    auto myFunc = [](Vect& dx, double t, const Vect& x) {
-        dx.Data[0] = x.Data[1];
-        dx.Data[1] = -x.Data[0];
+    Vect x0(2*N);
+    for (int i = 0; i < 2*N; ++i) {
+        if (i%2 == 0) {
+            x0.Data[i] = {1., 0.};
+        } else {
+            x0.Data[i] = {0., 0.};
+        }
+    }
+
+    ElasticChain1D chain(N, 0.5, 1.);
+
+    chain.Dx().VectMult(x0);
+    auto myFunc = [&chain](Vect& dx, double t, const Vect& x) {
+        dx = chain.Dx().VectMult(x);
     };
 
 
-    IVP ballProblem(0., x0, myFunc);
-    RK4 solver(ballProblem, 1e-6);
+    IVP   ballProblem(0., x0, myFunc);
+    RK4 solver(ballProblem, 1e-1);
 
-    auto results = SolveIVP(ballProblem, solver, 0.1, 2. * M_PI);
+    auto results = SolveIVP(ballProblem, solver, 0.1, 4. * M_PI);
 
     ToCSV("data/data.csv", results);
     return 0;

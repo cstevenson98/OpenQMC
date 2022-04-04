@@ -7,3 +7,4 @@ main
 cmake_install.cmake
 la
 ode
+data/**

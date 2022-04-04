@@ -17,7 +17,7 @@ Sparse ElasticChain1D::Dx() {
                 out.Data.emplace_back(i, j, delta);
             }
 
-            if (j == i+1 && j%2 == 0) {
+            if (j == i+1 && j%2 == 1) {
                 out.Data.emplace_back(i, j, -delta);
             }
         }
