@@ -5,4 +5,4 @@ CMakeCache.txt
 Makefile
 main
 cmake_install.cmake
-data/**
+data/*
