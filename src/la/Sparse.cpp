@@ -249,3 +249,16 @@ Dense Sparse::ToDense() {
 
     return out;
 }
+
+Vect Sparse::VectMult(const Vect &vect) const {
+    vector<CompressedRow> sRows = SparseRowsCOO(*this);
+
+    Vect out(vect.Data.size());
+    for (const auto& row : sRows) {
+            for (const auto rowElem : row.RowData) {
+                out.Data[row.Index] += rowElem.Val * vect.Data[rowElem.Coords[1]];
+            }
+    }
+
+    return out;
+}

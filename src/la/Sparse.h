@@ -7,6 +7,8 @@
 
 #include <complex>
 #include <vector>
+#include "Dense.h"
+#include "Vect.h"
 
 using namespace std;
 
@@ -44,6 +46,8 @@ struct Sparse {
     Dense ToDense();
 
     void SortByRow();
+
+    Vect VectMult(const Vect &vect) const;
 };
 
 Sparse ToSparseCOO(Dense d);

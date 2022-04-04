@@ -42,7 +42,6 @@ double Euler::Step(double step) {
         } else {
             break;
         }
-
     }
 
     x = y1;

@@ -14,7 +14,7 @@ class Euler : public Integrator {
     std::function<void(Vect&, double, const Vect&)> Func;
     double Err, Tol;
 public:
-    explicit Euler(const IVP &ivp, double tol) : Tol(tol) {
+    Euler(const IVP &ivp, double tol) : Tol(tol) {
         x = ivp.y0;
         dx = Vect(x.Data.size());
         t = ivp.t0;
