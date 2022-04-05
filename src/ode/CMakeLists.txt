@@ -9,4 +9,4 @@ set(ode_source_files
 
 add_library(ode ${ode_source_files})
 
-target_link_libraries(la)
+target_link_libraries(ode la)

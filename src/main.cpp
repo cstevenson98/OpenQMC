@@ -10,6 +10,7 @@
 #include "ode/Euler.h"
 #include "ode/RK4.h"
 #include "models/ElasticChain1D.h"
+#include "qm/Spins.h"
 
 void ToCSV(const string& filename, const vector<State>& results) {
     std::ofstream myfile;
@@ -44,13 +45,17 @@ int main() {
         }
     }
 
+    auto sigmax = SigmaX(2, 0);
+    sigmax.ToDense().Print();
+
     ElasticChain1D chain(N, 0.1, 6.67);
-    auto myFunc = [&chain](Vect& dx, double t, const Vect& x) {
-        dx = chain.Dx().VectMult(x);
+    auto chainDx = chain.Dx();
+    auto myFunc = [&chain, &chainDx](Vect& dx, double t, const Vect& x) {
+        dx = chainDx.VectMult(x);
     };
 
     IVP ballProblem(0., x0, myFunc);
-    RK4 solver(ballProblem, 1e-1);
+    RK4 solver(ballProblem, 1e-2);
 
     auto results = SolveIVP(ballProblem, solver, 0.1, 28. * M_PI);
     ToCSV("data/data.csv", results);

@@ -32,6 +32,7 @@ double RK4::Step(double step) {
     while (true) {
         if (iterations > maxDepth) {
             std::cout << "max depth reached, aborting" << std::endl;
+            assert(false);
         }
         iterations++;
 
@@ -66,5 +67,4 @@ double RK4::Step(double step) {
     t += nextStepSize;
 
     return nextStepSize;
-
 }

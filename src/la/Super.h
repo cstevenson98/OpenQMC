@@ -9,5 +9,6 @@
 
 Sparse Kronecker(const Sparse& A, const Sparse& B);
 Sparse Tensor(const vector<Sparse>& matrices);
+Sparse ToSuper(const Sparse& A, const Sparse& B);
 
 #endif //MAIN_SUPER_H

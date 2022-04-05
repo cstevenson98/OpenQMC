@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <cassert>
 #include "Dense.h"
 
 using namespace std;
