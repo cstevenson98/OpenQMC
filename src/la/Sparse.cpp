@@ -19,11 +19,18 @@ Sparse Sparse::Scale(complex<double> alpha) {
     return out;
 }
 
-Sparse Sparse::Add(const Sparse& A) const {
-    Sparse out(A.DimX, A.DimY);
+Sparse Sparse::Add(const Sparse& B) const {
+    Sparse out(B.DimX, B.DimY);
 
     auto rowsA = SparseRowsCOO(*this);
-    auto rowsB = SparseRowsCOO(*this);
+    if (rowsA.empty()) {
+        return B;
+    }
+
+    auto rowsB = SparseRowsCOO(B);
+    if (rowsB.empty()) {
+        return *this;
+    }
 
     unsigned int i = 0, j = 0;
     unsigned int I = rowsA.size();
@@ -160,7 +167,9 @@ vector<CompressedRow> SparseRowsCOO(const Sparse& s) {
 
     }
 
-    sRows.emplace_back(index, rowData);
+    if (!rowData.empty()) {
+        sRows.emplace_back(index, rowData);
+    }
 
     return sRows;
 }

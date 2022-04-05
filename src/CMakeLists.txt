@@ -11,4 +11,4 @@ add_subdirectory(models)
 set(source_files main.cpp)
 add_executable(main ${source_files})
 
-target_link_libraries(main la qm ode models)
+target_link_libraries(main la qm models ode)

@@ -38,7 +38,7 @@ struct Sparse {
 
     Sparse(int dimX, int dimY) : DimX(dimX), DimY(dimY) { };
     Sparse Scale(complex<double> alpha);
-    Sparse Add(const Sparse& A) const;
+    Sparse Add(const Sparse& B) const;
     Sparse RightMult(const Sparse& A) const;
     Sparse Transpose() const;
     Sparse HermitianC(const Sparse& A);

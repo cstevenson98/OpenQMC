@@ -10,6 +10,7 @@
 #include "ode/Euler.h"
 #include "ode/RK4.h"
 #include "models/ElasticChain1D.h"
+#include "models/XYZModel.h"
 #include "qm/Spins.h"
 
 void ToCSV(const string& filename, const vector<State>& results) {
@@ -27,14 +28,6 @@ void ToCSV(const string& filename, const vector<State>& results) {
 }
 
 int main() {
-    Dense myDense(2, 2);
-    myDense.Data = {
-            {{1, -1}, {1, 1}},
-            {-2, 3}
-    };
-    myDense.Print();
-    myDense.Transpose().Print();
-
     const int N = 1;
     Vect x0(2*N);
     for (int i = 0; i < 2*N; ++i) {
@@ -44,9 +37,6 @@ int main() {
             x0.Data[i] = {0., 0.};
         }
     }
-
-    auto sigmax = SigmaX(2, 0);
-    sigmax.ToDense().Print();
 
     ElasticChain1D chain(N, 0.1, 6.67);
     auto chainDx = chain.Dx();
@@ -59,6 +49,12 @@ int main() {
 
     auto results = SolveIVP(ballProblem, solver, 0.1, 28. * M_PI);
     ToCSV("data/data.csv", results);
+
+
+    XYZModel xyz(2, 0.1, 1.);
+
+    auto H = xyz.H(false);
+    H.ToDense().Print();
 
     return 0;
 }

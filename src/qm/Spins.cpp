@@ -32,6 +32,18 @@ Sparse SigmaZ() {
     return ToSparseCOO(out);
 }
 
+Sparse SigmaPlus() {
+    Dense out(2, 2);
+    out.Data = {{0, 1}, {0, 0}};
+    return ToSparseCOO(out);
+}
+
+Sparse SigmaMinus() {
+    Dense out(2, 2);
+    out.Data = {{0, 0}, {1, 0}};
+    return ToSparseCOO(out);
+}
+
 Sparse SigmaX(unsigned int N, unsigned int j) {
     vector<Sparse> operators;
 
@@ -66,6 +78,34 @@ Sparse SigmaZ(unsigned int N, unsigned int j) {
     for (int i = 0; i < N; ++i) {
         if (i == j) {
             operators.emplace_back(SigmaZ());
+        } else {
+            operators.emplace_back(Identity(2));
+        }
+    }
+
+    return Tensor(operators);
+}
+
+Sparse SigmaPlus(unsigned int N, unsigned int j) {
+    vector<Sparse> operators;
+
+    for (int i = 0; i < N; ++i) {
+        if (i == j) {
+            operators.emplace_back(SigmaPlus());
+        } else {
+            operators.emplace_back(Identity(2));
+        }
+    }
+
+    return Tensor(operators);
+}
+
+Sparse SigmaMinus(unsigned int N, unsigned int j) {
+    vector<Sparse> operators;
+
+    for (int i = 0; i < N; ++i) {
+        if (i == j) {
+            operators.emplace_back(SigmaMinus());
         } else {
             operators.emplace_back(Identity(2));
         }
