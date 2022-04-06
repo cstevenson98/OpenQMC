@@ -17,12 +17,21 @@ struct Vect {
 
     vector<complex<double> > Data;
 
-    Vect Add(Vect& A);
-    Vect Subtract(Vect& A);
-    Vect Scale(complex<double> alpha);
-    Vect AddScaledVect(complex<double> alpha, Vect& A);
+    Vect Add(const Vect& A) const;
+    Vect Subtract(const Vect& A) const;
+    Vect Scale(const complex<double>& alpha) const;
+    Vect AddScaledVect(const complex<double>& alpha, const Vect& A) const;
 
-    double Norm();
+    Vect operator + (const Vect& A) const;
+    Vect operator - (const Vect& A) const;
+    Vect operator * (const complex<double>& alpha) const;
+    complex<double> operator [] (unsigned int i) const;
+
+    double Dot(const Vect& A) const;
+    double Norm() const;
 };
+
+// Non-member binary operators
+Vect operator * (const complex<double>& alpha, const Vect& rhs);
 
 #endif //MAIN_VECT_H

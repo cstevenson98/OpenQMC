@@ -31,13 +31,9 @@ struct Dense {
     }
 
     Dense Add(const Dense &A);
-
     Dense RightMult(const Dense &A);
-
     Dense Scale(complex<double> alpha);
-
     Dense Transpose();
-
     Dense HermitianC();
 
     void Print();
