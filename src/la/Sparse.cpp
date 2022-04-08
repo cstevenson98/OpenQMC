@@ -5,14 +5,15 @@
 #include <algorithm>
 #include "Dense.h"
 #include "Sparse.h"
+#include "Super.h"
 
-Sparse Sparse::Scale(complex<double> alpha) {
+Sparse Sparse::Scale(const complex<double> &alpha) const {
     Sparse out(DimX, DimY);
     out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
     for (int i = 0; i < Data.size(); ++i) {
         out.Data[i] = COOTuple(
-                Data[i].Coords[0], Data[i].Coords[0],
+                Data[i].Coords[0], Data[i].Coords[1],
                 alpha * Data[i].Val
                 );
     }
@@ -104,7 +105,7 @@ Sparse Sparse::Transpose() const {
     return out;
 }
 
-Sparse Sparse::HermitianC(const Sparse& A) {
+Sparse Sparse::HermitianC() const {
     Sparse out(DimX, DimY);
     out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
@@ -130,7 +131,7 @@ void Sparse::SortByRow() {
     std::sort(Data.begin(), Data.end(), CompareCOORows);
 }
 
-Sparse ToSparseCOO(Dense d) {
+Sparse ToSparseCOO(const Dense& d) {
     Sparse out(d.DimX, d.DimY);
 
     for (int i = 0; i < d.DimX; i++) {
@@ -270,4 +271,28 @@ Vect Sparse::VectMult(const Vect &vect) const {
     }
 
     return out;
+}
+
+Sparse Sparse::operator + (const Sparse &A) const {
+    return this->Add(A);
+}
+
+Sparse Sparse::operator - (const Sparse &A) const {
+    return this->Add(A.Scale(-1));
+}
+
+Sparse Sparse::operator * (const complex<double>& alpha) const {
+    return this->Scale(alpha);
+}
+
+Sparse operator * (const complex<double>& alpha, const Sparse& rhs) {
+    return rhs*alpha;
+}
+
+Sparse Sparse::operator * (const Sparse &A) const {
+    return this->RightMult(A);
+}
+
+Sparse Sparse::operator % (const Sparse& A) const {
+    return Kronecker(*this, A);
 }

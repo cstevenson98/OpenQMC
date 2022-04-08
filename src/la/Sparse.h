@@ -37,23 +37,29 @@ struct Sparse {
     std::vector<COOTuple> Data;
 
     Sparse(int dimX, int dimY) : DimX(dimX), DimY(dimY) { };
-    Sparse Scale(complex<double> alpha);
+
+    Sparse Scale(const complex<double> &alpha) const;
     Sparse Add(const Sparse& B) const;
     Sparse RightMult(const Sparse& A) const;
     Sparse Transpose() const;
-    Sparse HermitianC(const Sparse& A);
-
+    Sparse HermitianC() const;
     Dense ToDense();
-
     void SortByRow();
-
     Vect VectMult(const Vect &vect) const;
+
+    Sparse operator + (const Sparse& A) const;
+    Sparse operator - (const Sparse& A) const;
+    Sparse operator * (const complex<double>& alpha) const;
+    Sparse operator * (const Sparse& A) const;
+    Sparse operator % (const Sparse& A) const;
 };
 
-Sparse ToSparseCOO(Dense d);
+Sparse ToSparseCOO(const Dense& d);
 vector<CompressedRow> SparseRowsCOO(const Sparse& s);
 vector<CompressedRow> SparseColsCOO(const Sparse& s);
 CompressedRow SparseVectorSum(const CompressedRow& A, const CompressedRow& B);
 complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B);
+
+Sparse operator * (const complex<double>& alpha, const Sparse& rhs);
 
 #endif //MAIN_SPARSE_H

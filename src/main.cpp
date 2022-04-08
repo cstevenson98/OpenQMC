@@ -7,6 +7,7 @@
 
 #include "la/Dense.h"
 #include "la/Sparse.h"
+#include "la/Super.h"
 #include "ode/Euler.h"
 #include "ode/RK4.h"
 #include "models/ElasticChain1D.h"
@@ -28,12 +29,20 @@ void ToCSV(const string& filename, const vector<State>& results) {
 }
 
 int main() {
-    Vect v(2);
-    v.Data = {1., 2.};
+    Dense mat1(2, 2);
+    mat1.Data = {{1, 1},
+                 {0, -2}};
 
-    Vect w(2);
-    w = v+2*v;
+    Dense mat2(2, 2);
+    mat2.Data = {{2, -2},
+                 {1, 1}};
 
+    Sparse mat1s = ToSparseCOO(mat1);
+    Sparse mat2s = ToSparseCOO(mat2);
+
+    auto mat3s = Tensor({mat2s.Transpose(), mat1s, mat2s});
+
+    mat3s.ToDense().Print();
 
 //    const int N = 1;
 //    Vect x0(2*N);
