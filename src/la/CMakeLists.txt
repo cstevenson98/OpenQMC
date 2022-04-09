@@ -9,3 +9,4 @@ set(la_source_files
         Super.h
         )
 add_library(la ${la_source_files})
+target_link_libraries(la utils)

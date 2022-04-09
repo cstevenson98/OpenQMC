@@ -21,7 +21,7 @@ struct Vect {
     Vect Subtract(const Vect& A) const;
     Vect Scale(const complex<double>& alpha) const;
     Vect AddScaledVect(const complex<double>& alpha, const Vect& A) const;
-
+    Vect Conj() const;
     Vect operator + (const Vect& A) const;
     Vect operator - (const Vect& A) const;
     Vect operator * (const complex<double>& alpha) const;
@@ -29,6 +29,11 @@ struct Vect {
 
     double Dot(const Vect& A) const;
     double Norm() const;
+
+    void Print() const;
+    void PrintRe() const;
+    void PrintIm() const;
+    void PrintAbs() const;
 };
 
 // Non-member binary operators

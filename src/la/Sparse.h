@@ -52,6 +52,13 @@ struct Sparse {
     Sparse operator * (const complex<double>& alpha) const;
     Sparse operator * (const Sparse& A) const;
     Sparse operator % (const Sparse& A) const;
+
+    void Print() const;
+    void PrintRe() const;
+    void PrintIm() const;
+    void PrintAbs() const;
+
+    unsigned int NNZ() const;
 };
 
 Sparse ToSparseCOO(const Dense& d);

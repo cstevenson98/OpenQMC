@@ -30,14 +30,25 @@ struct Dense {
         return matrix_row(Data.at(x));
     }
 
-    Dense Add(const Dense &A);
-    Dense RightMult(const Dense &A);
-    Dense Scale(complex<double> alpha);
-    Dense Transpose();
-    Dense HermitianC();
+    Dense Add(const Dense &A) const;
+    Dense RightMult(const Dense &A) const;
+    Dense Scale(complex<double> alpha) const;
+    Dense Transpose() const;
+    Dense HermitianC() const;
 
-    void Print();
+    Dense operator + (const Dense& A) const;
+    Dense operator - (const Dense& A) const;
+    Dense operator * (const complex<double>& alpha) const;
+    Dense operator * (const Dense& A) const;
+    Dense operator % (const Dense& A) const;
+
+    void Print(unsigned int kind = 0) const;
+    void PrintRe() const;
+    void PrintIm() const;
+    void PrintAbs() const;
 };
+
+Dense operator * (const complex<double>& alpha, const Dense& rhs);
 
 
 #endif //MAIN_DENSE_H

@@ -296,3 +296,7 @@ Sparse Sparse::operator * (const Sparse &A) const {
 Sparse Sparse::operator % (const Sparse& A) const {
     return Kronecker(*this, A);
 }
+
+unsigned int Sparse::NNZ() const {
+    return Data.size();
+}

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cassert>
 #include "Dense.h"
+#include "../utils/SignPadding.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ Dense::Dense(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
     Data.resize(dimX, vector<complex<double> >(dimY));
 }
 
-Dense Dense::Add(const Dense& A) {
+Dense Dense::Add(const Dense& A) const {
     assert(DimX == A.DimX && DimY == A.DimY);
 
     Dense out(DimX, DimY);
@@ -25,7 +26,7 @@ Dense Dense::Add(const Dense& A) {
     return out;
 }
 
-Dense Dense::RightMult(const Dense& A) {
+Dense Dense::RightMult(const Dense& A) const {
     assert(DimY == A.DimX);
 
     Dense out(DimX, A.DimY);
@@ -42,7 +43,7 @@ Dense Dense::RightMult(const Dense& A) {
     return out;
 }
 
-Dense Dense::Scale(complex<double> alpha) {
+Dense Dense::Scale(complex<double> alpha) const {
     Dense out(DimX, DimY);
 
     for (int i = 0; i < out.Data.size(); ++i) {
@@ -54,7 +55,7 @@ Dense Dense::Scale(complex<double> alpha) {
     return out;
 }
 
-Dense Dense::Transpose() {
+Dense Dense::Transpose() const {
     Dense out(DimY, DimX);
 
     for (int i = 0; i < DimY; ++i) {
@@ -66,7 +67,7 @@ Dense Dense::Transpose() {
     return out;
 }
 
-Dense Dense::HermitianC() {
+Dense Dense::HermitianC() const {
     Dense out(DimY, DimX);
 
     for (int i = 0; i < DimY; ++i) {
@@ -78,7 +79,7 @@ Dense Dense::HermitianC() {
     return out;
 }
 
-void Dense::Print() {
+void Dense::Print(unsigned int kind) const {
     string s;
     stringstream stream;
     stream.setf(ios::fixed);
@@ -86,13 +87,70 @@ void Dense::Print() {
 
     stream << " Matrix [" << DimX << " x " << DimY << "]:" << endl;
     for (const auto& X : Data) {
-        stream << "  ";
+        stream << "   ";
         for (auto Y : X) {
-            stream << "("<< Y.real() << ", " << Y.imag() << ") ";
+            string spaceCharRe = !std::signbit(Y.real()) ? " " : "";
+            string spaceCharIm = !std::signbit(Y.imag()) ? " " : "";
+            string spaceCharAbs = !std::signbit(Y.imag()) ? " + " : " - ";
+
+            switch (kind) {
+                case 0: // re + im
+                    stream << spaceCharRe << Y.real() << spaceCharAbs << abs(Y.imag()) << "i  ";
+                    break;
+                case 1: // re
+                    stream << spaceCharRe << Y.real() << " ";
+                    break;
+                case 2: // im
+                    stream << spaceCharIm << Y.imag() << "i  ";
+                    break;
+                case 3: // abs
+                    stream << " " << abs(Y);
+                    break;
+                default:
+                    stream << "[e]";
+            }
         }
         stream << endl;
     }
 
     s = stream.str();
+
+    cout.imbue(locale(cout.getloc(), new SignPadding));
     cout << s << endl;
+}
+
+void Dense::PrintRe() const {
+    this->Print(1);
+}
+
+void Dense::PrintIm() const {
+    this->Print(2);
+}
+
+void Dense::PrintAbs() const {
+    this->Print(3);
+}
+
+Dense Dense::operator + (const Dense &A) const {
+    return this->Add(A);
+}
+
+Dense Dense::operator - (const Dense &A) const {
+    return this->Add(A.Scale(-1));
+}
+
+Dense Dense::operator * (const complex<double> &alpha) const {
+    return this->Scale(alpha);
+}
+
+Dense operator * (const complex<double> &alpha, const Dense& rhs) {
+    return rhs*alpha;
+}
+
+Dense Dense::operator * (const Dense &A) const {
+    return this->RightMult(A);
+}
+
+Dense Dense::operator % (const Dense &A) const {
+    return {0, 0};
 }
