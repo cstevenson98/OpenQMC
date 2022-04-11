@@ -1,0 +1,13 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/src",
+    "files.associations": {
+        "complex": "cpp",
+        "cmath": "cpp",
+        "array": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp",
+        "valarray": "cpp"
+    }
+}

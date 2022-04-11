@@ -5,6 +5,8 @@ set(la_source_files
         Vect.h
         Sparse.cpp
         Sparse.h
+        SparseELL.cpp
+        SparseELL.h
         Super.cpp
         Super.h
         )

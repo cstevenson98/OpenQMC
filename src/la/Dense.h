@@ -15,6 +15,7 @@ struct Dense {
     int DimY;
     vector<vector<complex<double> > > Data;
 
+    Dense() : DimX(0), DimY(0) { };
     Dense(int dimX, int dimY);
 
     struct matrix_row {
@@ -35,6 +36,8 @@ struct Dense {
     Dense Scale(complex<double> alpha) const;
     Dense Transpose() const;
     Dense HermitianC() const;
+    vector<complex<double> > FlattenedData() const;
+    vector<int> FlattenedDataInt() const;
 
     Dense operator + (const Dense& A) const;
     Dense operator - (const Dense& A) const;
@@ -49,6 +52,5 @@ struct Dense {
 };
 
 Dense operator * (const complex<double>& alpha, const Dense& rhs);
-
 
 #endif //MAIN_DENSE_H

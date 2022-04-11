@@ -4,7 +4,10 @@
 
 #include <iostream>
 #include <cassert>
+#include <cmath>
+
 #include "Dense.h"
+#include "Sparse.h"
 #include "../utils/SignPadding.h"
 
 using namespace std;
@@ -76,6 +79,33 @@ Dense Dense::HermitianC() const {
         }
     }
 
+    return out;
+}
+
+vector<complex<double> > Dense::FlattenedData() const {
+    vector<complex<double> > out;
+    out.resize(DimX * DimY);
+
+    for (int i = 0; i < DimX; i++) {
+        for (int j = 0; j < DimY; j++) {
+            out[i + j * DimX] = Data[i][j];
+        }
+    }
+    
+    return out;
+}
+
+vector<int> Dense::FlattenedDataInt() const {
+    vector<int> out;
+    
+    out.resize(DimX * DimY);
+
+    for (int i = 0; i < DimX; i++) {
+        for (int j = 0; j < DimY; j++) {
+            out[i + j * DimX] = round(abs(Data[i][j]));
+        }
+    }
+    
     return out;
 }
 
