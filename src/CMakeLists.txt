@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(main LANGUAGES CUDA CXX)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
+set (CMAKE_CUDA_FLAGS "${CMAKE_CXX_FLAGS} -G")
 # BOOST SETUP
 # find_package(Boost 1.71.0 COMPONENTS filesystem)
 # set(Boost_USE_STATIC_LIBS OFF)
@@ -14,7 +14,7 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 find_package(CUDA REQUIRED)
 set (CMAKE_CUDA_COMPILER /usr/local/cuda-11.5/bin/nvcc)
 if(NOT DEFINED CMAKE_CUDA_STANDARD)
-    set(CMAKE_CUDA_STANDARD 11)
+    set(CMAKE_CUDA_STANDARD 14)
     set(CMAKE_CUDA_STANDARD_REQUIRED ON)
 endif()
 

@@ -26,6 +26,7 @@ SparseELL ToSparseELL(const Sparse& A) {
 
         // padding with '-1'
         for (int i = row.RowData.size(); i < highestCount; i++) {
+            out.Values.Data[row.Index][i] = 0;
             out.Indices.Data[row.Index][i] = -1;
         }
     }
