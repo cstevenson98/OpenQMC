@@ -11,12 +11,14 @@
 #include "Vect.cuh"
 
 using namespace std;
+using t_cplx = thrust::complex<double>;
+using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
 struct COOTuple {
-    int Coords[2]{0, 0};
-    complex<double> Val;
+    int    Coords[2]{0, 0};
+    t_cplx Val;
 
-    COOTuple(int x, int y, complex<double> val) : Val(val) {
+    COOTuple(int x, int y, t_cplx val) : Val(val) {
       Coords[0] = x; Coords[1] = y;
     };
 };
@@ -38,7 +40,7 @@ struct Sparse {
 
     Sparse(int dimX, int dimY) : DimX(dimX), DimY(dimY) { };
 
-    Sparse Scale(const complex<double> &alpha) const;
+    Sparse Scale(const t_cplx &alpha) const;
     Sparse Add(const Sparse& B) const;
     Sparse RightMult(const Sparse& A) const;
     Sparse Transpose() const;
@@ -49,7 +51,7 @@ struct Sparse {
 
     Sparse operator + (const Sparse& A) const;
     Sparse operator - (const Sparse& A) const;
-    Sparse operator * (const complex<double>& alpha) const;
+    Sparse operator * (const t_cplx& alpha) const;
     Sparse operator * (const Sparse& A) const;
     Sparse operator % (const Sparse& A) const;
 
@@ -67,6 +69,6 @@ vector<CompressedRow> SparseColsCOO(const Sparse& s);
 CompressedRow SparseVectorSum(const CompressedRow& A, const CompressedRow& B);
 complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B);
 
-Sparse operator * (const complex<double>& alpha, const Sparse& rhs);
+Sparse operator * (const t_cplx& alpha, const Sparse& rhs);
 
 #endif //MAIN_SPARSE_CUH

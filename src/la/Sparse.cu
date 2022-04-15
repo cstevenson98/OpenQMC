@@ -6,8 +6,10 @@
 #include "Dense.cuh"
 #include "Sparse.cuh"
 #include "Super.cuh"
+using t_cplx = thrust::complex<double>;
+using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
-Sparse Sparse::Scale(const complex<double> &alpha) const {
+Sparse Sparse::Scale(const t_cplx &alpha) const {
     Sparse out(DimX, DimY);
     out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
@@ -223,7 +225,7 @@ complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B) {
     unsigned int I = A.RowData.size();
     unsigned int J = B.RowData.size();
 
-    complex<double> out = 0;
+    t_cplx out = 0;
     while (true) {
         if (i > I-1 || j > J-1) {
             break;
@@ -281,11 +283,11 @@ Sparse Sparse::operator - (const Sparse &A) const {
     return this->Add(A.Scale(-1));
 }
 
-Sparse Sparse::operator * (const complex<double>& alpha) const {
+Sparse Sparse::operator * (const t_cplx& alpha) const {
     return this->Scale(alpha);
 }
 
-Sparse operator * (const complex<double>& alpha, const Sparse& rhs) {
+Sparse operator * (const t_cplx& alpha, const Sparse& rhs) {
     return rhs*alpha;
 }
 

@@ -9,6 +9,8 @@
 #include <thrust/device_vector.h>
 #include <thrust/complex.h>
 
+#include "../la/SparseELL.cuh"
+
 void xpy_fast(thrust::device_vector<thrust::complex<double>>& X,
               thrust::device_vector<thrust::complex<double>>& Y);
 
@@ -21,5 +23,6 @@ __global__ void spmv_ell_kernel(int num_cols_per_row,
                                 thrust::complex<double> *data,
                                 thrust::complex<double> *x,
                                 thrust::complex<double> *y);
+void SPMV_ELL_CALL(const SparseELL& M, Vect& v);
 
 #endif //MAIN_GPU_CUH

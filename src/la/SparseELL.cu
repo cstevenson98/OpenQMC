@@ -4,6 +4,9 @@
 
 #include "SparseELL.cuh"
 
+using t_cplx = thrust::complex<double>;
+using t_hostVect = thrust::host_vector<thrust::complex<double>>;
+
 SparseELL ToSparseELL(const Sparse& A) {
     auto rows = SparseRowsCOO(A);
 
@@ -40,8 +43,8 @@ Vect SparseELL::VectMult(const Vect &vect) const {
     for (int row = 0; row < vect.Data.size(); ++row) {
         out[row] = 0;
         for (int i = 0; i < EntriesPerRow; i++) {
-            int                  col = floor(Indices.Data[row][i].real());
-            std::complex<double> val = Values.Data[row][i];
+            int    col = floor(Indices.Data[row][i].real());
+            t_cplx val = Values.Data[row][i];
 
             if (col > -1)
                 out.Data[row] += val * vect.Data[col];

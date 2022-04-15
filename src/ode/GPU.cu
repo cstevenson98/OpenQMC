@@ -47,7 +47,7 @@ void saxpy_fast(thrust::complex<double> A,
                       saxpy_functor(A));
 }
 
-void SPMV_ELL_CALL(const SparseELL& M, const Vect& v) {
+void SPMV_ELL_CALL(const SparseELL& M, Vect& v) {
     thrust::device_vector<thrust::complex<double>>  D_M_Values;
     thrust::device_vector<int>                      D_M_Indices;
 
@@ -70,6 +70,7 @@ void SPMV_ELL_CALL(const SparseELL& M, const Vect& v) {
                                             D_xArray,
                                             D_dxArray);
 
+    thrust::copy(D_MdotVect.begin(), D_MdotVect.end(), v.Data.begin());
 }
 
 __global__ void spmv_ell_kernel(const int num_cols_per_row,
@@ -79,12 +80,12 @@ __global__ void spmv_ell_kernel(const int num_cols_per_row,
                                 thrust::complex<double>       *y)
 {
     int row = blockDim.x * blockIdx.x + threadIdx.x ;
-    for (int i = 0; i < num_cols_per_row; i++)
-    {
-        int                     col = indices[i + row * num_cols_per_row];
-        thrust::complex<double> val = data   [i + row * num_cols_per_row];
-
-        if (col > -1)
-            y[row] = y[row] + val * x[col];
+    thrust::complex<double> dot = 0;
+    for ( int n = 0; n < num_cols_per_row ; n ++){
+        int                     col = indices [n + row * num_cols_per_row];
+        thrust::complex<double> val = data [n + row * num_cols_per_row];
+        if( val != 0 && col > -1)
+            dot += val * x [col];
     }
+    y[row] = dot ;
 }

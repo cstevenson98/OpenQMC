@@ -13,8 +13,15 @@ Sparse ElasticChain1D::Dx() {
         }
 
         if (i%2 == 1) {
-            out.Data.emplace_back(i, i-1, -delta - w0);
+            if (i > 2) {
+                out.Data.emplace_back(i, i-3, delta);
+            } else {
+                out.Data.emplace_back(i, 2*N-1, delta);
+            }
+
+            out.Data.emplace_back(i, i-1, -w0);
             out.Data.emplace_back(i, i, -kappa);
+
             if (i < 2*N-1) {
                 out.Data.emplace_back(i, i+1, delta);
             } else {

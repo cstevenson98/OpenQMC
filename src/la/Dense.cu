@@ -11,6 +11,9 @@
 #include "../utils/SignPadding.cuh"
 
 using namespace std;
+using t_cplx = thrust::complex<double>;
+using t_hostVect = thrust::host_vector<thrust::complex<double>>;
+using t_hostVectInt = thrust::host_vector<int>;
 
 Dense::Dense(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
     Data.resize(dimX, vector<complex<double> >(dimY));
@@ -35,7 +38,7 @@ Dense Dense::RightMult(const Dense& A) const {
     Dense out(DimX, A.DimY);
     for (int i = 0; i < DimX; ++i) {
         for (int j = 0; j < DimY; ++j) {
-            complex<double> sum = 0;
+            t_cplx sum = 0;
             for (int k = 0; k < DimY; ++k) {
                 sum += Data[i][k] * A.Data[k][j];
             }
@@ -46,7 +49,7 @@ Dense Dense::RightMult(const Dense& A) const {
     return out;
 }
 
-Dense Dense::Scale(complex<double> alpha) const {
+Dense Dense::Scale(t_cplx alpha) const {
     Dense out(DimX, DimY);
 
     for (int i = 0; i < out.Data.size(); ++i) {
@@ -82,27 +85,27 @@ Dense Dense::HermitianC() const {
     return out;
 }
 
-vector<complex<double> > Dense::FlattenedData() const {
-    vector<complex<double> > out;
+t_hostVect Dense::FlattenedData() const {
+    t_hostVect out;
     out.resize(DimX * DimY);
 
     for (int i = 0; i < DimX; i++) {
         for (int j = 0; j < DimY; j++) {
-            out[i + j * DimX] = Data[i][j];
+            out[j + i * DimY] = Data[i][j];
         }
     }
     
     return out;
 }
 
-vector<int> Dense::FlattenedDataInt() const {
+t_hostVectInt Dense::FlattenedDataInt() const {
     vector<int> out;
     
     out.resize(DimX * DimY);
 
     for (int i = 0; i < DimX; i++) {
         for (int j = 0; j < DimY; j++) {
-            out[i + j * DimX] = round(abs(Data[i][j]));
+            out[j + i * DimY] = round(abs(Data[i][j]));
         }
     }
     
@@ -169,11 +172,11 @@ Dense Dense::operator - (const Dense &A) const {
     return this->Add(A.Scale(-1));
 }
 
-Dense Dense::operator * (const complex<double> &alpha) const {
+Dense Dense::operator * (const t_cplx &alpha) const {
     return this->Scale(alpha);
 }
 
-Dense operator * (const complex<double> &alpha, const Dense& rhs) {
+Dense operator * (const t_cplx &alpha, const Dense& rhs) {
     return rhs*alpha;
 }
 
