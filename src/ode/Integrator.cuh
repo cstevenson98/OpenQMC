@@ -2,14 +2,14 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#ifndef MAIN_INTEGRATOR_H
-#define MAIN_INTEGRATOR_H
+#ifndef MAIN_INTEGRATOR_CUH
+#define MAIN_INTEGRATOR_CUH
 
 #include <utility>
 #include <functional>
 #include <cassert>
 
-#include "../la/Vect.h"
+#include "../la/Vect.cuh"
 
 using namespace std;
 
@@ -36,6 +36,6 @@ public:
     virtual double Step(double step) = 0;
 };
 
-vector<State> SolveIVP(const IVP& ivp, Integrator& solver, double stepsize, double tEnd);
+vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize, double tEnd);
 
-#endif //MAIN_INTEGRATOR_H
+#endif //MAIN_INTEGRATOR_CUH

@@ -3,9 +3,9 @@
 //
 
 #include <algorithm>
-#include "Dense.h"
-#include "Sparse.h"
-#include "Super.h"
+#include "Dense.cuh"
+#include "Sparse.cuh"
+#include "Super.cuh"
 
 Sparse Sparse::Scale(const complex<double> &alpha) const {
     Sparse out(DimX, DimY);

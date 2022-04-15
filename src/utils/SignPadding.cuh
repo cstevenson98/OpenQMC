@@ -2,8 +2,8 @@
 // Created by conor on 09/04/2022.
 //
 
-#ifndef MAIN_SIGNPADDING_H
-#define MAIN_SIGNPADDING_H
+#ifndef MAIN_SIGNPADDING_CUH
+#define MAIN_SIGNPADDING_CUH
 
 
 #include <locale>
@@ -16,4 +16,4 @@ public:
                      double v) const override;
 };
 
-#endif //MAIN_SIGNPADDING_H
+#endif //MAIN_SIGNPADDING_CUH

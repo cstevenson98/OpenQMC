@@ -7,6 +7,7 @@
 #include <thrust/complex.h>
 
 #include "GPU.cuh"
+#include "../la/SparseELL.cuh"
 
 struct xpy_functor {
     xpy_functor() = default;
@@ -46,6 +47,31 @@ void saxpy_fast(thrust::complex<double> A,
                       saxpy_functor(A));
 }
 
+void SPMV_ELL_CALL(const SparseELL& M, const Vect& v) {
+    thrust::device_vector<thrust::complex<double>>  D_M_Values;
+    thrust::device_vector<int>                      D_M_Indices;
+
+    thrust::device_vector<thrust::complex<double>>  D_Vect;
+    thrust::device_vector<thrust::complex<double>>  D_MdotVect;
+
+    D_M_Values  = M.Values.FlattenedData();
+    D_M_Indices = M.Indices.FlattenedDataInt();
+    D_Vect = v.Data;
+    D_MdotVect = v.Data;
+
+    thrust::complex<double>* D_MValuesArray = thrust::raw_pointer_cast( D_M_Values.data() );
+    int*                     D_MIndicesArray = thrust::raw_pointer_cast( D_M_Indices.data() );
+    thrust::complex<double>* D_xArray = thrust::raw_pointer_cast( D_Vect.data() );
+    thrust::complex<double>* D_dxArray = thrust::raw_pointer_cast( D_MdotVect.data() );
+
+    spmv_ell_kernel<<< v.Data.size(), 1 >>>(M.EntriesPerRow,
+                                            D_MIndicesArray,
+                                            D_MValuesArray,
+                                            D_xArray,
+                                            D_dxArray);
+
+}
+
 __global__ void spmv_ell_kernel(const int num_cols_per_row,
                                 const int *indices,
                                 thrust::complex<double> *data,
@@ -58,6 +84,7 @@ __global__ void spmv_ell_kernel(const int num_cols_per_row,
         int                     col = indices[i + row * num_cols_per_row];
         thrust::complex<double> val = data   [i + row * num_cols_per_row];
 
-        y[row] = y[row] + val * x[col];
+        if (col > -1)
+            y[row] = y[row] + val * x[col];
     }
 }

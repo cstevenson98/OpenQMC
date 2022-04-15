@@ -6,9 +6,9 @@
 #include <cassert>
 #include <cmath>
 
-#include "Dense.h"
-#include "Sparse.h"
-#include "../utils/SignPadding.h"
+#include "Dense.cuh"
+#include "Sparse.cuh"
+#include "../utils/SignPadding.cuh"
 
 using namespace std;
 

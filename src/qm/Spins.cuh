@@ -2,10 +2,10 @@
 // Created by conor on 05/04/2022.
 //
 
-#ifndef MAIN_SPINS_H
-#define MAIN_SPINS_H
+#ifndef MAIN_SPINS_CUH
+#define MAIN_SPINS_CUH
 
-#include "../la/Sparse.h"
+#include "../la/Sparse.cuh"
 
 // Defines 2 level systems
 Sparse Identity(unsigned int N);
@@ -24,4 +24,4 @@ Sparse SigmaZ(unsigned int N, unsigned int j);
 Sparse SigmaPlus(unsigned int N, unsigned int j);
 Sparse SigmaMinus(unsigned int N, unsigned int j);
 
-#endif //MAIN_SPINS_H
+#endif //MAIN_SPINS_CUH

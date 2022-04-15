@@ -2,8 +2,8 @@
 // Created by conor on 05/04/2022.
 //
 
-#include "XYZModel.h"
-#include "../qm/Spins.h"
+#include "XYZModel.cuh"
+#include "../qm/Spins.cuh"
 
 Sparse XYZModel::H(bool PBC) const {
     const int size = pow(N, 2);

@@ -2,10 +2,10 @@
 // Created by conor on 05/04/2022.
 //
 
-#ifndef MAIN_XYZMODEL_H
-#define MAIN_XYZMODEL_H
+#ifndef MAIN_XYZMODEL_CUH
+#define MAIN_XYZMODEL_CUH
 
-#include "../la/Sparse.h"
+#include "../la/Sparse.cuh"
 
 // XYZ model of N coupled 2LS
 struct XYZModel {
@@ -22,4 +22,4 @@ struct XYZModel {
     static Sparse Dx(bool PBC);
 };
 
-#endif //MAIN_XYZMODEL_H
+#endif //MAIN_XYZMODEL_CUH

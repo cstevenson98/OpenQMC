@@ -6,10 +6,10 @@
 #include <string>
 #include <iostream>
 
-#include "models/ElasticChain1D.h"
-#include "ode/RK4.h"
-#include "utils/CSV.h"
-#include "la/Vect.h"
+#include "models/ElasticChain1D.cuh"
+#include "ode/RK4.cuh"
+#include "utils/CSV.cuh"
+#include "la/Vect.cuh"
 
 using namespace std;
 

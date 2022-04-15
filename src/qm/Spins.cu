@@ -2,8 +2,8 @@
 // Created by conor on 05/04/2022.
 //
 
-#include "Spins.h"
-#include "../la/Super.h"
+#include "Spins.cuh"
+#include "../la/Super.cuh"
 
 Sparse Identity(unsigned int N) {
     Sparse out(N, N);

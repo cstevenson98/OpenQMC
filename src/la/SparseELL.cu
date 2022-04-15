@@ -2,7 +2,7 @@
 // Created by conor on 11/04/2022.
 //
 
-#include "SparseELL.h"
+#include "SparseELL.cuh"
 
 SparseELL ToSparseELL(const Sparse& A) {
     auto rows = SparseRowsCOO(A);
@@ -31,5 +31,21 @@ SparseELL ToSparseELL(const Sparse& A) {
         }
     }
 
+    return out;
+}
+
+Vect SparseELL::VectMult(const Vect &vect) const {
+    Vect out(vect.Data.size());
+
+    for (int row = 0; row < vect.Data.size(); ++row) {
+        out[row] = 0;
+        for (int i = 0; i < EntriesPerRow; i++) {
+            int                  col = floor(Indices.Data[row][i].real());
+            std::complex<double> val = Values.Data[row][i];
+
+            if (col > -1)
+                out.Data[row] += val * vect.Data[col];
+        }
+    }
     return out;
 }

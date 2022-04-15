@@ -2,11 +2,11 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#include "Integrator.h"
+#include "Integrator.cuh"
 
-vector<State> SolveIVP(const IVP& ivp, Integrator& solver, double stepsize, double tEnd) {
-    double t0 = ivp.t0;
-    Vect   x0 = ivp.y0;
+vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize, double tEnd) {
+    double t0 = T0;
+    Vect   x0 = y0;
 
     unsigned int nx = x0.Data.size();
     Vect         y(nx);

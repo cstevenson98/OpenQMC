@@ -2,13 +2,13 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#ifndef MAIN_SPARSE_H
-#define MAIN_SPARSE_H
+#ifndef MAIN_SPARSE_CUH
+#define MAIN_SPARSE_CUH
 
 #include <complex>
 #include <vector>
-#include "Dense.h"
-#include "Vect.h"
+#include "Dense.cuh"
+#include "Vect.cuh"
 
 using namespace std;
 
@@ -69,4 +69,4 @@ complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B);
 
 Sparse operator * (const complex<double>& alpha, const Sparse& rhs);
 
-#endif //MAIN_SPARSE_H
+#endif //MAIN_SPARSE_CUH

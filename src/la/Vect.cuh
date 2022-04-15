@@ -2,41 +2,46 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#ifndef MAIN_VECT_H
-#define MAIN_VECT_H
+#ifndef MAIN_VECT_CUH
+#define MAIN_VECT_CUH
 
 #include <complex>
 #include <vector>
+#include <thrust/complex.h>
+#include <thrust/host_vector.h>
 
 using namespace std;
+
+using t_cplx = thrust::complex<double>;
+using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
 struct Vect {
     explicit Vect() = default;
     explicit Vect(unsigned int N);
-    explicit Vect(vector<complex<double>> &in);
+    explicit Vect(t_hostVect &in);
 
-    vector<complex<double> > Data;
+    t_hostVect Data;
 
     Vect Add(const Vect& A) const;
     Vect Subtract(const Vect& A) const;
-    Vect Scale(const complex<double>& alpha) const;
-    Vect AddScaledVect(const complex<double>& alpha, const Vect& A) const;
+    Vect Scale(const t_cplx& alpha) const;
+    Vect AddScaledVect(const t_cplx& alpha, const Vect& A) const;
     Vect Conj() const;
     Vect operator + (const Vect& A) const;
     Vect operator - (const Vect& A) const;
-    Vect operator * (const complex<double>& alpha) const;
+    Vect operator * (const t_cplx& alpha) const;
     complex<double> operator [] (unsigned int i) const;
 
     double Dot(const Vect& A) const;
     double Norm() const;
 
-    void Print() const;
+    void Print(unsigned int kind) const;
     void PrintRe() const;
     void PrintIm() const;
     void PrintAbs() const;
 };
 
 // Non-member binary operators
-Vect operator * (const complex<double>& alpha, const Vect& rhs);
+Vect operator * (const t_cplx& alpha, const Vect& rhs);
 
-#endif //MAIN_VECT_H
+#endif //MAIN_VECT_CUH

@@ -38,7 +38,8 @@ target_link_libraries(main utils la qm models ode)
 target_include_directories(main PRIVATE /home/conor/dev/thrust/cmake/)
 
 # ELASTIC
-set(elastic_files elastic.cpp)
+set(elastic_files elastic.cu)
 add_executable(elastic ${elastic_files})
+set_target_properties(main PROPERTIES CUDA_ARCHITECTURES "75")
 target_link_libraries(elastic utils la qm models ode)
 

@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include "Euler.h"
+#include "Euler.cuh"
 
 using namespace std;
 

@@ -1,10 +1,10 @@
 set(qm_source_files
-        Spins.cpp
-        Spins.h
-        ../models/ElasticChain1D.cpp
-        ../models/ElasticChain1D.h
-        ../models/XYZModel.cpp
-        ../models/XYZModel.h
+        Spins.cu
+        Spins.cuh
+        ../models/ElasticChain1D.cu
+        ../models/ElasticChain1D.cuh
+        ../models/XYZModel.cu
+        ../models/XYZModel.cuh
         )
 
 add_library(qm ${qm_source_files})

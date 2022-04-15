@@ -5,7 +5,7 @@
 #include <thrust/host_vector.h>
 
 #include "Euler_GPU.cuh"
-#include "Integrator.h"
+#include "Integrator.cuh"
 #include "GPU.cuh"
 
 Euler_GPU::Euler_GPU(thrust::host_vector<thrust::complex<double> >& y0,
@@ -13,10 +13,11 @@ Euler_GPU::Euler_GPU(thrust::host_vector<thrust::complex<double> >& y0,
                      SparseELL& M,
                      double tol)
                      : Tol(tol),
-                       D_x(y0.size(), 0), D_dx(y0.size(), 0) {
+                       D_x(y0.size(), 0), D_dx(y0.size(), 0){
 
     D_M_Values  = M.Values.FlattenedData();
     D_M_Indices = M.Indices.FlattenedDataInt();
+    n_columns = M.EntriesPerRow;
 
     x = y0;
     thrust::copy(x.begin(), x.end(), D_x.begin());
@@ -38,7 +39,7 @@ double Euler_GPU::Step(double step) {
     thrust::complex<double>* D_xArray = thrust::raw_pointer_cast( D_x.data() );
     thrust::complex<double>* D_dxArray = thrust::raw_pointer_cast( D_dx.data() );
 
-    spmv_ell_kernel<<< x.size(), 1 >>>(1,
+    spmv_ell_kernel<<< x.size(), 1 >>>(n_columns,
                                        D_MIndicesArray, D_MValuesArray,
                                        D_xArray, D_dxArray);
 

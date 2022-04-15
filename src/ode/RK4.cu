@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "RK4.h"
+#include "RK4.cuh"
 
 void RK4::State(struct State &dst) {
     dst.T = t;

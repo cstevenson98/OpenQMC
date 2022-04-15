@@ -1,12 +1,12 @@
 set(ode_source_files
-        Integrator.cpp
-        Integrator.h
-        Euler.cpp
-        Euler.h
+        Integrator.cu
+        Integrator.cuh
+        Euler.cu
+        Euler.cuh
         Euler_GPU.cu
         Euler_GPU.cuh
-        RK4.cpp
-        RK4.h
+        RK4.cu
+        RK4.cuh
         GPU.cu
         GPU.cuh
         )

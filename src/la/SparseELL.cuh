@@ -2,14 +2,14 @@
 // Created by conor on 11/04/2022.
 //
 
-#ifndef MAIN_SPARSEELL_H
-#define MAIN_SPARSEELL_H
+#ifndef MAIN_SPARSEELL_CUH
+#define MAIN_SPARSEELL_CUH
 
 #include <complex>
 #include <vector>
-#include "Vect.h"
-#include "Dense.h"
-#include "Sparse.h"
+#include "Vect.cuh"
+#include "Dense.cuh"
+#include "Sparse.cuh"
 
 struct SparseELL {
     int DimX;
@@ -39,4 +39,4 @@ struct SparseELL {
 
 SparseELL ToSparseELL(const Sparse& A);
 
-#endif //MAIN_SPARSEELL_H
+#endif //MAIN_SPARSEELL_CUH

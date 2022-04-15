@@ -9,8 +9,8 @@
 #include <thrust/complex.h>
 #include <cmath>
 
-#include "Integrator.h"
-#include "../la/SparseELL.h"
+#include "Integrator.cuh"
+#include "../la/SparseELL.cuh"
 
 class Euler_GPU : public Integrator {
     thrust::host_vector<thrust::complex<double> > x, dx;
@@ -20,7 +20,7 @@ class Euler_GPU : public Integrator {
 
     thrust::device_vector<thrust::complex<double> > D_M_Values;
     thrust::device_vector<int>                      D_M_Indices;
-
+    int                                             n_columns;
     thrust::device_vector<thrust::complex<double> > D_x;
     thrust::device_vector<thrust::complex<double> > D_dx;
 

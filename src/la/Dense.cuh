@@ -2,8 +2,8 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#ifndef MAIN_DENSE_H
-#define MAIN_DENSE_H
+#ifndef MAIN_DENSE_CUH
+#define MAIN_DENSE_CUH
 
 #include <vector>
 #include <complex>
@@ -53,4 +53,4 @@ struct Dense {
 
 Dense operator * (const complex<double>& alpha, const Dense& rhs);
 
-#endif //MAIN_DENSE_H
+#endif //MAIN_DENSE_CUH
