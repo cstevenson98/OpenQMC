@@ -5,7 +5,6 @@
 #ifndef MAIN_RK4_CUH
 #define MAIN_RK4_CUH
 
-
 #include "Integrator.cuh"
 
 class RK4 : public Integrator {

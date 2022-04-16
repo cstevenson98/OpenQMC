@@ -7,6 +7,8 @@ set(ode_source_files
         Euler_GPU.cuh
         RK4.cu
         RK4.cuh
+        RK4_GPU.cu
+        RK4_GPU.cuh
         GPU.cu
         GPU.cuh
         )
