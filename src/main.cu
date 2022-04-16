@@ -12,19 +12,20 @@
 #include "ode/RK4.cuh"
 #include "models/ElasticChain1D.cuh"
 #include "utils/CSV.cuh"
+#include "qm/Open.cuh"
+#include "la/Super.cuh"
+#include "models/XYZModel.cuh"
 
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
 #include <thrust/complex.h>
 
-#define N 5000000
+#define N 7
 
-vector<State> SolveIVPGPU(double t0,
-                          thrust::host_vector<thrust::complex<double> >& y0,
-                          Integrator& solver,
-                          double stepsize,
-                          double tEnd,
-                          bool save) 
+using t_hostVect = thrust::host_vector<thrust::complex<double>>;
+
+vector<State> SolveIVPGPU(double t0, t_hostVect& y0, Integrator& solver,
+                          double stepsize, double tEnd, bool save)
 {
     unsigned int nx = y0.size();
     Vect         y(nx);
@@ -54,22 +55,38 @@ vector<State> SolveIVPGPU(double t0,
 
 int main()
 {
-    thrust::host_vector<thrust::complex<double>> D_Yvals(2*N, 0);
+//    t_hostVect D_Yvals(2*N, 0);
+//
+//    for (int i = 0; i < 2*N; ++i) {
+//        D_Yvals[i] = (sin(10.*(i+1)/( (double)(N) ))/2.)
+//                    * sin(10.*(i+1)/( (double)(N) ))/2. / (double)((i+1)/200.);
+//    }
+//
+//    ElasticChain1D chain(N, 10, 0.25, 2);
+//
+//    auto chainDx = chain.Dx();
+//    auto chainDxELL = ToSparseELL(chainDx);
 
-    Vect y0(2*N);
-    for (int i = 0; i < 2*N; ++i) {
-        D_Yvals[i] = sin(5.*i/((double)(N)))/2.;
-        y0.Data[i] = 0;
-    }
-    y0.Data[0] = 1;
+    auto sX = Lindblad(SigmaMinus(2, 1), SigmaPlus(2, 1));
+//    sX.ToDense().PrintRe();
 
-    ElasticChain1D chain(N, 10, 0.25, 1);
+    auto test = (SigmaPlus(3, 0) + SigmaPlus(3, 1));
 
-    auto chainDx = chain.Dx();
-    auto chainDxELL = ToSparseELL(chainDx);
+    test.ToDense().PrintRe();
 
-    Euler_GPU test(D_Yvals, 0, chainDxELL, 1e-1);
-    auto res = SolveIVPGPU(0, D_Yvals, test, 0.01, 10., false);
+    std:cout << test.NNZ() << std::endl;
+
+    XYZModel spinChain(3, 10., 0.);
+//    auto H = spinChain.H(true);
+//    H.ToDense().PrintRe();
+
+//    (ToSuper(SigmaMinus(), SigmaPlus()).Add
+//    (ToSuper(SigmaPlus()*SigmaMinus(), Identity(2)))).ToDense().PrintRe();
+
+//    (SigmaMinus() - SigmaPlus()).ToDense().PrintRe();
+
+//    Euler_GPU test(D_Yvals, 0, chainDxELL, 1e-1);
+//    auto res = SolveIVPGPU(0, D_Yvals, test, 0.01, 10., true);
 //    ToCSV("/home/conor/dev/OpenQMC/data/data.csv", res);
 
     return 0;

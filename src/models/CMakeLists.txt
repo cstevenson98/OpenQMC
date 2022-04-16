@@ -1,8 +1,8 @@
 set(models_source_files
         ElasticChain1D.cu
         ElasticChain1D.cuh
-#        XYZModel.cpp
-#        XYZModel.h
+        XYZModel.cu
+        XYZModel.cuh
         )
 
 add_library(models ${models_source_files})

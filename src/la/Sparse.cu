@@ -25,52 +25,49 @@ Sparse Sparse::Scale(const t_cplx &alpha) const {
 Sparse Sparse::Add(const Sparse& B) const {
     Sparse out(B.DimX, B.DimY);
 
-    auto rowsA = SparseRowsCOO(*this);
-    if (rowsA.empty()) {
+    auto entriesA = this->Data;
+    if (entriesA.empty()) {
         return B;
     }
 
-    auto rowsB = SparseRowsCOO(B);
-    if (rowsB.empty()) {
+    auto entriesB = B.Data;
+    if (entriesB.empty()) {
         return *this;
     }
 
     unsigned int i = 0, j = 0;
-    unsigned int I = rowsA.size();
-    unsigned int J = rowsB.size();
+    unsigned int I = entriesA.size();
+    unsigned int J = entriesB.size();
 
     while (true) {
         if (i > I-1 || j > J-1) {
             break;
         }
 
-        if (rowsA[i].Index == rowsB[j].Index) {
-            auto sumRow = SparseVectorSum(rowsA[i], rowsB[j]);
-            for (auto &elem : sumRow.RowData) {
-                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-            }
+        if (entriesA[i].Coords[1] == entriesB[j].Coords[1]) {
+            out.Data.emplace_back(COOTuple(
+                    entriesA[i].Coords[1], entriesA[i].Coords[1],
+                    entriesA[i].Val + entriesB[j].Val
+            ));
             i++;
             j++;
             continue;
         }
 
-        if (rowsA[i].Index < rowsB[j].Index) {
-            for (auto &elem : rowsA[i].RowData) {
-                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-            }
+        if (entriesA[i].Coords[1] < entriesB[j].Coords[1]) {
+            out.Data.emplace_back(entriesA[i]);
             i++;
             continue;
         }
 
-        if (rowsA[i].Index > rowsB[j].Index) {
-            for (auto &elem : rowsB[j].RowData) {
-                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-            }
+        if (entriesA[i].Coords[1] > entriesB[j].Coords[1]) {
+            out.Data.emplace_back(entriesB[j]);
             j++;
             continue;
         }
-
     }
+
+    out.SortByRow();
 
     return out;
 }

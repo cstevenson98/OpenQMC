@@ -116,3 +116,18 @@ __global__
         y[row] = dot;
     }
 }
+
+struct square
+{
+    __host__ __device__
+    double operator()(const t_cplx& x) const {
+        return abs(x) * abs(x);
+    }
+};
+
+double Norm(const t_devcVect& v) {
+    square               unary_op;
+    thrust::plus<double> binary_op;
+
+    return std::sqrt( thrust::transform_reduce(v.begin(), v.end(), unary_op, 0, binary_op) );
+}

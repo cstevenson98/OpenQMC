@@ -1,10 +1,8 @@
 set(qm_source_files
         Spins.cu
         Spins.cuh
-        ../models/ElasticChain1D.cu
-        ../models/ElasticChain1D.cuh
-        ../models/XYZModel.cu
-        ../models/XYZModel.cuh
+        Open.cu
+        Open.cuh
         )
 
 add_library(qm ${qm_source_files})
