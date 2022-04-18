@@ -6,6 +6,7 @@
 #include "Dense.cuh"
 #include "Sparse.cuh"
 #include "Super.cuh"
+
 using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
@@ -25,49 +26,66 @@ Sparse Sparse::Scale(const t_cplx &alpha) const {
 Sparse Sparse::Add(const Sparse& B) const {
     Sparse out(B.DimX, B.DimY);
 
-    auto entriesA = this->Data;
-    if (entriesA.empty()) {
+    auto rowsA = SparseRowsCOO(*this);
+    if (rowsA.empty()) {
         return B;
     }
 
-    auto entriesB = B.Data;
-    if (entriesB.empty()) {
+    auto rowsB = SparseRowsCOO(B);
+    if (rowsB.empty()) {
         return *this;
     }
 
     unsigned int i = 0, j = 0;
-    unsigned int I = entriesA.size();
-    unsigned int J = entriesB.size();
+    unsigned int I = rowsA.size();
+    unsigned int J = rowsB.size();
 
     while (true) {
         if (i > I-1 || j > J-1) {
             break;
         }
 
-        if (entriesA[i].Coords[1] == entriesB[j].Coords[1]) {
-            out.Data.emplace_back(COOTuple(
-                    entriesA[i].Coords[1], entriesA[i].Coords[1],
-                    entriesA[i].Val + entriesB[j].Val
-            ));
+        if (rowsA[i].Index == rowsB[j].Index) {
+            auto sumRow = SparseVectorSum(rowsA[i], rowsB[j]);
+            for (auto &elem : sumRow.RowData) {
+                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+            }
             i++;
             j++;
             continue;
         }
 
-        if (entriesA[i].Coords[1] < entriesB[j].Coords[1]) {
-            out.Data.emplace_back(entriesA[i]);
+        if (rowsA[i].Index < rowsB[j].Index) {
+            for (auto &elem : rowsA[i].RowData) {
+                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+            }
             i++;
             continue;
         }
 
-        if (entriesA[i].Coords[1] > entriesB[j].Coords[1]) {
-            out.Data.emplace_back(entriesB[j]);
+        if (rowsA[i].Index > rowsB[j].Index) {
+            for (auto &elem : rowsB[j].RowData) {
+                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+            }
             j++;
             continue;
         }
+
     }
 
-    out.SortByRow();
+    // Add anything remaining
+    while (i < I) {
+        for (auto &elem : rowsA[i].RowData) {
+            out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+        }
+        i++;
+    }
+    while (j < J) {
+        for (auto &elem : rowsB[j].RowData) {
+            out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+        }
+        j++;
+    }
 
     return out;
 }
@@ -128,6 +146,10 @@ bool CompareCOORows(COOTuple L, COOTuple R) {
 
 void Sparse::SortByRow() {
     std::sort(Data.begin(), Data.end(), CompareCOORows);
+}
+
+void Sparse::Trim() {
+
 }
 
 Sparse ToSparseCOO(const Dense& d) {
@@ -212,6 +234,16 @@ CompressedRow SparseVectorSum(const CompressedRow &rowA, const CompressedRow &ro
             j++;
             continue;
         }
+    }
+
+    while (i < I) {
+        out.RowData.emplace_back(rowA.RowData[i]);
+        i++;
+    }
+
+    while (j < J) {
+        out.RowData.emplace_back(rowB.RowData[j]);
+        j++;
     }
 
     return out;

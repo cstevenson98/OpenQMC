@@ -51,10 +51,10 @@ struct Dense {
     Dense operator * (const Dense& A) const;
     Dense operator % (const Dense& A) const;
 
-    void Print(unsigned int kind = 0) const;
-    void PrintRe() const;
-    void PrintIm() const;
-    void PrintAbs() const;
+    void Print(unsigned int kind = 0, unsigned int prec = 2) const;
+    void PrintRe(unsigned int prec) const;
+    void PrintIm(unsigned int prec) const;
+    void PrintAbs(unsigned int prec) const;
 };
 
 Dense operator * (const complex<double>& alpha, const Dense& rhs);

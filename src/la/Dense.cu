@@ -112,11 +112,11 @@ t_hostVectInt Dense::FlattenedDataInt() const {
     return out;
 }
 
-void Dense::Print(unsigned int kind) const {
+void Dense::Print(unsigned int kind, unsigned int prec) const {
     string s;
     stringstream stream;
     stream.setf(ios::fixed);
-    stream.precision(2);
+    stream.precision(prec);
 
     stream << " Matrix [" << DimX << " x " << DimY << "]:" << endl;
     for (const auto& X : Data) {
@@ -152,16 +152,16 @@ void Dense::Print(unsigned int kind) const {
     cout << s << endl;
 }
 
-void Dense::PrintRe() const {
-    this->Print(1);
+void Dense::PrintRe(unsigned int prec) const {
+    this->Print(1, prec);
 }
 
-void Dense::PrintIm() const {
-    this->Print(2);
+void Dense::PrintIm(unsigned int prec) const {
+    this->Print(2, prec);
 }
 
-void Dense::PrintAbs() const {
-    this->Print(3);
+void Dense::PrintAbs(unsigned int prec) const {
+    this->Print(3, prec);
 }
 
 Dense Dense::operator + (const Dense &A) const {

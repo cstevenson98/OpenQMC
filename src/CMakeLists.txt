@@ -30,6 +30,9 @@ add_subdirectory(qm)
 add_subdirectory(ode)
 add_subdirectory(models)
 
+# TESTS
+add_subdirectory(Boost_tests)
+
 # MAIN
 set(main_files main.cu)
 add_executable(main ${main_files})

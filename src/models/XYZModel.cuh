@@ -11,15 +11,17 @@
 struct XYZModel {
     unsigned int N;
     double g, Delta;
+    double kappa;
 
-    XYZModel(unsigned int N, double g, double Delta) : N(N), g(g), Delta(Delta) { };
+    XYZModel(unsigned int N, double g, double Delta, double kappa)
+            : N(N), g(g), Delta(Delta), kappa(kappa) { };
 
     // Hamiltonian
     Sparse H(bool PBC) const;
 
     // Derivative of density matrix,
     // with or without dissipator
-    static Sparse Dx(bool PBC);
+    Sparse Dx(bool PBC) const;
 };
 
 #endif //MAIN_XYZMODEL_CUH

@@ -12,3 +12,8 @@ Sparse Lindblad(const Sparse& A, const Sparse& B) {
 
     return 2 * ToSuper(A, B) - ToSuper(BA, id) - ToSuper(id, BA);
 }
+
+Sparse SuperComm(const Sparse& A) {
+    auto id = Identity(A.DimY);
+    return ToSuper(A, id) - ToSuper(id, A);
+}

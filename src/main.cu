@@ -20,38 +20,9 @@
 #include <thrust/device_vector.h>
 #include <thrust/complex.h>
 
-#define N 7
+#define N 2
 
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
-
-vector<State> SolveIVPGPU(double t0, t_hostVect& y0, Integrator& solver,
-                          double stepsize, double tEnd, bool save)
-{
-    unsigned int nx = y0.size();
-    Vect         y(nx);
-    double       t = t0;
-
-    vector<State> results;
-    while (t < tEnd) {
-        State res(t, y, 0.);
-
-        if (t-tEnd > 1e-10){
-            stepsize = min(stepsize, (t-tEnd)*(1+1e-3));
-        }
-
-        stepsize = solver.Step(stepsize);
-        assert(stepsize >= 0);
-
-        if (save) {
-            solver.State(res);
-            results.emplace_back(res);
-        }
-
-        t += stepsize;
-    }
-
-    return results;
-}
 
 int main()
 {
@@ -67,18 +38,15 @@ int main()
 //    auto chainDx = chain.Dx();
 //    auto chainDxELL = ToSparseELL(chainDx);
 
-    auto sX = Lindblad(SigmaMinus(2, 1), SigmaPlus(2, 1));
-//    sX.ToDense().PrintRe();
+    auto sX = Lindblad(SigmaMinus(N, 1), SigmaPlus(N, 1));
+    sX.ToDense().PrintRe(0);
 
-    auto test = (SigmaPlus(3, 0) + SigmaPlus(3, 1));
+    XYZModel spinChain(N, 1., 0., 0.);
+    auto H = spinChain.H(true);
+    H.ToDense().PrintRe(0);
 
-    test.ToDense().PrintRe();
-
-    std:cout << test.NNZ() << std::endl;
-
-    XYZModel spinChain(3, 10., 0.);
-//    auto H = spinChain.H(true);
-//    H.ToDense().PrintRe();
+    auto L = spinChain.Dx(true);
+    L.ToDense().Print(0);
 
 //    (ToSuper(SigmaMinus(), SigmaPlus()).Add
 //    (ToSuper(SigmaPlus()*SigmaMinus(), Identity(2)))).ToDense().PrintRe();

@@ -31,3 +31,32 @@ vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize,
 
     return results;
 }
+
+vector<State> SolveIVPGPU(double t0, t_hostVect& y0, Integrator& solver,
+                          double stepsize, double tEnd, bool save)
+{
+    unsigned int nx = y0.size();
+    Vect         y(nx);
+    double       t = t0;
+
+    vector<State> results;
+    while (t < tEnd) {
+        State res(t, y, 0.);
+
+        if (t-tEnd > 1e-10){
+            stepsize = min(stepsize, (t-tEnd)*(1+1e-3));
+        }
+
+        stepsize = solver.Step(stepsize);
+        assert(stepsize >= 0);
+
+        if (save) {
+            solver.State(res);
+            results.emplace_back(res);
+        }
+
+        t += stepsize;
+    }
+
+    return results;
+}
