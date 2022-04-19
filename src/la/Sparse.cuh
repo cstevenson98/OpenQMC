@@ -23,10 +23,6 @@ struct COOTuple {
     };
 };
 
-bool operator == (const COOTuple& A, const COOTuple& B) {
-    return A.Coords[0] == B.Coords[0] && A.Coords[1] == B.Coords[1] && A.Val == B.Val;
-}
-
 struct CompressedRow {
     int Index;
     vector<COOTuple> RowData;
@@ -67,12 +63,6 @@ struct Sparse {
 
     unsigned int NNZ() const;
 };
-
-bool operator == (const Sparse& A, const Sparse& B) {
-    if (A.DimX != B.DimX || A.DimY != B.DimY) return false;
-
-    return A.Data == B.Data;
-}
 
 Sparse ToSparseCOO(const Dense& d);
 vector<CompressedRow> SparseRowsCOO(const Sparse& s);

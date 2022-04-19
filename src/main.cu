@@ -38,15 +38,28 @@ int main()
 //    auto chainDx = chain.Dx();
 //    auto chainDxELL = ToSparseELL(chainDx);
 
-    auto sX = Lindblad(SigmaMinus(N, 1), SigmaPlus(N, 1));
-    sX.ToDense().PrintRe(0);
 
-    XYZModel spinChain(N, 1., 0., 0.);
-    auto H = spinChain.H(true);
-    H.ToDense().PrintRe(0);
+    auto Sm2 = Kronecker(Identity(2), SigmaMinus());
+    Sm2.ToDense().PrintRe(0);
 
-    auto L = spinChain.Dx(true);
-    L.ToDense().Print(0);
+    auto A = 2*Kronecker(Sm2, Sm2);
+    auto B = Kronecker(Sm2.HermitianC() * Sm2, Identity(4));
+    auto C = Kronecker(Identity(4), Sm2.HermitianC() * Sm2);
+
+    (B+C).ToDense().PrintRe(0);
+    // Try to build lindblad operator manually
+
+//    auto sX = Lindblad(Kronecker(Identity(2), SigmaMinus()));
+//    sX.ToDense().PrintRe(0);
+//
+
+//
+//    XYZModel spinChain(N, 1., 0., 0.);
+//    auto H = spinChain.H(true);
+//    H.ToDense().PrintRe(0);
+//
+//    auto L = spinChain.Dx(true);
+//    L.ToDense().Print(0);
 
 //    (ToSuper(SigmaMinus(), SigmaPlus()).Add
 //    (ToSuper(SigmaPlus()*SigmaMinus(), Identity(2)))).ToDense().PrintRe();

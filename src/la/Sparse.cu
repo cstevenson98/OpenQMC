@@ -26,67 +26,85 @@ Sparse Sparse::Scale(const t_cplx &alpha) const {
 Sparse Sparse::Add(const Sparse& B) const {
     Sparse out(B.DimX, B.DimY);
 
-    auto rowsA = SparseRowsCOO(*this);
-    if (rowsA.empty()) {
-        return B;
-    }
-
-    auto rowsB = SparseRowsCOO(B);
-    if (rowsB.empty()) {
-        return *this;
-    }
-
-    unsigned int i = 0, j = 0;
-    unsigned int I = rowsA.size();
-    unsigned int J = rowsB.size();
-
-    while (true) {
-        if (i > I-1 || j > J-1) {
-            break;
-        }
-
-        if (rowsA[i].Index == rowsB[j].Index) {
-            auto sumRow = SparseVectorSum(rowsA[i], rowsB[j]);
-            for (auto &elem : sumRow.RowData) {
-                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-            }
+    int i = 0;
+    int I = B.Data.size();
+    for (auto elemA : Data) {
+        while (i < I-1 && B.Data[i].Coords[0] != elemA.Coords[0] && B.Data[i].Coords[1] != elemA.Coords[1]) {
+            out.Data.emplace_back(COOTuple(B.Data[i].Coords[0], B.Data[i].Coords[1],
+                                           B.Data[i].Val));
             i++;
-            j++;
-            continue;
         }
 
-        if (rowsA[i].Index < rowsB[j].Index) {
-            for (auto &elem : rowsA[i].RowData) {
-                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-            }
-            i++;
-            continue;
+        if (i < I && B.Data[i].Coords[0] == elemA.Coords[0] && B.Data[i].Coords[1] == elemA.Coords[1]) {
+            out.Data.emplace_back(COOTuple(elemA.Coords[0], elemA.Coords[1],
+                                           elemA.Val + B.Data[i].Val));
+        } else {
+            out.Data.emplace_back(COOTuple(elemA.Coords[0], elemA.Coords[1],
+                                           B.Data[i].Val));
         }
-
-        if (rowsA[i].Index > rowsB[j].Index) {
-            for (auto &elem : rowsB[j].RowData) {
-                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-            }
-            j++;
-            continue;
-        }
-
     }
 
-    // Add anything remaining
-    while (i < I) {
-        for (auto &elem : rowsA[i].RowData) {
-            out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-        }
-        i++;
-    }
-    while (j < J) {
-        for (auto &elem : rowsB[j].RowData) {
-            out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
-        }
-        j++;
-    }
-
+//    auto rowsA = SparseRowsCOO(*this);
+//    if (rowsA.empty()) {
+//        return B;
+//    }
+//
+//    auto rowsB = SparseRowsCOO(B);
+//    if (rowsB.empty()) {
+//        return *this;
+//    }
+//
+//    unsigned int i = 0, j = 0;
+//    unsigned int I = rowsA.size();
+//    unsigned int J = rowsB.size();
+//
+//    while (true) {
+//        if (i > I-1 || j > J-1) {
+//            break;
+//        }
+//
+//        if (rowsA[i].Index == rowsB[j].Index) {
+//            auto sumRow = SparseVectorSum(rowsA[i], rowsB[j]);
+//            for (auto &elem : sumRow.RowData) {
+//                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+//            }
+//            i++;
+//            j++;
+//            continue;
+//        }
+//
+//        if (rowsA[i].Index < rowsB[j].Index) {
+//            for (auto &elem : rowsA[i].RowData) {
+//                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+//            }
+//            i++;
+//            continue;
+//        }
+//
+//        if (rowsA[i].Index > rowsB[j].Index) {
+//            for (auto &elem : rowsB[j].RowData) {
+//                out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+//            }
+//            j++;
+//            continue;
+//        }
+//
+//    }
+//
+//    // Add anything remaining
+//    while (i < I) {
+//        for (auto &elem : rowsA[i].RowData) {
+//            out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+//        }
+//        i++;
+//    }
+//    while (j < J) {
+//        for (auto &elem : rowsB[j].RowData) {
+//            out.Data.emplace_back(elem.Coords[0], elem.Coords[1], elem.Val);
+//        }
+//        j++;
+//    }
+//
     return out;
 }
 

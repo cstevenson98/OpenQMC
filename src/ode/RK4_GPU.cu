@@ -38,24 +38,6 @@ double RK4_GPU::Step(double step) {
     t_cplx* D_MValues_  = thrust::raw_pointer_cast( D_M_Values.data() );
     int*    D_MIndices_ = thrust::raw_pointer_cast( D_M_Indices.data() );
 
-    // TODO combine to one
-    //  Func(k1, t, x);
-//    spmv_ell_kernel<<< x.size(), 1 >>>(
-//            n_columns, D_MIndices_, D_MValues_, D_x_, k1_);
-
-    //  k1 = k1.Scale(step);
-    say_fast((t_cplx)(step), k1);
-    // TODO end
-
-//    Func(k2, t + step/2., x.AddScaledVect(0.5, k1));
-
-//    k2 = k2.Scale(step);
-//
-//    Vect y0(x.Data.size());
-//    Vect y1(y0.Data.size());
-//
-//    y0 = x.Add(k2);
-//
-//    double nextStepSize = step;
+    return 0;
 }
 

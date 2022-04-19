@@ -21,9 +21,7 @@ Sparse Kronecker(const Sparse& A, const Sparse& B) {
 }
 
 Sparse Tensor(const vector<Sparse>& matrices) {
-    Sparse out(matrices[0].DimX, matrices[0].DimY);
-
-    out.Data = matrices[0].Data;
+    Sparse out = matrices[0];
 
     for (int i = 1; i < matrices.size(); ++i) {
         out = Kronecker(out, matrices[i]);
@@ -33,6 +31,5 @@ Sparse Tensor(const vector<Sparse>& matrices) {
 }
 
 Sparse ToSuper(const Sparse& A, const Sparse& B) {
-    Sparse out = Kronecker(B.Transpose(), A);
-    return out;
+    return Kronecker(B.Transpose(), A);
 }
