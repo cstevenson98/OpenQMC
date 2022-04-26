@@ -4,6 +4,7 @@ from qutip import lindblad_dissipator, fock, tensor, mesolve, steadystate, to_su
     sprepost
 
 from fermiChain import fermi_tight_binding, fermi_lower
+from fermionOperators import current_i
 from spinOperators import identity_n
 
 
@@ -19,29 +20,22 @@ def supercomm(H, n):
 if __name__ == '__main__':
     n = 4
 
-    H = fermi_tight_binding(n, 1., 2., 5.)
+    H = fermi_tight_binding(n, 20., 1., 1.)
     c = [fermi_lower(n, i) for i in range(n)]
 
-    times = np.linspace(0.0, 20.0, 2000)
+    times = np.linspace(0.0, 200.0, 2000)
     psi0 = tensor([fock(2, 0) for i in range(n)]) + tensor([fock(2, 1) for i in range(n)])
     psi0 /= psi0.norm()
 
-    collapse_ops = [c[0].dag(), c[3]]
-
-    # Pumping site-1, sink site-N
-    L1 = lindblad_dissipator(c[0].dag(), c[0].dag())
-    L4 = lindblad_dissipator(c[3], c[3])
+    collapse_ops = [.5 * c[0].dag(), .75 * c[3]]
 
     rho_ss = steadystate(H, collapse_ops, method='power', use_rcm=True)
 
-    print(c[0].dag() * c[0])
+    print('total current', expect(current_i(n, 0)+current_i(n, 1)+current_i(n, 2), rho_ss))
 
-    result = mesolve(H, psi0, times, [L1, L4], [c[0].dag()*c[0], c[1].dag()*c[1], c[2].dag()*c[2], c[3].dag()*c[3]])
+    result = mesolve(H, psi0, times, collapse_ops, [current_i(n, 0) + current_i(n, 1) + current_i(n, 2)])
 
     plt.figure()
     plt.plot(times, result.expect[0])
-    plt.plot(times, result.expect[1])
-    plt.plot(times, result.expect[2])
-    plt.plot(times, result.expect[3])
 
     plt.show()
