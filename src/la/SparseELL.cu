@@ -2,6 +2,7 @@
 // Created by conor on 11/04/2022.
 //
 
+#include "Sparse.cuh"
 #include "SparseELL.cuh"
 
 using t_cplx = thrust::complex<double>;

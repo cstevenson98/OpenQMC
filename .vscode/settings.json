@@ -1,5 +1,4 @@
 {
-    "cmake.sourceDirectory": "${workspaceFolder}/src",
     "files.associations": {
         "complex": "cpp",
         "cmath": "cpp",
@@ -9,5 +8,6 @@
         "initializer_list": "cpp",
         "utility": "cpp",
         "valarray": "cpp"
-    }
+    },
+    "clangd.arguments": ["--compile-commands-dir=${workspaceFolder}/build/Debug"],
 }

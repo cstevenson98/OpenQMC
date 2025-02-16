@@ -6,7 +6,6 @@
 #define MAIN_VECT_CUH
 
 #include <complex>
-#include <vector>
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>
 

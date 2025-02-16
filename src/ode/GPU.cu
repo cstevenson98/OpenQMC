@@ -129,5 +129,6 @@ double Norm(const t_devcVect& v) {
     square               unary_op;
     thrust::plus<double> binary_op;
 
-    return std::sqrt( thrust::transform_reduce(v.begin(), v.end(), unary_op, 0, binary_op) );
+    return 0;
+    // return std::sqrt( thrust::transform_reduce(v.begin(), v.end(), unary_op, 0, binary_op) );
 }
