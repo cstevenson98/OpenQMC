@@ -6,7 +6,7 @@
 #define MAIN_EULER_CUH
 
 #include <functional>
-#include "Integrator.cuh"
+#include "ode/Integrator.cuh"
 
 class Euler : public Integrator {
     Vect x, dx;

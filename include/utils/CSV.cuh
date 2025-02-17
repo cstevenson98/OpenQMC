@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "../ode/Integrator.cuh"
+#include "ode/Integrator.cuh"
 using namespace std;
 
 void ToCSV(const string& filename, const vector<State>& results);

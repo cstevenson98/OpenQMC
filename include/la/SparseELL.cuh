@@ -5,8 +5,6 @@
 #ifndef MAIN_SPARSEELL_CUH
 #define MAIN_SPARSEELL_CUH
 
-#include <complex>
-#include <vector>
 #include "Vect.cuh"
 #include "Dense.cuh"
 #include "Sparse.cuh"

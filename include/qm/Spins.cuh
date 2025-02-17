@@ -5,7 +5,7 @@
 #ifndef MAIN_SPINS_CUH
 #define MAIN_SPINS_CUH
 
-#include "../la/Sparse.cuh"
+#include "la/Sparse.cuh"
 
 // Defines 2 level systems
 Sparse Identity(unsigned int N);

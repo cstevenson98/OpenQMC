@@ -9,7 +9,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/complex.h>
 
-#include "../la/SparseELL.cuh"
+#include "la/SparseELL.cuh"
 
 using t_cplx        = thrust::complex<double>;
 using t_hostVect    = thrust::host_vector<thrust::complex<double>>;

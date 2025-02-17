@@ -9,7 +9,7 @@
 #include <functional>
 #include <utility>
 
-#include "../la/Vect.cuh"
+#include "la/Vect.cuh"
 
 using namespace std;
 

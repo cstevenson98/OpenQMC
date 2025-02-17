@@ -5,7 +5,6 @@
 #ifndef MAIN_DENSE_CUH
 #define MAIN_DENSE_CUH
 
-#include <vector>
 #include <complex>
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>

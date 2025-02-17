@@ -8,7 +8,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/complex.h>
 
-#include "Integrator.cuh"
+#include "ode/Integrator.cuh"
 #include "la/SparseELL.cuh"
 
 using t_cplx        = thrust::complex<double>;

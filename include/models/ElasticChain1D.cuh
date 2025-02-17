@@ -6,7 +6,7 @@
 #define MAIN_ELASTICCHAIN1D_CUH
 
 
-#include "../la/Sparse.cuh"
+#include "la/Sparse.cuh"
 
 class ElasticChain1D {
     int N;

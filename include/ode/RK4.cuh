@@ -5,7 +5,7 @@
 #ifndef MAIN_RK4_CUH
 #define MAIN_RK4_CUH
 
-#include "Integrator.cuh"
+#include "ode/Integrator.cuh"
 
 class RK4 : public Integrator {
     Vect x, k1, k2, k3, k4;
