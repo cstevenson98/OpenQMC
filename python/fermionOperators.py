@@ -1,3 +1,7 @@
+##
+## Copyright (C) 2025 Conor Stevenson
+## Licensed under the GNU General Public License v3.0
+##
 from functools import reduce
 
 from spinOperators import sigmaz_site, identity_n, sigmam_site

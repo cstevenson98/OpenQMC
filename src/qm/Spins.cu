@@ -1,6 +1,8 @@
-////
-//// Created by conor on 05/04/2022.
-////
+//
+// Copyright (C) 2025 Conor Stevenson
+// Licensed under the GNU General Public License v3.0
+// Created by conor on 05/04/2022.
+//
 
 #include "qm/Spins.cuh"
 #include "la/Super.cuh"

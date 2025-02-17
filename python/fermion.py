@@ -1,3 +1,7 @@
+##
+## Copyright (C) 2025 Conor Stevenson
+## Licensed under the GNU General Public License v3.0
+##
 import numpy as np
 from matplotlib import pyplot as plt
 from qutip import lindblad_dissipator, fock, tensor, mesolve, steadystate, to_super, expect, operator_to_vector, \

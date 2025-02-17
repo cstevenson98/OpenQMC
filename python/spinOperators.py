@@ -1,3 +1,7 @@
+##
+## Copyright (C) 2025 Conor Stevenson
+## Licensed under the GNU General Public License v3.0
+##
 from qutip import qeye, sigmax, tensor, sigmay, sigmaz, sigmap, sigmam, qzero
 
 

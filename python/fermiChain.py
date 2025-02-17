@@ -1,3 +1,8 @@
+##
+## Copyright (C) 2025 Conor Stevenson
+## Licensed under the GNU General Public License v3.0
+##
+
 from functools import reduce
 
 from fermionOperators import fermi_lower

@@ -1,5 +1,7 @@
 //
-// Created by Conor Stevenson on 03/04/2022.
+// Copyright (C) 2025 Conor Stevenson
+// Licensed under the GNU General Public License v3.0
+// Created by Conor Stevenson on 04/04/2022.
 //
 
 #include "models/ElasticChain1D.cuh"
@@ -20,6 +22,8 @@ using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
 int main()
 {
+
+
    t_hostVect D_Yvals(2*N, 0);
 
    for (int i = 0; i < 2*N; ++i) {

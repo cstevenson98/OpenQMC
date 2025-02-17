@@ -1,4 +1,6 @@
 //
+// Copyright (C) 2025 Conor Stevenson
+// Licensed under the GNU General Public License v3.0
 // Created by Conor Stevenson on 03/04/2022.
 //
 #include <iostream>
