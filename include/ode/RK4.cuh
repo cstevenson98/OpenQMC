@@ -16,7 +16,7 @@ class RK4 : public Integrator {
     double Err, Tol;
 
 public:
-    RK4(Vect& y0, double t0, function<void(Vect& dy, double t, const Vect& y)> func, double tol) 
+    RK4(Vect& y0, double t0, std::function<void(Vect& dy, double t, const Vect& y)> func, double tol) 
     : Tol(tol) 
     {
         const unsigned int N = y0.Data.size();

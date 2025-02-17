@@ -9,12 +9,8 @@
 
 #include <complex>
 #include <vector>
-#include "Dense.cuh"
-#include "Vect.cuh"
-
-using namespace std;
-using t_cplx = thrust::complex<double>;
-using t_hostVect = thrust::host_vector<thrust::complex<double>>;
+#include "la/Dense.cuh"
+#include "la/Vect.cuh"
 
 struct COOTuple {
     int    Coords[2]{0, 0};
@@ -27,10 +23,10 @@ struct COOTuple {
 
 struct CompressedRow {
     int Index;
-    vector<COOTuple> RowData;
+    std::vector<COOTuple> RowData;
 
     explicit CompressedRow(int index) : Index(index) { };
-    CompressedRow(int index, const vector<COOTuple>& rowData) : Index(index) {
+    CompressedRow(int index, const std::vector<COOTuple>& rowData) : Index(index) {
        RowData = rowData;
     };
 };
@@ -67,11 +63,11 @@ struct Sparse {
 };
 
 Sparse ToSparseCOO(const Dense& d);
-vector<CompressedRow> SparseRowsCOO(const Sparse& s);
-vector<CompressedRow> SparseColsCOO(const Sparse& s);
+std::vector<CompressedRow> SparseRowsCOO(const Sparse& s);
+std::vector<CompressedRow> SparseColsCOO(const Sparse& s);
 CompressedRow SparseVectorSum(const CompressedRow& A, const CompressedRow& B);
-complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B);
+std::complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B);
 
-Sparse operator * (const t_cplx& alpha, const Sparse& rhs);
+Sparse operator * (const std::complex<double>& alpha, const Sparse& rhs);
 
 #endif //MAIN_SPARSE_CUH

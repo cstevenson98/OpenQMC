@@ -10,7 +10,6 @@
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>
 
-using namespace std;
 using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
@@ -100,22 +99,22 @@ Vect operator*(const t_cplx& alpha, const Vect& rhs) {
     return rhs*alpha;
 }
 
-complex<double> Vect::operator[](unsigned int i) const {
+std::complex<double> Vect::operator[](unsigned int i) const {
     return this->Data[i];
 }
 
 void Vect::Print(unsigned int kind) const {
-    string s;
-    stringstream stream;
-    stream.setf(ios::fixed);
+    std::string s;
+    std::stringstream stream;
+    stream.setf(std::ios::fixed);
     stream.precision(2);
 
-    stream << " Vector [" << Data.size() << " x " << 1 << "]:" << endl;
+    stream << " Vector [" << Data.size() << " x " << 1 << "]:" << std::endl;
     for (const auto& X : Data) {
         stream << "   ";
-            string spaceCharRe = !std::signbit(X.real()) ? " " : "";
-            string spaceCharIm = !std::signbit(X.imag()) ? " " : "";
-            string spaceCharAbs = !std::signbit(X.imag()) ? " + " : " - ";
+            std::string spaceCharRe = !std::signbit(X.real()) ? " " : "";
+            std::string spaceCharIm = !std::signbit(X.imag()) ? " " : "";
+            std::string spaceCharAbs = !std::signbit(X.imag()) ? " + " : " - ";
 
             switch (kind) {
                 case 0: // re + im
@@ -133,13 +132,13 @@ void Vect::Print(unsigned int kind) const {
                 default:
                     stream << "[e]";
             }
-        stream << endl;
+        stream << std::endl;
     }
 
     s = stream.str();
 
-    cout.imbue(locale(cout.getloc(), new SignPadding));
-    cout << s << endl;
+    std::cout.imbue(std::locale(std::cout.getloc(), new SignPadding));
+    std::cout << s << std::endl;
 }
 
 void Vect::PrintRe() const {

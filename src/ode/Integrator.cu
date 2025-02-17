@@ -6,7 +6,7 @@
 
 #include "ode/Integrator.cuh"
 
-vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize, double tEnd) {
+std::vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize, double tEnd) {
     double t0 = T0;
     Vect   x0 = y0;
 
@@ -15,12 +15,12 @@ vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize,
 
     double t = t0;
 
-    vector<State> results;
+    std::vector<State> results;
     while (t < tEnd) {
         State res(t, y, 0.);
 
         if (t-tEnd > 1e-10){
-            stepsize = min(stepsize, (t-tEnd)*(1+1e-3));
+            stepsize = std::min(stepsize, (t-tEnd)*(1+1e-3));
         }
 
         stepsize = solver.Step(stepsize);
@@ -34,19 +34,19 @@ vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize,
     return results;
 }
 
-vector<State> SolveIVPGPU(double t0, t_hostVect& y0, Integrator& solver,
+std::vector<State> SolveIVPGPU(double t0, t_hostVect& y0, Integrator& solver,
                           double stepsize, double tEnd, bool save)
 {
     unsigned int nx = y0.size();
     Vect         y(nx);
     double       t = t0;
 
-    vector<State> results;
+    std::vector<State> results;
     while (t < tEnd) {
         State res(t, y, 0.);
 
         if (t-tEnd > 1e-10){
-            stepsize = min(stepsize, (t-tEnd)*(1+1e-3));
+            stepsize = std::min(stepsize, (t-tEnd)*(1+1e-3));
         }
 
         stepsize = solver.Step(stepsize);

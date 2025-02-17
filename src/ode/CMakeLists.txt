@@ -5,6 +5,7 @@ file(GLOB_RECURSE ode_headers "${PROJECT_SOURCE_DIR}/include/*.h" "${PROJECT_SOU
 add_library(${ode_lib} ${ode_sources} ${ode_headers})
 
 target_link_libraries(${ode_lib} ${la_lib})
+set_property(TARGET ${ode_lib} PROPERTY CUDA_ARCHITECTURES native)
 
 #include all headers in the include directory
 target_include_directories(${ode_lib} PUBLIC "${PROJECT_SOURCE_DIR}/include")

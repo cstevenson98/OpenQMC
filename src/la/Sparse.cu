@@ -186,9 +186,9 @@ Sparse ToSparseCOO(const Dense& d) {
     return out;
 }
 
-vector<CompressedRow> SparseRowsCOO(const Sparse& s) {
-    vector<CompressedRow> sRows;
-    vector<COOTuple> rowData;
+std::vector<CompressedRow> SparseRowsCOO(const Sparse& s) {
+    std::vector<CompressedRow> sRows;
+    std::vector<COOTuple> rowData;
 
     int index = 0;
     for (auto data : s.Data) {
@@ -216,7 +216,7 @@ vector<CompressedRow> SparseRowsCOO(const Sparse& s) {
     return sRows;
 }
 
-vector<CompressedRow> SparseColsCOO(const Sparse& s) {
+std::vector<CompressedRow> SparseColsCOO(const Sparse& s) {
     Sparse sT = s.Transpose();
 
     return SparseRowsCOO(sT);
@@ -269,7 +269,7 @@ CompressedRow SparseVectorSum(const CompressedRow &rowA, const CompressedRow &ro
     return out;
 }
 
-complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B) {
+std::complex<double> SparseDot(const CompressedRow& A, const CompressedRow& B) {
     unsigned int i = 0, j = 0;
     unsigned int I = A.RowData.size();
     unsigned int J = B.RowData.size();
@@ -312,7 +312,7 @@ Dense Sparse::ToDense() {
 }
 
 Vect Sparse::VectMult(const Vect &vect) const {
-    vector<CompressedRow> sRows = SparseRowsCOO(*this);
+    std::vector<CompressedRow> sRows = SparseRowsCOO(*this);
 
     Vect out(vect.Data.size());
     for (const auto& row : sRows) {
@@ -336,7 +336,7 @@ Sparse Sparse::operator * (const t_cplx& alpha) const {
     return this->Scale(alpha);
 }
 
-Sparse operator * (const t_cplx& alpha, const Sparse& rhs) {
+Sparse operator * (const std::complex<double>& alpha, const Sparse& rhs) {
     return rhs*alpha;
 }
 

@@ -19,7 +19,7 @@ Sparse Identity(unsigned int N) {
 Sparse SigmaX() {
     Dense out(2, 2);
 
-    vector<vector<complex<double>>> sX = {{0,1},{1,0}};
+    std::vector<std::vector<std::complex<double>>> sX = {{0,1},{1,0}};
     out.Data = sX;
 
     return ToSparseCOO(out);
@@ -28,7 +28,7 @@ Sparse SigmaX() {
 Sparse SigmaY() {
     Dense out(2, 2);
 
-    vector<vector<complex<double>>> sY = {{0, {0,-1}}, {{0, 1}, 0}};
+    std::vector<std::vector<std::complex<double>>> sY = {{0, {0,-1}}, {{0, 1}, 0}};
     out.Data = sY;
 
     return ToSparseCOO(out);
@@ -37,7 +37,7 @@ Sparse SigmaY() {
 Sparse SigmaZ() {
     Dense out(2, 2);
 
-    vector<vector<complex<double>>> sZ = {{1, 0}, {0, -1}};
+    std::vector<std::vector<std::complex<double>>> sZ = {{1, 0}, {0, -1}};
     out.Data = sZ;
 
     return ToSparseCOO(out);
@@ -46,7 +46,7 @@ Sparse SigmaZ() {
 Sparse SigmaPlus() {
     Dense out(2, 2);
 
-    vector<vector<complex<double>>> sP = {{0, 1}, {0, 0}};
+    std::vector<std::vector<std::complex<double>>> sP = {{0, 1}, {0, 0}};
     out.Data = sP;
 
     return ToSparseCOO(out);
@@ -55,14 +55,14 @@ Sparse SigmaPlus() {
 Sparse SigmaMinus() {
     Dense out(2, 2);
 
-    vector<vector<complex<double>>> sM = {{0, 0}, {1, 0}};
+    std::vector<std::vector<std::complex<double>>> sM = {{0, 0}, {1, 0}};
     out.Data = sM;
 
     return ToSparseCOO(out);
 }
 
 Sparse SigmaX(unsigned int N, unsigned int j) {
-    vector<Sparse> operators;
+    std::vector<Sparse> operators;
 
     for (int i = 0; i < N; ++i) {
         if (i == j) {
@@ -76,7 +76,7 @@ Sparse SigmaX(unsigned int N, unsigned int j) {
 }
 
 Sparse SigmaY(unsigned int N, unsigned int j) {
-    vector<Sparse> operators;
+    std::vector<Sparse> operators;
 
     for (int i = 0; i < N; ++i) {
         if (i == j) {
@@ -90,7 +90,7 @@ Sparse SigmaY(unsigned int N, unsigned int j) {
 }
 
 Sparse SigmaZ(unsigned int N, unsigned int j) {
-    vector<Sparse> operators;
+    std::vector<Sparse> operators;
 
     for (int i = 0; i < N; ++i) {
         if (i == j) {
@@ -104,7 +104,7 @@ Sparse SigmaZ(unsigned int N, unsigned int j) {
 }
 
 Sparse SigmaPlus(unsigned int N, unsigned int j) {
-    vector<Sparse> operators;
+    std::vector<Sparse> operators;
 
     for (int i = 0; i < N; ++i) {
         if (i == j) {
@@ -118,7 +118,7 @@ Sparse SigmaPlus(unsigned int N, unsigned int j) {
 }
 
 Sparse SigmaMinus(unsigned int N, unsigned int j) {
-    vector<Sparse> operators;
+    std::vector<Sparse> operators;
 
     for (int i = 0; i < N; ++i) {
         if (i == j) {

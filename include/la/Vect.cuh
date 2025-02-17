@@ -11,8 +11,6 @@
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>
 
-using namespace std;
-
 using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
@@ -31,7 +29,7 @@ struct Vect {
     Vect operator + (const Vect& A) const;
     Vect operator - (const Vect& A) const;
     Vect operator * (const t_cplx& alpha) const;
-    complex<double> operator [] (unsigned int i) const;
+    std::complex<double> operator [] (unsigned int i) const;
 
     double Dot(const Vect& A) const;
     double Norm() const;

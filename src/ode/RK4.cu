@@ -54,7 +54,7 @@ double RK4::Step(double step) {
 
         err1 = y1.Subtract(y0).Norm();
 
-        nextStepSize = 0.9 * nextStepSize * min(max(sqrt(Tol/(2*sqrt(err1*err1))), 0.3), 2.);
+        nextStepSize = 0.9 * nextStepSize * std::min(std::max(std::sqrt(Tol/(2*std::sqrt(err1*err1))), 0.3), 2.);
 
         if (err1 >= Tol) {
             y0 = y1;

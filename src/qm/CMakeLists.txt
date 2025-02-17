@@ -4,6 +4,7 @@ file(GLOB_RECURSE qm_headers "${PROJECT_SOURCE_DIR}/include/*.h" "${PROJECT_SOUR
 add_library(${qm_lib} ${qm_sources} ${qm_headers})
 
 target_link_libraries(${qm_lib} ${la_lib})
+set_property(TARGET ${qm_lib} PROPERTY CUDA_ARCHITECTURES native)
 
 #include all headers in the include directory
 target_include_directories(${qm_lib} PUBLIC "${PROJECT_SOURCE_DIR}/include")

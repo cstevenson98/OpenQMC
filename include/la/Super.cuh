@@ -7,10 +7,10 @@
 #ifndef MAIN_SUPER_CUH
 #define MAIN_SUPER_CUH
 
-#include "Sparse.cuh"
+#include "la/Sparse.cuh"
 
 Sparse Kronecker(const Sparse& A, const Sparse& B);
-Sparse Tensor(const vector<Sparse>& matrices);
+Sparse Tensor(const std::vector<Sparse>& matrices);
 Sparse ToSuper(const Sparse& A, const Sparse& B);
 
 #endif //MAIN_SUPER_CUH

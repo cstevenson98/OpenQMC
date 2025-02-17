@@ -11,8 +11,7 @@
 #include <vector>
 
 #include "ode/Integrator.cuh"
-using namespace std;
 
-void ToCSV(const string& filename, const vector<State>& results);
+void ToCSV(const std::string& filename, const std::vector<State>& results);
 
 #endif //MAIN_CSV_CUH

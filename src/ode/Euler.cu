@@ -8,8 +8,6 @@
 #include <algorithm>
 #include "ode/Euler.cuh"
 
-using namespace std;
-
 void Euler::State(struct State &dst) {
     dst.T = t;
     dst.Y = x;
@@ -36,7 +34,7 @@ double Euler::Step(double step) {
         y1 = x.AddScaledVect(nextStepSize/2., dx);
         err1 = y1.Subtract(y0).Norm();
 
-        nextStepSize = 0.9 * nextStepSize * min(max(sqrt(Tol/(2*sqrt(err1*err1))), 0.3), 2.);
+        nextStepSize = 0.9 * nextStepSize * std::min(std::max(sqrt(Tol/(2*sqrt(err1*err1))), 0.3), 2.);
 
         if (err1 >= Tol) {
             y0 = y1;

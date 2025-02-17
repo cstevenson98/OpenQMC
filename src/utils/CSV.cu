@@ -9,7 +9,7 @@
 #include "utils/CSV.cuh"
 #include "ode/Integrator.cuh"
 
-void ToCSV(const std::string& filename, const vector<State>& results) {
+void ToCSV(const std::string& filename, const std::vector<State>& results) {
     std::ofstream myfile;
     myfile.open(filename);
     for (const auto& r : results) {

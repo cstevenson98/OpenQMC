@@ -22,7 +22,7 @@ Sparse Kronecker(const Sparse& A, const Sparse& B) {
     return out;
 }
 
-Sparse Tensor(const vector<Sparse>& matrices) {
+Sparse Tensor(const std::vector<Sparse>& matrices) {
     Sparse out = matrices[0];
 
     for (int i = 1; i < matrices.size(); ++i) {

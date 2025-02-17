@@ -11,7 +11,6 @@
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>
 
-using namespace std;
 using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 using t_hostMat = thrust::host_vector<thrust::host_vector<thrust::complex<double>>>;
@@ -29,7 +28,7 @@ struct Dense {
         t_hostVect& row;
         explicit matrix_row(t_hostVect& r) : row(r) { }
 
-        complex<double> operator[](int y) {
+        std::complex<double> operator[](int y) {
             return row[y];
         }
     };
@@ -58,6 +57,6 @@ struct Dense {
     void PrintAbs(unsigned int prec) const;
 };
 
-Dense operator * (const complex<double>& alpha, const Dense& rhs);
+Dense operator * (const std::complex<double>& alpha, const Dense& rhs);
 
 #endif //MAIN_DENSE_CUH

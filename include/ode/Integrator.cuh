@@ -13,14 +13,12 @@
 
 #include "la/Vect.cuh"
 
-using namespace std;
-
 struct IVP {
   double t0;
   Vect y0;
-  function<void(Vect &dy, double t, const Vect &y)> Func;
+  std::function<void(Vect &dy, double t, const Vect &y)> Func;
 
-  IVP(double t0, Vect y0, function<void(Vect &dy, double t, const Vect &y)> f)
+  IVP(double t0, Vect y0, std::function<void(Vect &dy, double t, const Vect &y)> f)
       : t0(t0), y0(std::move(y0)), Func(std::move(f)) {};
 };
 
@@ -38,7 +36,7 @@ public:
   virtual double Step(double step) = 0;
 };
 
-vector<State> SolveIVP(Vect &y0, double T0, Integrator &solver, double stepsize,
+std::vector<State> SolveIVP(Vect &y0, double T0, Integrator &solver, double stepsize,
                        double tEnd);
 
 #endif // MAIN_INTEGRATOR_CUH

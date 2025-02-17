@@ -7,18 +7,18 @@
 #include <iostream>
 #include <cassert>
 #include <cmath>
+#include <complex>
 
 #include "la/Dense.cuh"
 #include "la/Sparse.cuh"
 #include "utils/SignPadding.cuh"
 
-using namespace std;
 using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 using t_hostVectInt = thrust::host_vector<int>;
 
 Dense::Dense(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
-    Data.resize(dimX, vector<complex<double> >(dimY));
+    Data.resize(dimX, std::vector<std::complex<double> >(dimY));
 }
 
 Dense Dense::Add(const Dense& A) const {
@@ -101,7 +101,7 @@ t_hostVect Dense::FlattenedData() const {
 }
 
 t_hostVectInt Dense::FlattenedDataInt() const {
-    vector<int> out;
+    std::vector<int> out;
     
     out.resize(DimX * DimY);
 
@@ -115,18 +115,18 @@ t_hostVectInt Dense::FlattenedDataInt() const {
 }
 
 void Dense::Print(unsigned int kind, unsigned int prec) const {
-    string s;
-    stringstream stream;
-    stream.setf(ios::fixed);
+    std::string s;
+    std::stringstream stream;
+    stream.setf(std::ios::fixed);
     stream.precision(prec);
 
-    stream << " Matrix [" << DimX << " x " << DimY << "]:" << endl;
+    stream << " Matrix [" << DimX << " x " << DimY << "]:" << std::endl;
     for (const auto& X : Data) {
         stream << "   ";
         for (auto Y : X) {
-            string spaceCharRe = !std::signbit(Y.real()) ? " " : "";
-            string spaceCharIm = !std::signbit(Y.imag()) ? " " : "";
-            string spaceCharAbs = !std::signbit(Y.imag()) ? " + " : " - ";
+            std::string spaceCharRe = !std::signbit(Y.real()) ? " " : "";
+            std::string spaceCharIm = !std::signbit(Y.imag()) ? " " : "";
+            std::string spaceCharAbs = !std::signbit(Y.imag()) ? " + " : " - ";
 
             switch (kind) {
                 case 0: // re + im
@@ -145,13 +145,13 @@ void Dense::Print(unsigned int kind, unsigned int prec) const {
                     stream << "[e]";
             }
         }
-        stream << endl;
+        stream << std::endl;
     }
 
     s = stream.str();
 
-    cout.imbue(locale(cout.getloc(), new SignPadding));
-    cout << s << endl;
+    std::cout.imbue(std::locale(std::cout.getloc(), new SignPadding));
+    std::cout << s << std::endl;
 }
 
 void Dense::PrintRe(unsigned int prec) const {
