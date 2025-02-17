@@ -2,9 +2,9 @@
 // Created by conor on 16/04/22.
 //
 
-#include "Open.cuh"
-#include "../la/Super.cuh"
-#include "Spins.cuh"
+#include "qm/Open.cuh"
+#include "la/Super.cuh"
+#include "qm/Spins.cuh"
 
 Sparse Lindblad(const Sparse& A) {
     auto id = Identity(A.DimY);

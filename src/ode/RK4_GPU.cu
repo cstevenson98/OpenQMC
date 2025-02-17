@@ -1,8 +1,8 @@
 //
 // Created by conor on 16/04/22.
 //
-#include "RK4_GPU.cuh"
-#include "GPU.cuh"
+#include "ode/RK4_GPU.cuh"
+#include "ode/GPU.cuh"
 
 using t_cplx        = thrust::complex<double>;
 using t_hostVect    = thrust::host_vector<thrust::complex<double>>;

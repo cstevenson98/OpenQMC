@@ -2,7 +2,7 @@
 // Created by conor on 04/04/2022.
 //
 
-#include "ElasticChain1D.cuh"
+#include "models/ElasticChain1D.cuh"
 
 Sparse ElasticChain1D::Dx() {
     Sparse out(2*N, 2*N);

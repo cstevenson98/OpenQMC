@@ -6,9 +6,9 @@
 #include <cassert>
 #include <cmath>
 
-#include "Dense.cuh"
-#include "Sparse.cuh"
-#include "../utils/SignPadding.cuh"
+#include "la/Dense.cuh"
+#include "la/Sparse.cuh"
+#include "utils/SignPadding.cuh"
 
 using namespace std;
 using t_cplx = thrust::complex<double>;

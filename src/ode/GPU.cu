@@ -6,7 +6,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/complex.h>
 
-#include "GPU.cuh"
+#include "ode/GPU.cuh"
 
 using t_cplx        = thrust::complex<double>;
 using t_hostVect    = thrust::host_vector<thrust::complex<double>>;

@@ -2,8 +2,8 @@
 // Created by conor on 11/04/2022.
 //
 
-#include "Sparse.cuh"
-#include "SparseELL.cuh"
+#include "la/Sparse.cuh"
+#include "la/SparseELL.cuh"
 
 using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;

@@ -1,19 +1,10 @@
-set(ode_source_files
-        Integrator.cu
-        Integrator.cuh
-        Euler.cu
-        Euler.cuh
-        Euler_GPU.cu
-        Euler_GPU.cuh
-        RK4.cu
-        RK4.cuh
-        RK4_GPU.cu
-        RK4_GPU.cuh
-        GPU.cu
-        GPU.cuh
-        )
+# glob all source files
+file(GLOB_RECURSE ode_sources "*.cu")
+file(GLOB_RECURSE ode_headers "${PROJECT_SOURCE_DIR}/include/*.h" "${PROJECT_SOURCE_DIR}/include/**.cuh")
 
-add_library(ode ${ode_source_files})
+add_library(${ode_lib} ${ode_sources} ${ode_headers})
 
-target_link_libraries(ode la)
-set_target_properties(ode PROPERTIES CUDA_ARCHITECTURES "75")
+target_link_libraries(${ode_lib} ${la_lib})
+
+#include all headers in the include directory
+target_include_directories(${ode_lib} PUBLIC "${PROJECT_SOURCE_DIR}/include")

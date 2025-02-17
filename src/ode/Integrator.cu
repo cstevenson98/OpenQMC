@@ -2,7 +2,7 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
-#include "Integrator.cuh"
+#include "ode/Integrator.cuh"
 
 vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize, double tEnd) {
     double t0 = T0;

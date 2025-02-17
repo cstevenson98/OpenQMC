@@ -3,8 +3,8 @@
 //
 #include <iostream>
 
-#include "Vect.cuh"
-#include "../utils/SignPadding.cuh"
+#include "la/Vect.cuh"
+#include "utils/SignPadding.cuh"
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>
 

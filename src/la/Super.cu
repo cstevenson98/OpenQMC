@@ -2,8 +2,8 @@
 // Created by conor on 04/04/2022.
 //
 
-#include "Sparse.cuh"
-#include "Super.cuh"
+#include "la/Sparse.cuh"
+#include "la/Super.cuh"
 
 Sparse Kronecker(const Sparse& A, const Sparse& B) {
     Sparse out(A.DimX * B.DimX, A.DimY * B.DimY);

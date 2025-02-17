@@ -4,9 +4,9 @@
 
 #include <thrust/host_vector.h>
 
-#include "Euler_GPU.cuh"
-#include "Integrator.cuh"
-#include "GPU.cuh"
+#include "ode/Euler_GPU.cuh"
+#include "ode/Integrator.cuh"
+#include "ode/GPU.cuh"
 
 using t_cplx        = thrust::complex<double>;
 using t_hostVect    = thrust::host_vector<thrust::complex<double>>;

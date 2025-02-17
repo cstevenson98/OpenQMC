@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <cmath>
-#include "SignPadding.cuh"
+#include "utils/SignPadding.cuh"
 
 SignPadding::iter_type SignPadding::do_put(SignPadding::iter_type s,
                                            std::ios_base& f,

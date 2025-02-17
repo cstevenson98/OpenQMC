@@ -1,14 +1,10 @@
-set(la_source_files
-        Dense.cu
-        Dense.cuh
-        Vect.cu
-        Vect.cuh
-        Sparse.cu
-        Sparse.cuh
-        SparseELL.cu
-        SparseELL.cuh
-        Super.cu
-        Super.cuh
-        )
-add_library(la ${la_source_files})
-target_link_libraries(la utils)
+# glob all source files
+file(GLOB_RECURSE la_sources "*.cu")
+file(GLOB_RECURSE la_headers "${PROJECT_SOURCE_DIR}/include/*.h" "${PROJECT_SOURCE_DIR}/include/**.cuh")
+
+add_library(${la_lib} ${la_sources} ${la_headers})
+
+target_link_libraries(${la_lib} ${utils_lib})
+
+#include all headers in the include directory
+target_include_directories(${la_lib} PUBLIC "${PROJECT_SOURCE_DIR}/include")

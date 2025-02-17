@@ -4,8 +4,8 @@
 
 #include <iostream>
 #include <fstream>
-#include "CSV.cuh"
-#include "../ode/Integrator.cuh"
+#include "utils/CSV.cuh"
+#include "ode/Integrator.cuh"
 
 void ToCSV(const std::string& filename, const vector<State>& results) {
     std::ofstream myfile;

@@ -3,9 +3,9 @@
 //
 
 #include <algorithm>
-#include "Dense.cuh"
-#include "Sparse.cuh"
-#include "Super.cuh"
+#include "la/Dense.cuh"
+#include "la/Sparse.cuh"
+#include "la/Super.cuh"
 
 using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
