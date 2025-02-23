@@ -15,7 +15,8 @@ set(utils_lib "utils")
 file(GLOB_RECURSE oqmc_sources "${PROJECT_SOURCE_DIR}/src/*.cu" "${PROJECT_SOURCE_DIR}/src/*.cuh")
 file(GLOB_RECURSE oqmc_headers "${PROJECT_SOURCE_DIR}/include/*.h" "${PROJECT_SOURCE_DIR}/include/**.cuh")
 
-add_library(oqmc ${oqmc_sources} ${oqmc_headers})
+# add_library(oqmc ${oqmc_sources} ${oqmc_headers})
+add_library(oqmc "${PROJECT_SOURCE_DIR}/src/la/Dense.cu" "${PROJECT_SOURCE_DIR}/include/la/Dense.h")
 target_include_directories(oqmc PUBLIC "${PROJECT_SOURCE_DIR}/include")
 
 # # ELASTIC

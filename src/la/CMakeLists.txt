@@ -1,5 +1,5 @@
 # glob all source files
-file(GLOB_RECURSE la_sources "*.cu")
+file(GLOB_RECURSE la_sources "Dense.cu")
 file(GLOB_RECURSE la_headers "${PROJECT_SOURCE_DIR}/include/*.h" "${PROJECT_SOURCE_DIR}/include/**.cuh")
 
 add_library(${la_lib} ${la_sources} ${la_headers})

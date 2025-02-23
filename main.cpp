@@ -12,26 +12,22 @@
 // #include "qm/Spins.cuh"
 // #include "utils/CSV.cuh"
 
-#include "utils/pimpl_test.h"
+#include "la/Dense.h"
 #include <cstdio>
-
+#include <vector>
 
 #define N 2000
 
+int main() {       //
+  Dense d(10, 10); //
 
-int main() {
-  printf("making pimpl");
-  MyClass myClass(103213);
-  // t_hostVect D_Yvals(2 * N, 0);
-
-  // for (int i = 0; i < 2 * N; ++i) {
+  2.*d;
+  //  (int i = 0; i < 2 * N; ++i) {
   //   D_Yvals[i] = (sin(10. * (i + 1) / ((double)(N))) / 2.) *
   //                sin(10. * (i + 1) / ((double)(N))) / 2. /
-  //                (double)((i + 1) / 200.);
+  //                (double)((i + 1) /
+  // 200.);                        //
   // }
-
-  // ElasticChain1D chain(N, 10, 0.25, 2);
-
   // auto chainDx = chain.Dx();
   // auto chainDxELL = ToSparseELL(chainDx);
 
@@ -58,7 +54,8 @@ int main() {
   // //    L.ToDense().Print(0);
 
   // //    (ToSuper(SigmaMinus(), SigmaPlus()).Add
-  // //    (ToSuper(SigmaPlus()*SigmaMinus(), Identity(2)))).ToDense().PrintRe();
+  // //    (ToSuper(SigmaPlus()*SigmaMinus(),
+  // Identity(2)))).ToDense().PrintRe();
 
   // //    (SigmaMinus() - SigmaPlus()).ToDense().PrintRe();
 
