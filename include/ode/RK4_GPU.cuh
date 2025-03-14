@@ -13,13 +13,8 @@
 #include "ode/Integrator.cuh"
 #include "la/SparseELL.cuh"
 
-using t_cplx        = thrust::complex<double>;
-using t_hostVect    = thrust::host_vector<thrust::complex<double>>;
-using t_devcVect    = thrust::device_vector<thrust::complex<double>>;
-using t_devcVectInt = thrust::device_vector<int>;
-
 class RK4_GPU : public Integrator {
-    t_hostVect    x, dx;
+    th_hostVect    x, dx;
     double        t;
     SparseELL     M;
     double        Err, Tol;
@@ -33,7 +28,7 @@ class RK4_GPU : public Integrator {
     int           n_columns;
 
 public:
-    RK4_GPU(t_hostVect& y0, double t0, SparseELL& M, double tol);
+    RK4_GPU(th_hostVect& y0, double t0, SparseELL& M, double tol);
 
     void State(struct State &dst) override;
     double Step(double step) override;

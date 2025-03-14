@@ -11,24 +11,23 @@
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>
 
-using t_cplx = thrust::complex<double>;
-using t_hostVect = thrust::host_vector<thrust::complex<double>>;
+#include "core/types.cuh"
 
 struct Vect {
     explicit Vect() = default;
     explicit Vect(unsigned int N);
-    explicit Vect(t_hostVect &in);
+    explicit Vect(th_hostVect &in);
 
-    t_hostVect Data;
+    th_hostVect Data;
 
     Vect Add(const Vect& A) const;
     Vect Subtract(const Vect& A) const;
-    Vect Scale(const t_cplx& alpha) const;
-    Vect AddScaledVect(const t_cplx& alpha, const Vect& A) const;
+    Vect Scale(const th_cplx& alpha) const;
+    Vect AddScaledVect(const th_cplx& alpha, const Vect& A) const;
     Vect Conj() const;
     Vect operator + (const Vect& A) const;
     Vect operator - (const Vect& A) const;
-    Vect operator * (const t_cplx& alpha) const;
+    Vect operator * (const th_cplx& alpha) const;
     std::complex<double> operator [] (unsigned int i) const;
 
     double Dot(const Vect& A) const;
@@ -41,6 +40,6 @@ struct Vect {
 };
 
 // Non-member binary operators
-Vect operator * (const t_cplx& alpha, const Vect& rhs);
+Vect operator * (const th_cplx& alpha, const Vect& rhs);
 
 #endif //MAIN_VECT_CUH

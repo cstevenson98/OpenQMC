@@ -5,6 +5,7 @@
 //
 
 #include "ode/Integrator.cuh"
+#include "core/types.h"
 
 std::vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double stepsize, double tEnd) {
     double t0 = T0;

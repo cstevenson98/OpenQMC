@@ -9,12 +9,12 @@
 
 #include <complex>
 #include <vector>
-#include "la/Dense.cuh"
+#include "la/Dense.h"
 #include "la/Vect.cuh"
 
 struct COOTuple {
     int    Coords[2]{0, 0};
-    t_cplx Val;
+    th_cplx Val;
 
     COOTuple(int x, int y, t_cplx val) : Val(val) {
       Coords[0] = x; Coords[1] = y;
@@ -38,7 +38,7 @@ struct Sparse {
 
     Sparse(int dimX, int dimY) : DimX(dimX), DimY(dimY) { };
 
-    Sparse Scale(const t_cplx &alpha) const;
+    Sparse Scale(const th_cplx &alpha) const;
     Sparse Add(const Sparse& B) const;
     Sparse RightMult(const Sparse& A) const;
     Sparse Transpose() const;

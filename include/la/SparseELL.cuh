@@ -7,9 +7,9 @@
 #ifndef MAIN_SPARSEELL_CUH
 #define MAIN_SPARSEELL_CUH
 
-#include "Vect.cuh"
-#include "Dense.cuh"
-#include "Sparse.cuh"
+#include "la/Vect.cuh"
+#include "la/Dense.h"
+#include "la/Sparse.cuh"
 
 struct SparseELL {
     int DimX;
@@ -29,7 +29,6 @@ struct SparseELL {
           Indices(dimX, EntriesPerRow),
           EntriesPerRow(EntriesPerRow)
         { };
-
 
     void LoadDense(const Dense& A);
 

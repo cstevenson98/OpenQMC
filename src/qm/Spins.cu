@@ -4,129 +4,115 @@
 // Created by conor on 05/04/2022.
 //
 
-#include "qm/Spins.cuh"
+#include "core/types.h"
 #include "la/Super.cuh"
+#include "qm/Spins.cuh"
 
 Sparse Identity(unsigned int N) {
-    Sparse out(N, N);
-    for (int i = 0; i < N; ++i) {
-        out.Data.emplace_back(i, i, 1);
-    }
+  Sparse out(N, N);
+  for (int i = 0; i < N; ++i) {
+    out.Data.emplace_back(i, i, 1);
+  }
 
-    return out;
+  return out;
 }
 
 Sparse SigmaX() {
-    Dense out(2, 2);
-
-    std::vector<std::vector<std::complex<double>>> sX = {{0,1},{1,0}};
-    out.Data = sX;
-
-    return ToSparseCOO(out);
+  t_hostMat sX = {{0, 1}, {1, 0}};
+  Dense out(sX);
+  return ToSparseCOO(out);
 }
 
 Sparse SigmaY() {
-    Dense out(2, 2);
-
-    std::vector<std::vector<std::complex<double>>> sY = {{0, {0,-1}}, {{0, 1}, 0}};
-    out.Data = sY;
-
-    return ToSparseCOO(out);
+  t_hostMat sY = {{0, {0, -1}}, {{0, 1}, 0}};
+  Dense out(sY);
+  return ToSparseCOO(out);
 }
 
 Sparse SigmaZ() {
-    Dense out(2, 2);
-
-    std::vector<std::vector<std::complex<double>>> sZ = {{1, 0}, {0, -1}};
-    out.Data = sZ;
-
-    return ToSparseCOO(out);
+  t_hostMat sZ = {{1, 0}, {0, -1}};
+  Dense out(sZ);
+  return ToSparseCOO(out);
 }
 
 Sparse SigmaPlus() {
-    Dense out(2, 2);
-
-    std::vector<std::vector<std::complex<double>>> sP = {{0, 1}, {0, 0}};
-    out.Data = sP;
-
-    return ToSparseCOO(out);
+  t_hostMat sP = {{0, 1}, {0, 0}};
+  Dense out(sP);
+  return ToSparseCOO(out);
 }
 
 Sparse SigmaMinus() {
-    Dense out(2, 2);
-
-    std::vector<std::vector<std::complex<double>>> sM = {{0, 0}, {1, 0}};
-    out.Data = sM;
-
-    return ToSparseCOO(out);
+  t_hostMat sM = {{0, 0}, {1, 0}};
+  Dense out(sM);
+  return ToSparseCOO(out);
 }
 
 Sparse SigmaX(unsigned int N, unsigned int j) {
-    std::vector<Sparse> operators;
+  std::vector<Sparse> operators;
 
-    for (int i = 0; i < N; ++i) {
-        if (i == j) {
-            operators.emplace_back(SigmaX());
-        } else {
-            operators.emplace_back(Identity(2));
-        }
+  for (int i = 0; i < N; ++i) {
+    if (i == j) {
+      operators.emplace_back(SigmaX());
+    } else {
+      operators.emplace_back(Identity(2));
     }
+  }
 
-    return Tensor(operators);
+  return Tensor(operators);
 }
 
 Sparse SigmaY(unsigned int N, unsigned int j) {
-    std::vector<Sparse> operators;
+  std::vector<Sparse> operators;
 
-    for (int i = 0; i < N; ++i) {
-        if (i == j) {
-            operators.emplace_back(SigmaY());
-        } else {
-            operators.emplace_back(Identity(2));
-        }
+  for (int i = 0; i < N; ++i) {
+    if (i == j) {
+      operators.emplace_back(SigmaY());
+    } else {
+      operators.emplace_back(Identity(2));
     }
+  }
 
-    return Tensor(operators);
+  return Tensor(operators);
 }
 
 Sparse SigmaZ(unsigned int N, unsigned int j) {
-    std::vector<Sparse> operators;
+  std::vector<Sparse> operators;
 
-    for (int i = 0; i < N; ++i) {
-        if (i == j) {
-            operators.emplace_back(SigmaZ());
-        } else {
-            operators.emplace_back(Identity(2));
-        }
+  for (int i = 0; i < N; ++i) {
+    if (i == j) {
+      operators.emplace_back(SigmaZ());
+    } else {
+      operators.emplace_back(Identity(2));
     }
+  }
 
-    return Tensor(operators);
+  return Tensor(operators);
 }
 
 Sparse SigmaPlus(unsigned int N, unsigned int j) {
-    std::vector<Sparse> operators;
+  std::vector<Sparse> operators;
 
-    for (int i = 0; i < N; ++i) {
-        if (i == j) {
-            operators.emplace_back(SigmaPlus());
-        } else {
-            operators.emplace_back(Identity(2));
-        }
+  for (int i = 0; i < N; ++i) {
+    if (i == j) {
+      operators.emplace_back(SigmaPlus());
+    } else {
+      operators.emplace_back(Identity(2));
     }
+  }
 
-    return Tensor(operators);
+  return Tensor(operators);
 }
 
 Sparse SigmaMinus(unsigned int N, unsigned int j) {
-    std::vector<Sparse> operators;
+  std::vector<Sparse> operators;
 
-    for (int i = 0; i < N; ++i) {
-        if (i == j) {
-            operators.emplace_back(SigmaMinus());
-        } else {
-            operators.emplace_back(Identity(2));
-        }
+  for (int i = 0; i < N; ++i) {
+    if (i == j) {
+      operators.emplace_back(SigmaMinus());
+    } else {
+      operators.emplace_back(Identity(2));
     }
+  }
 
-    return Tensor(operators);
+  return Tensor(operators);
 }

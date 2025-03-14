@@ -13,15 +13,28 @@
 // #include "utils/CSV.cuh"
 
 #include "la/Dense.h"
+// complex literals
+#include <complex>
 #include <cstdio>
-#include <vector>
-
+#include <iostream>
 #define N 2000
 
-int main() {       //
-  Dense d(10, 10); //
+int main() { //
+  using namespace std::complex_literals;
+  auto d = t_hostMat{{1., 2. - 3.i}, {3., 4. + 1.i}};
 
-  2.*d;
+  std::cout << std::endl;
+  std::cout << std::endl;
+
+  Dense dense(d);
+  dense.Print();
+
+  auto d2 = 222 * dense * dense;
+  d2.Print();
+
+  // auto d2 = dense + dense;
+
+  //  std::cout << d2[0, 0] << std::endl;
   //  (int i = 0; i < 2 * N; ++i) {
   //   D_Yvals[i] = (sin(10. * (i + 1) / ((double)(N))) / 2.) *
   //                sin(10. * (i + 1) / ((double)(N))) / 2. /

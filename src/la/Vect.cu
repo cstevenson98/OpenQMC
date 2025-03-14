@@ -6,11 +6,9 @@
 #include <iostream>
 
 #include "la/Vect.cuh"
-#include "utils/SignPadding.cuh"
 #include <thrust/complex.h>
 #include <thrust/host_vector.h>
 
-using t_cplx = thrust::complex<double>;
 using t_hostVect = thrust::host_vector<thrust::complex<double>>;
 
 Vect Vect::Add(const Vect &A) const {
@@ -35,7 +33,7 @@ Vect Vect::Subtract(const Vect &A) const {
     return out;
 }
 
-Vect Vect::Scale(const t_cplx& alpha) const {
+Vect Vect::Scale(const th_cplx& alpha) const {
     Vect out(Data.size());
     out.Data.resize(Data.size());
 
@@ -46,7 +44,7 @@ Vect Vect::Scale(const t_cplx& alpha) const {
     return out;
 }
 
-Vect Vect::AddScaledVect(const t_cplx& alpha, const Vect &A) const {
+Vect Vect::AddScaledVect(const th_cplx& alpha, const Vect &A) const {
     Vect out(Data.size());
     out.Data.resize(Data.size());
 
@@ -91,11 +89,11 @@ Vect Vect::operator-(const Vect &A) const {
     return this->Subtract(A);
 }
 
-Vect Vect::operator*(const t_cplx& alpha) const {
+Vect Vect::operator*(const th_cplx& alpha) const {
     return this->Scale(alpha);
 }
 
-Vect operator*(const t_cplx& alpha, const Vect& rhs) {
+Vect operator*(const th_cplx& alpha, const Vect& rhs) {
     return rhs*alpha;
 }
 
@@ -137,7 +135,6 @@ void Vect::Print(unsigned int kind) const {
 
     s = stream.str();
 
-    std::cout.imbue(std::locale(std::cout.getloc(), new SignPadding));
     std::cout << s << std::endl;
 }
 
