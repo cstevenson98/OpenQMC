@@ -25,7 +25,8 @@ Euler_GPU::Euler_GPU(th_hostVect &y0, double t0, SparseELL &M, double tol)
 }
 
 void Euler_GPU::State(struct State &dst) {
-  thrust::copy(D_x.begin(), D_x.end(), dst.Y.Data.begin());
+  // change to use VectImpl
+  // thrust::copy(D_x.begin(), D_x.end(), dst.Y.Data.begin());
   dst.E = Err;
   dst.T = t;
 }

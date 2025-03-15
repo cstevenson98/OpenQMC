@@ -11,7 +11,7 @@
 #include <functional>
 #include <utility>
 
-#include "la/Vect.cuh"
+#include "la/Vect.h"
 
 struct IVP {
   double t0;

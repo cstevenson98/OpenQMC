@@ -7,35 +7,30 @@
 #ifndef MAIN_SPARSEELL_CUH
 #define MAIN_SPARSEELL_CUH
 
-#include "la/Vect.cuh"
 #include "la/Dense.h"
+#include "la/DenseImpl.cuh"
 #include "la/Sparse.cuh"
+#include "la/Vect.h"
 
 struct SparseELL {
-    int DimX;
-    int DimY;
-    int NNZ;
-    int EntriesPerRow;
+  int DimX;
+  int DimY;
+  int NNZ;
+  int EntriesPerRow;
 
-    Dense Values;
-    Dense Indices;
+  DenseImpl Values;
+  DenseImpl Indices;
 
-    SparseELL() : DimX(0), DimY(0) { };
-    SparseELL(int dimX, int dimY, int EntriesPerRow) 
-        : 
-          DimX(dimX), 
-          DimY(dimY), 
-          Values(dimX, EntriesPerRow), 
-          Indices(dimX, EntriesPerRow),
-          EntriesPerRow(EntriesPerRow)
-        { };
+  SparseELL() : DimX(0), DimY(0) {};
+  SparseELL(int dimX, int dimY, int EntriesPerRow)
+      : DimX(dimX), DimY(dimY), Values(dimX, EntriesPerRow),
+        Indices(dimX, EntriesPerRow), EntriesPerRow(EntriesPerRow) {};
 
-    void LoadDense(const Dense& A);
-
-    Dense ToDense();
-    Vect VectMult(const Vect &vect) const;
+  void LoadDense(const Dense &A);
+  Dense ToDense();
+  Vect VectMult(const Vect &vect) const;
 };
 
-SparseELL ToSparseELL(const Sparse& A);
+SparseELL ToSparseELL(const Sparse &A);
 
-#endif //MAIN_SPARSEELL_CUH
+#endif // MAIN_SPARSEELL_CUH

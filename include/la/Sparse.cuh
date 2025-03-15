@@ -10,7 +10,8 @@
 #include <complex>
 #include <vector>
 #include "la/Dense.h"
-#include "la/Vect.cuh"
+#include "la/Vect.h"
+#include "core/types.cuh"
 
 struct COOTuple {
     int    Coords[2]{0, 0};

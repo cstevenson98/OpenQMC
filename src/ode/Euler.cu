@@ -18,7 +18,7 @@ double Euler::Step(double step) {
     Func(dx, t, x);
 
     Vect y0 = x.AddScaledVect(step, dx);
-    Vect y1(y0.Data.size());
+    Vect y1(y0.size());
 
     double nextStepSize = step;
 

@@ -8,26 +8,30 @@
 #define MAIN_VECT_CUH
 
 #include <complex>
-#include <thrust/complex.h>
-#include <thrust/host_vector.h>
 
-#include "core/types.cuh"
+#include "core/types.h"
+#include <memory>
 
-struct Vect {
-    explicit Vect() = default;
+class VectImpl;
+class Vect {
+public:
+    explicit Vect();
     explicit Vect(unsigned int N);
-    explicit Vect(th_hostVect &in);
-
-    th_hostVect Data;
+    explicit Vect(t_hostVect &in);
+    ~Vect();
+    Vect(const Vect &other);
+    Vect(Vect &&other) noexcept;
+    Vect &operator=(const Vect &other);
+    Vect &operator=(Vect &&other) noexcept;
 
     Vect Add(const Vect& A) const;
     Vect Subtract(const Vect& A) const;
-    Vect Scale(const th_cplx& alpha) const;
-    Vect AddScaledVect(const th_cplx& alpha, const Vect& A) const;
+    Vect Scale(const t_cplx& alpha) const;
+    Vect AddScaledVect(const t_cplx& alpha, const Vect& A) const;
     Vect Conj() const;
     Vect operator + (const Vect& A) const;
     Vect operator - (const Vect& A) const;
-    Vect operator * (const th_cplx& alpha) const;
+    Vect operator * (const t_cplx& alpha) const;
     std::complex<double> operator [] (unsigned int i) const;
 
     double Dot(const Vect& A) const;
@@ -37,9 +41,17 @@ struct Vect {
     void PrintRe() const;
     void PrintIm() const;
     void PrintAbs() const;
+    int size() const;
+
+    std::vector<std::complex<double>> GetData() const;
+
+private:
+    std::unique_ptr<VectImpl> pImpl;
 };
 
 // Non-member binary operators
-Vect operator * (const th_cplx& alpha, const Vect& rhs);
+Vect operator * (const t_cplx& alpha, const Vect& rhs);
+
+// Non-member binary operators
 
 #endif //MAIN_VECT_CUH

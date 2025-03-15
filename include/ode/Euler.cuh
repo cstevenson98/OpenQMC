@@ -18,7 +18,7 @@ class Euler : public Integrator {
 public:
     Euler(const IVP &ivp, double tol) : Tol(tol) {
         x = ivp.y0;
-        dx = Vect(x.Data.size());
+        dx = Vect(x.size());
         t = ivp.t0;
         Func = ivp.Func;
         Err = 0;

@@ -1,0 +1,119 @@
+#include <vector>
+
+#include "core/types.cuh"
+#include "core/types.h"
+#include "la/Dense.h"
+
+class DenseImpl {
+public:
+  int DimX;                        ///< Number of rows
+  int DimY;                        ///< Number of columns
+  std::vector<t_hostVect> CPUData; ///< Matrix data stored in a 2D vector
+
+  /**
+   * @brief Default constructor for DenseImpl.
+   */
+  DenseImpl();
+
+  /**
+   * @brief Destructor for DenseImpl.
+   */
+  ~DenseImpl();
+
+  /**
+   * @brief Constructor to initialize DenseImpl matrix with given dimensions.
+   *
+   * @param dimX Number of rows.
+   * @param dimY Number of columns.
+   */
+  DenseImpl(int dimX, int dimY);
+
+  /**
+   * @brief Copy constructor for DenseImpl.
+   *
+   * @param other Another DenseImpl object to copy from.
+   */
+  DenseImpl(const DenseImpl &other);
+
+  /**
+   * @brief Move constructor for DenseImpl.
+   *
+   * @param other Another DenseImpl object to move from.
+   */
+  DenseImpl(DenseImpl &&other) noexcept;
+
+  /**
+   * @brief Constructor to initialize DenseImpl matrix with given data.
+   *
+   * @param in Input matrix data.
+   */
+  DenseImpl(t_hostMat &in);
+
+  /**
+   * @brief Copy assignment operator for DenseImpl.
+   *
+   * @param other Another DenseImpl object to copy from.
+   * @return DenseImpl& Reference to the current object.
+   */
+  DenseImpl &operator=(const DenseImpl &other);
+
+  /**
+   * @brief Adds two DenseImpl matrices.
+   *
+   * @param A Another DenseImpl object to add.
+   * @return DenseImpl Result of the addition.
+   */
+  DenseImpl Add(const DenseImpl &A) const;
+
+  /**
+   * @brief Multiplies two DenseImpl matrices.
+   *
+   * @param A Another DenseImpl object to multiply.
+   * @return DenseImpl Result of the multiplication.
+   */
+  DenseImpl RightMult(const DenseImpl &A) const;
+
+  /**
+   * @brief Scales the DenseImpl matrix by a scalar value.
+   *
+   * @param alpha Scalar value to multiply.
+   * @return DenseImpl Result of the scalar multiplication.
+   */
+  DenseImpl Scale(t_cplx alpha) const;
+
+  /**
+   * @brief Transposes the DenseImpl matrix.
+   *
+   * @return DenseImpl Transposed matrix.
+   */
+  DenseImpl Transpose() const;
+
+  /**
+   * @brief Computes the Hermitian conjugate of the DenseImpl matrix.
+   *
+   * @return DenseImpl Hermitian conjugate matrix.
+   */
+  DenseImpl HermitianC() const;
+
+  /**
+   * @brief Flattens the DenseImpl matrix data into a vector.
+   *
+   * @return t_hostVect Flattened data.
+   */
+  t_hostVect FlattenedData() const;
+
+  /**
+   * @brief Flattens the DenseImpl matrix data into a vector of integers.
+   *
+   * @return t_hostVectInt Flattened data as integers.
+   */
+  t_hostVectInt FlattenedDataInt() const;
+
+  /**
+   * @brief Prints the DenseImpl matrix.
+   *
+   * @param kind Type of data to print (real, imaginary, etc.).
+   * @param prec Precision of the printed data.
+   */
+  void Print(unsigned int kind, unsigned int prec) const;
+};

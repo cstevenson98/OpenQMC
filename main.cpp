@@ -17,7 +17,7 @@
 #include <complex>
 #include <cstdio>
 #include <iostream>
-#define N 2000
+#include "la/Vect.h"
 
 int main() { //
   using namespace std::complex_literals;

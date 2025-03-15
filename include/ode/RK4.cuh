@@ -19,7 +19,7 @@ public:
     RK4(Vect& y0, double t0, std::function<void(Vect& dy, double t, const Vect& y)> func, double tol) 
     : Tol(tol) 
     {
-        const unsigned int N = y0.Data.size();
+        const unsigned int N = y0.size();
         x = y0;
         k1 = Vect(N); k2 = Vect(N);
         k3 = Vect(N); k4 = Vect(N);

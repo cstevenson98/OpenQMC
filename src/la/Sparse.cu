@@ -306,18 +306,20 @@ Dense Sparse::ToDense() {
   return out;
 }
 
-Vect Sparse::VectMult(const Vect &vect) const {
-  std::vector<CompressedRow> sRows = SparseRowsCOO(*this);
+// Vect Sparse::VectMult(const Vect &vect) const {
+//   std::vector<CompressedRow> sRows = SparseRowsCOO(*this);
 
-  Vect out(vect.Data.size());
-  for (const auto &row : sRows) {
-    for (const auto rowElem : row.RowData) {
-      out.Data[row.Index] += rowElem.Val * vect.Data[rowElem.Coords[1]];
-    }
-  }
+//   Vect out(vect.size());
+//   for (const auto &row : sRows) {
+//     for (const auto rowElem : row.RowData) {
+//       out.GetDataRef()[row.Index] =
+//           out.GetData()[row.Index] +
+//           rowElem.Val * vect.GetData()[rowElem.Coords[1]];
+//     }
+//   }
 
-  return out;
-}
+//   return out;
+// }
 
 Sparse Sparse::operator+(const Sparse &A) const { return this->Add(A); }
 

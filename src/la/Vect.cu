@@ -3,149 +3,207 @@
 // Licensed under the GNU General Public License v3.0
 // Created by Conor Stevenson on 03/04/2022.
 //
+#include <complex>
 #include <iostream>
+#include <memory>
+#include <vector>
 
-#include "la/Vect.cuh"
-#include <thrust/complex.h>
-#include <thrust/host_vector.h>
+#include "core/types.cuh"
+#include "la/Vect.h"
+#include "la/VectImpl.cuh"
 
-using t_hostVect = thrust::host_vector<thrust::complex<double>>;
+VectImpl VectImpl::Conj() const {
+  VectImpl out(Data.size());
+  out.Data.resize(Data.size());
 
-Vect Vect::Add(const Vect &A) const {
-    Vect out(Data.size());
-    out.Data.resize(Data.size());
+  for (int i = 0; i < Data.size(); ++i) {
+    out.Data[i] = thrust::conj(Data[i]);
+  }
 
-    for (int i = 0; i < A.Data.size(); ++i) {
-        out.Data[i] = Data[i] + A.Data[i];
+  return out;
+}
+
+VectImpl VectImpl::Add(const VectImpl &A) const {
+  VectImpl out(Data.size());
+  out.Data.resize(Data.size());
+
+  for (int i = 0; i < Data.size(); ++i) {
+    out.Data[i] = Data[i] + A.Data[i];
+  }
+
+  return out;
+}
+
+VectImpl VectImpl::Subtract(const VectImpl &A) const {
+  VectImpl out(Data.size());
+  out.Data.resize(Data.size());
+
+  for (int i = 0; i < A.Data.size(); ++i) {
+    out.Data[i] = Data[i] - A.Data[i];
+  }
+
+  return out;
+}
+
+VectImpl VectImpl::Scale(const th_cplx &alpha) const {
+  VectImpl out(Data.size());
+  out.Data.resize(Data.size());
+
+  for (int i = 0; i < Data.size(); ++i) {
+    out.Data[i] = alpha * Data[i];
+  }
+
+  return out;
+}
+
+double VectImpl::Dot(const VectImpl &A) const {
+  double dot = 0;
+  for (unsigned int i = 0; i < this->Data.size(); ++i) {
+    dot += (conj(this->Data[i]) * A.Data[i]).real();
+  }
+
+  return dot;
+}
+
+double VectImpl::Norm() const {
+  double out = 0;
+  for (auto elem : Data) {
+    out += abs(elem);
+  }
+
+  return sqrt(out);
+}
+
+VectImpl VectImpl::operator+(const VectImpl &A) const { return this->Add(A); }
+
+VectImpl VectImpl::operator-(const VectImpl &A) const {
+  return this->Subtract(A);
+}
+
+VectImpl VectImpl::operator*(const th_cplx &alpha) const {
+  return this->Scale(alpha);
+}
+
+//   Impl operator*(const th_cplx &alpha, const Vect::Impl &rhs) {
+//     return rhs * alpha;
+//   }
+
+std::complex<double> VectImpl::operator[](unsigned int i) const {
+  return this->Data[i];
+}
+
+void VectImpl::Print(unsigned int kind) const {
+  std::string s;
+  std::stringstream stream;
+  stream.setf(std::ios::fixed);
+  stream.precision(2);
+
+  stream << " Vector [" << Data.size() << " x " << 1 << "]:" << std::endl;
+  for (const auto &X : Data) {
+    stream << "   ";
+    std::string spaceCharRe = !std::signbit(X.real()) ? " " : "";
+    std::string spaceCharIm = !std::signbit(X.imag()) ? " " : "";
+    std::string spaceCharAbs = !std::signbit(X.imag()) ? " + " : " - ";
+
+    switch (kind) {
+    case 0: // re + im
+      stream << spaceCharRe << X.real() << spaceCharAbs << abs(X.imag())
+             << "i  ";
+      break;
+    case 1: // re
+      stream << spaceCharRe << X.real() << " ";
+      break;
+    case 2: // im
+      stream << spaceCharIm << X.imag() << "i  ";
+      break;
+    case 3: // abs
+      stream << " " << abs(X);
+      break;
+    default:
+      stream << "[e]";
     }
+    stream << std::endl;
+  }
 
-    return out;
+  s = stream.str();
+
+  std::cout << s << std::endl;
 }
 
-Vect Vect::Subtract(const Vect &A) const {
-    Vect out(Data.size());
-    out.Data.resize(Data.size());
+void VectImpl::PrintRe() const { this->Print(1); }
 
-    for (int i = 0; i < A.Data.size(); ++i) {
-        out.Data[i] = Data[i] - A.Data[i];
-    }
+void VectImpl::PrintIm() const { this->Print(2); }
 
-    return out;
+void VectImpl::PrintAbs() const { this->Print(3); }
+
+std::vector<std::complex<double>> VectImpl::GetData() const {
+  // convert thrust vector to std::vector
+  std::vector<std::complex<double>> out;
+  out.resize(Data.size());
+  thrust::copy(Data.begin(), Data.end(), out.begin());
+  return out;
 }
 
-Vect Vect::Scale(const th_cplx& alpha) const {
-    Vect out(Data.size());
-    out.Data.resize(Data.size());
+/////////////////////////////////////////////////////////
+/// Vect
+/////////////////////////////////////////////////////////
 
-    for (int i = 0; i < Data.size(); ++i) {
-        out.Data[i] = alpha * Data[i];
-    }
+Vect::Vect(unsigned int size)
+    : pImpl(std::make_unique<VectImpl>(VectImpl(size))) {}
 
-    return out;
+Vect::Vect(t_hostVect &in) : pImpl(std::make_unique<VectImpl>(in)) {}
+
+Vect Vect::Conj() const {
+  Vect out;
+  out.pImpl = std::make_unique<VectImpl>(pImpl->Conj());
+  return out;
 }
 
-Vect Vect::AddScaledVect(const th_cplx& alpha, const Vect &A) const {
-    Vect out(Data.size());
-    out.Data.resize(Data.size());
+Vect Vect::operator+(const Vect &A) const { return this->Add(A); }
 
-    for (int i = 0; i < A.Data.size(); ++i) {
-        out.Data[i] = Data[i] + alpha * A.Data[i];
-    }
+Vect Vect::operator-(const Vect &A) const { return this->Subtract(A); }
 
-    return out;
-}
+Vect Vect::operator*(const t_cplx &alpha) const { return this->Scale(alpha); }
 
-Vect::Vect(unsigned int size) {
-    Data.resize(size);
-}
-
-Vect::Vect(t_hostVect &in) {
-    Data = in;
-}
-
-double Vect::Dot(const Vect& A) const {
-    double dot = 0;
-    for (unsigned int i = 0; i < this->Data.size(); ++i) {
-        dot += (conj(this->Data[i]) * A.Data[i]).real();
-    }
-
-    return dot;
-}
-
-double Vect::Norm() const {
-    double out = 0;
-    for (auto elem : Data) {
-        out += abs(elem);
-    }
-
-    return sqrt(out);
-}
-
-Vect Vect::operator+(const Vect &A) const {
-    return this->Add(A);
-}
-
-Vect Vect::operator-(const Vect &A) const {
-    return this->Subtract(A);
-}
-
-Vect Vect::operator*(const th_cplx& alpha) const {
-    return this->Scale(alpha);
-}
-
-Vect operator*(const th_cplx& alpha, const Vect& rhs) {
-    return rhs*alpha;
-}
+Vect operator*(const t_cplx &alpha, const Vect &rhs) { return rhs * alpha; }
 
 std::complex<double> Vect::operator[](unsigned int i) const {
-    return this->Data[i];
+  return (*pImpl)[i];
 }
 
-void Vect::Print(unsigned int kind) const {
-    std::string s;
-    std::stringstream stream;
-    stream.setf(std::ios::fixed);
-    stream.precision(2);
+double Vect::Dot(const Vect &A) const { return pImpl->Dot(*A.pImpl); }
 
-    stream << " Vector [" << Data.size() << " x " << 1 << "]:" << std::endl;
-    for (const auto& X : Data) {
-        stream << "   ";
-            std::string spaceCharRe = !std::signbit(X.real()) ? " " : "";
-            std::string spaceCharIm = !std::signbit(X.imag()) ? " " : "";
-            std::string spaceCharAbs = !std::signbit(X.imag()) ? " + " : " - ";
+double Vect::Norm() const { return pImpl->Norm(); }
 
-            switch (kind) {
-                case 0: // re + im
-                    stream << spaceCharRe << X.real() << spaceCharAbs << abs(X.imag()) << "i  ";
-                    break;
-                case 1: // re
-                    stream << spaceCharRe << X.real() << " ";
-                    break;
-                case 2: // im
-                    stream << spaceCharIm << X.imag() << "i  ";
-                    break;
-                case 3: // abs
-                    stream << " " << abs(X);
-                    break;
-                default:
-                    stream << "[e]";
-            }
-        stream << std::endl;
-    }
+void Vect::Print(unsigned int kind) const { pImpl->Print(kind); }
 
-    s = stream.str();
+void Vect::PrintRe() const { pImpl->PrintRe(); }
 
-    std::cout << s << std::endl;
+void Vect::PrintIm() const { pImpl->PrintIm(); }
+
+void Vect::PrintAbs() const { pImpl->PrintAbs(); }
+
+std::vector<std::complex<double>> Vect::GetData() const {
+  return pImpl->GetData();
 }
 
-void Vect::PrintRe() const {
-    this->Print(1);
+// Destructor
+Vect::~Vect() = default;
+
+// Copy constructor
+Vect::Vect(const Vect &rhs) : pImpl(std::make_unique<VectImpl>(*rhs.pImpl)) {}
+
+// Copy assignment
+Vect &Vect::operator=(const Vect &rhs) {
+  if (this != &rhs) {
+    pImpl = std::make_unique<VectImpl>(*rhs.pImpl);
+  }
+
+  return *this;
 }
 
-void Vect::PrintIm() const {
-    this->Print(2);
-}
+Vect::Vect(Vect &&rhs) noexcept = default;
 
-void Vect::PrintAbs() const {
-    this->Print(3);
-}
+Vect &Vect::operator=(Vect &&rhs) noexcept = default;
+
+Vect::Vect() = default;

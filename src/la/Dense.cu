@@ -5,149 +5,62 @@
 //
 
 #include "la/Dense.h"
+#include "la/DenseImpl.cuh"
+#include "core/types.h"
+#include "core/types.cuh"
 #include <cassert>
 #include <complex>
 #include <iostream>
 #include <memory>
 #include <vector>
 
-using t_cplx = std::complex<double>;
-using t_hostVect = std::vector<std::complex<double>>;
-using t_hostVectInt = std::vector<int>;
+// DenseImpl constructor
+DenseImpl::DenseImpl() = default;
 
-class Dense::DenseImpl {
-public:
-  int DimX;                        ///< Number of rows
-  int DimY;                        ///< Number of columns
-  std::vector<t_hostVect> CPUData; ///< Matrix data stored in a 2D vector
+// DenseImpl destructor
+DenseImpl::~DenseImpl() = default;
 
-  /**
-   * @brief Default constructor for DenseImpl.
-   */
-  DenseImpl() = default;
-
-  /**
-   * @brief Destructor for DenseImpl.
-   */
-  ~DenseImpl() = default;
-
-  /**
-   * @brief Constructor to initialize DenseImpl matrix with given dimensions.
-   *
-   * @param dimX Number of rows.
-   * @param dimY Number of columns.
-   */
-  DenseImpl(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
-    CPUData.resize(dimX, std::vector<std::complex<double>>(dimY));
+// DenseImpl constructor
+DenseImpl::DenseImpl(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
+  CPUData.resize(DimX);
+  for (int i = 0; i < DimX; ++i) {
+    CPUData[i].resize(DimY);
   }
+}
 
-  /**
-   * @brief Copy constructor for DenseImpl.
-   *
-   * @param other Another DenseImpl object to copy from.
-   */
-  DenseImpl(const DenseImpl &other)
-      : DimX(other.DimX), DimY(other.DimY), CPUData(other.CPUData) {}
+// DenseImpl copy constructor
+DenseImpl::DenseImpl(const DenseImpl &other)
+    : DimX(other.DimX), DimY(other.DimY), CPUData(other.CPUData) {}
 
-  /**
-   * @brief Move constructor for DenseImpl.
-   *
-   * @param other Another DenseImpl object to move from.
-   */
-  DenseImpl(DenseImpl &&other) noexcept
-      : DimX(other.DimX), DimY(other.DimY), CPUData(std::move(other.CPUData)) {}
+// DenseImpl move constructor
+DenseImpl::DenseImpl(DenseImpl &&other) noexcept
+    : DimX(other.DimX), DimY(other.DimY), CPUData(std::move(other.CPUData)) {}
 
-  /**
-   * @brief Constructor to initialize DenseImpl matrix with given data.
-   *
-   * @param in Input matrix data.
-   */
-  DenseImpl(t_hostMat &in) : CPUData(in), DimX(in.size()), DimY(in[0].size()) {}
+// DenseImpl constructor
+DenseImpl::DenseImpl(t_hostMat &in) {
+  DimX = in.size();
+  DimY = in[0].size();
+  CPUData = in;
+}
 
-  /**
-   * @brief Copy assignment operator for DenseImpl.
-    *
-    * @param other Another DenseImpl object to copy from.
-    * @return DenseImpl& Reference to the current object.
-    */
-  DenseImpl &operator=(const DenseImpl &other) {
-    if (this == &other) {
-      return *this;
-    }
-
-    DimX = other.DimX;
-    DimY = other.DimY;
-    CPUData = other.CPUData;
-
+// Copy assignment operator
+DenseImpl &DenseImpl::operator=(const DenseImpl &other) {
+  if (this == &other) {
     return *this;
   }
 
-  /**
-   * @brief Adds two DenseImpl matrices.
-   *
-   * @param A Another DenseImpl object to add.
-   * @return DenseImpl Result of the addition.
-   */
-  DenseImpl Add(const DenseImpl &A) const;
+  DimX = other.DimX;
+  DimY = other.DimY;
+  CPUData = other.CPUData;
 
-  /**
-   * @brief Multiplies two DenseImpl matrices.
-   *
-   * @param A Another DenseImpl object to multiply.
-   * @return DenseImpl Result of the multiplication.
-   */
-  DenseImpl RightMult(const DenseImpl &A) const;
+  return *this;
+}
 
-  /**
-   * @brief Scales the DenseImpl matrix by a scalar value.
-   *
-   * @param alpha Scalar value to multiply.
-   * @return DenseImpl Result of the scalar multiplication.
-   */
-  DenseImpl Scale(t_cplx alpha) const;
-
-  /**
-   * @brief Transposes the DenseImpl matrix.
-   *
-   * @return DenseImpl Transposed matrix.
-   */
-  DenseImpl Transpose() const;
-
-  /**
-   * @brief Computes the Hermitian conjugate of the DenseImpl matrix.
-   *
-   * @return DenseImpl Hermitian conjugate matrix.
-   */
-  DenseImpl HermitianC() const;
-
-  /**
-   * @brief Flattens the DenseImpl matrix data into a vector.
-   *
-   * @return t_hostVect Flattened data.
-   */
-  t_hostVect FlattenedData() const;
-
-  /**
-   * @brief Flattens the DenseImpl matrix data into a vector of integers.
-   *
-   * @return t_hostVectInt Flattened data as integers.
-   */
-  t_hostVectInt FlattenedDataInt() const;
-
-  /**
-   * @brief Prints the DenseImpl matrix.
-   *
-   * @param kind Type of data to print (real, imaginary, etc.).
-   * @param prec Precision of the printed data.
-   */
-  void Print(unsigned int kind, unsigned int prec) const;
-};
-
-Dense::DenseImpl Dense::DenseImpl::Add(const Dense::DenseImpl &A) const {
+DenseImpl DenseImpl::Add(const DenseImpl &A) const {
   std::cout << "DenseImpl Add" << std::endl;
   assert(DimX == A.DimX && DimY == A.DimY);
 
-  Dense::DenseImpl out(DimX, DimY);
+  DenseImpl out(DimX, DimY);
   for (int i = 0; i < DimX; ++i) {
     for (int j = 0; j < DimY; ++j) {
       out.CPUData[i][j] = CPUData[i][j] + A.CPUData[i][j];
@@ -157,10 +70,10 @@ Dense::DenseImpl Dense::DenseImpl::Add(const Dense::DenseImpl &A) const {
   return out;
 }
 
-Dense::DenseImpl Dense::DenseImpl::RightMult(const Dense::DenseImpl &A) const {
+DenseImpl DenseImpl::RightMult(const DenseImpl &A) const {
   assert(DimY == A.DimX);
 
-  Dense::DenseImpl out(DimX, A.DimY);
+  DenseImpl out(DimX, A.DimY);
   for (int i = 0; i < DimX; ++i) {
     for (int j = 0; j < DimY; ++j) {
       t_cplx sum = 0;
@@ -174,8 +87,8 @@ Dense::DenseImpl Dense::DenseImpl::RightMult(const Dense::DenseImpl &A) const {
   return out;
 }
 
-Dense::DenseImpl Dense::DenseImpl::Scale(t_cplx alpha) const {
-  Dense::DenseImpl out(DimX, DimY);
+DenseImpl DenseImpl::Scale(t_cplx alpha) const {
+  DenseImpl out(DimX, DimY);
 
   for (int i = 0; i < out.CPUData.size(); ++i) {
     for (int j = 0; j < out.CPUData[0].size(); ++j) {
@@ -186,8 +99,8 @@ Dense::DenseImpl Dense::DenseImpl::Scale(t_cplx alpha) const {
   return out;
 }
 
-Dense::DenseImpl Dense::DenseImpl::Transpose() const {
-  Dense::DenseImpl out(DimY, DimX);
+DenseImpl DenseImpl::Transpose() const {
+  DenseImpl out(DimY, DimX);
 
   for (int i = 0; i < DimY; ++i) {
     for (int j = 0; j < DimX; ++j) {
@@ -198,8 +111,8 @@ Dense::DenseImpl Dense::DenseImpl::Transpose() const {
   return out;
 }
 
-Dense::DenseImpl Dense::DenseImpl::HermitianC() const {
-  Dense::DenseImpl out(DimY, DimX);
+DenseImpl DenseImpl::HermitianC() const {
+  DenseImpl out(DimY, DimX);
 
   for (int i = 0; i < DimY; ++i) {
     for (int j = 0; j < DimX; ++j) {
@@ -210,7 +123,7 @@ Dense::DenseImpl Dense::DenseImpl::HermitianC() const {
   return out;
 }
 
-t_hostVect Dense::DenseImpl::FlattenedData() const {
+t_hostVect DenseImpl::FlattenedData() const {
   t_hostVect out;
   out.resize(DimX * DimY);
 
@@ -223,7 +136,7 @@ t_hostVect Dense::DenseImpl::FlattenedData() const {
   return out;
 }
 
-t_hostVectInt Dense::DenseImpl::FlattenedDataInt() const {
+t_hostVectInt DenseImpl::FlattenedDataInt() const {
   std::vector<int> out;
 
   out.resize(DimX * DimY);
@@ -237,7 +150,7 @@ t_hostVectInt Dense::DenseImpl::FlattenedDataInt() const {
   return out;
 }
 
-void Dense::DenseImpl::Print(unsigned int kind, unsigned int prec) const {
+void DenseImpl::Print(unsigned int kind, unsigned int prec) const {
   std::string s;
   std::stringstream stream;
   stream.setf(std::ios::fixed);
@@ -345,11 +258,13 @@ std::complex<double> &Dense::GetData(int i, int j) const {
 }
 
 /**
- * @brief Get a reference to the data at a specific position in the Dense matrix.
+ * @brief Get a reference to the data at a specific position in the Dense
+ * matrix.
  *
  * @param i Row index.
  * @param j Column index.
- * @return std::complex<double>& Reference to the element at the specified position.
+ * @return std::complex<double>& Reference to the element at the specified
+ * position.
  */
 std::complex<double> &Dense::GetDataRef(int i, int j) const {
   return pImpl->CPUData[i][j];

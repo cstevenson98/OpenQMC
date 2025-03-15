@@ -11,7 +11,7 @@ std::vector<State> SolveIVP(Vect& y0, double T0, Integrator& solver, double step
     double t0 = T0;
     Vect   x0 = y0;
 
-    unsigned int nx = x0.Data.size();
+    unsigned int nx = x0.size();
     Vect         y(nx);
 
     double t = t0;

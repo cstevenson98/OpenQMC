@@ -9,15 +9,15 @@
 #include "utils/CSV.cuh"
 #include "ode/Integrator.cuh"
 
-void ToCSV(const std::string& filename, const std::vector<State>& results) {
-    std::ofstream myfile;
-    myfile.open(filename);
-    for (const auto& r : results) {
-        myfile << r.T << "," ;
-        for (const auto elem : r.Y.Data) {
-            myfile << elem.real() << ",";
-        }
-        myfile << r.E << std::endl;
-    }
-    myfile.close();
-}
+// void ToCSV(const std::string& filename, const std::vector<State>& results) {
+//     std::ofstream myfile;
+//     myfile.open(filename);
+//     for (const auto& r : results) {
+//         myfile << r.T << "," ;
+//         for (const auto elem : r.Y.Data) {
+//             myfile << elem.real() << ",";
+//         }
+//         myfile << r.E << std::endl;
+//     }
+//     myfile.close();
+// }

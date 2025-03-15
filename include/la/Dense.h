@@ -9,8 +9,9 @@
 
 #include <complex>
 #include <memory>
-#include <vector>
 #include "core/types.h"
+
+class DenseImpl;
 
 /**
  * @brief A class representing dense matrices. Supports matrix algebra and uses
@@ -183,7 +184,6 @@ Dense();
   void Print(unsigned int kind = 0, unsigned int prec = 2) const;
 
 private:
-  class DenseImpl;
   std::unique_ptr<DenseImpl> pImpl;
 
   /**

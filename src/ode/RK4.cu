@@ -21,8 +21,8 @@ double RK4::Step(double step) {
     Func(k2, t + step/2., x.AddScaledVect(0.5, k1));
     k2 = k2.Scale(step);
 
-    Vect y0(x.Data.size());
-    Vect y1(y0.Data.size());
+    Vect y0(x.size());
+    Vect y1(y0.size());
 
     y0 = x.Add(k2);
 
@@ -47,9 +47,10 @@ double RK4::Step(double step) {
         Func(k4, t + nextStepSize, x.Add(k3));
         k4 = k4.Scale(nextStepSize);
 
-        for (int i = 0; i < y1.Data.size(); ++i) {
-            y1.Data[i] = x.Data[i] + 1./6.*k1.Data[i] + 1./3.*k2.Data[i]
-                                   + 1./3.*k3.Data[i] + 1./6.*k4.Data[i];
+        for (int i = 0; i < y1.size(); ++i) {
+            // Need to convert all this to be directly using host part of VectImpl class
+            // y1.GetDataRef()[i] = x.GetDataRef()[i] + 1./6.*k1.GetDataRef()[i] + 1./3.*k2.GetDataRef()[i]
+            //                        + 1./3.*k3.GetDataRef()[i] + 1./6.*k4.GetDataRef()[i];
         }
 
         err1 = y1.Subtract(y0).Norm();
