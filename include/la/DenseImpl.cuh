@@ -1,3 +1,9 @@
+//
+// Copyright (C) 2025 Conor Stevenson
+// Licensed under the GNU General Public License v3.0
+// Created by Conor Stevenson on 15/3/2025.
+//
+
 #include <vector>
 
 #include "core/types.cuh"
