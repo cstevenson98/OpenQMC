@@ -22,7 +22,7 @@ public:
 /**
  * @brief Default constructor to initialize an empty Dense matrix.
  */
-Dense();
+Dense() noexcept;
 
   /**
    * @brief Constructor to initialize Dense matrix with given dimensions.
@@ -37,19 +37,19 @@ Dense();
    * 
    * @param in Input matrix data.
    */
-  explicit Dense(t_hostMat &in);
+  explicit Dense(t_hostMat &in) noexcept;
 
   /**
    * @brief Destructor for Dense matrix.
    */
-  ~Dense();
+  ~Dense() noexcept;
 
   /**
    * @brief Copy constructor for Dense matrix.
    * 
    * @param other Another Dense object to copy from.
    */
-  Dense(const Dense &other);
+  Dense(const Dense &other) noexcept;
 
   /**
    * @brief Move constructor for Dense matrix.
@@ -64,7 +64,7 @@ Dense();
    * @param other Another Dense object to copy from.
    * @return Dense& Reference to the current object.
    */
-  Dense &operator=(const Dense &other);
+  Dense &operator=(const Dense &other) noexcept;
 
   /**
    * @brief Move assignment operator for Dense matrix.
@@ -74,6 +74,8 @@ Dense();
    */
   Dense &operator=(Dense &&other) noexcept;
 
+  // at 
+  std::complex<double> at(int col, int row) const noexcept;
   /**
    * @brief Get the number of rows in the Dense matrix.
    * 
@@ -128,7 +130,7 @@ Dense();
    * @param alpha Scalar value to multiply.
    * @return Dense Result of the scalar multiplication.
    */
-  Dense operator*(const t_cplx &alpha) const;
+  Dense operator*(const t_cplx &alpha) const noexcept;
 
   /**
    * @brief Overloaded multiplication operator for Dense matrices.
@@ -152,28 +154,22 @@ Dense();
    * 
    * @return Dense Transposed matrix.
    */
-  Dense Transpose() const;
+  Dense Transpose() const noexcept;
+
 
   /**
    * @brief Compute the Hermitian conjugate of the Dense matrix.
    * 
    * @return Dense Hermitian conjugate matrix.
    */
-  Dense HermitianC() const;
+  Dense HermitianC() const noexcept;
 
   /**
    * @brief Flatten the Dense matrix data into a vector.
    * 
    * @return t_hostVect Flattened data.
    */
-  t_hostVect FlattenedData() const;
-
-  /**
-   * @brief Flatten the Dense matrix data into a vector of integers.
-   * 
-   * @return t_hostVectInt Flattened data as integers.
-   */
-  t_hostVectInt FlattenedDataInt() const;
+  t_hostVect FlattenedData() const noexcept;
 
   /**
    * @brief Print the Dense matrix.
@@ -191,7 +187,7 @@ private:
    * 
    * @param pImpl Unique pointer to DenseImpl.
    */
-  Dense(std::unique_ptr<DenseImpl> pImpl);
+  Dense(std::unique_ptr<DenseImpl> pImpl) noexcept;
 };
 
 /**
@@ -201,6 +197,6 @@ private:
  * @param rhs Dense object to multiply.
  * @return Dense Result of the scalar multiplication.
  */
-Dense operator*(const std::complex<double> &alpha, const Dense &rhs);
+Dense operator*(const std::complex<double> &alpha, const Dense &rhs) noexcept;
 
 #endif // MAIN_DENSE_CUH

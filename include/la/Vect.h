@@ -21,194 +21,162 @@ class VectImpl;
  */
 class Vect {
 public:
-    /**
-     * @brief Default constructor to initialize an empty Vect.
-     */
-    explicit Vect();
+  /**
+   * @brief Default constructor to initialize an empty Vect.
+   */
+  explicit Vect();
 
-    /**
-     * @brief Constructor to initialize Vect with given size.
-     * 
-     * @param N Size of the vector.
-     */
-    explicit Vect(unsigned int N);
+  /**
+   * @brief Constructor to initialize Vect with given size.
+   *
+   * @param N Size of the vector.
+   */
+  explicit Vect(unsigned int N);
 
-    /**
-     * @brief Constructor to initialize Vect with given data.
-     * 
-     * @param in Input vector data.
-     */
-    explicit Vect(t_hostVect &in);
+  /**
+   * @brief Constructor to initialize Vect with given data.
+   *
+   * @param in Input vector data.
+   */
+  explicit Vect(t_hostVect &in);
 
-    /**
-     * @brief Destructor for Vect.
-     */
-    ~Vect();
+  /**
+   * @brief Destructor for Vect.
+   */
+  ~Vect();
 
-    /**
-     * @brief Copy constructor for Vect.
-     * 
-     * @param other Another Vect object to copy from.
-     */
-    Vect(const Vect &other);
+  /**
+   * @brief Copy constructor for Vect.
+   *
+   * @param other Another Vect object to copy from.
+   */
+  Vect(const Vect &other);
 
-    /**
-     * @brief Move constructor for Vect.
-     * 
-     * @param other Another Vect object to move from.
-     */
-    Vect(Vect &&other) noexcept;
+  /**
+   * @brief Move constructor for Vect.
+   *
+   * @param other Another Vect object to move from.
+   */
+  Vect(Vect &&other) noexcept;
 
-    /**
-     * @brief Copy assignment operator for Vect.
-     * 
-     * @param other Another Vect object to copy from.
-     * @return Vect& Reference to the current object.
-     */
-    Vect &operator=(const Vect &other);
+  /**
+   * @brief Copy assignment operator for Vect.
+   *
+   * @param other Another Vect object to copy from.
+   * @return Vect& Reference to the current object.
+   */
+  Vect &operator=(const Vect &other);
 
-    /**
-     * @brief Move assignment operator for Vect.
-     * 
-     * @param other Another Vect object to move from.
-     * @return Vect& Reference to the current object.
-     */
-    Vect &operator=(Vect &&other) noexcept;
+  /**
+   * @brief Move assignment operator for Vect.
+   *
+   * @param other Another Vect object to move from.
+   * @return Vect& Reference to the current object.
+   */
+  Vect &operator=(Vect &&other) noexcept;
 
-    /**
-     * @brief Adds two Vect objects.
-     * 
-     * @param A Another Vect object to add.
-     * @return Vect Result of the addition.
-     */
-    Vect Add(const Vect& A) const;
+  /**
+   * @brief Computes the conjugate of the Vect.
+   *
+   * @return Vect Conjugated vector.
+   */
+  Vect Conj() const;
 
-    /**
-     * @brief Subtracts one Vect object from another.
-     * 
-     * @param A Another Vect object to subtract.
-     * @return Vect Result of the subtraction.
-     */
-    Vect Subtract(const Vect& A) const;
+  /**
+   * @brief Overloaded addition operator for Vect objects.
+   *
+   * @param A Another Vect object to add.
+   * @return Vect Result of the addition.
+   */
+  Vect operator+(const Vect &A) const;
 
-    /**
-     * @brief Scales the Vect by a scalar value.
-     * 
-     * @param alpha Scalar value to multiply.
-     * @return Vect Result of the scalar multiplication.
-     */
-    Vect Scale(const t_cplx& alpha) const;
+  /**
+   * @brief Overloaded subtraction operator for Vect objects.
+   *
+   * @param A Another Vect object to subtract.
+   * @return Vect Result of the subtraction.
+   */
+  Vect operator-(const Vect &A) const;
 
-    /**
-     * @brief Adds a scaled Vect to the current Vect.
-     * 
-     * @param alpha Scalar value to multiply.
-     * @param A Another Vect object to add.
-     * @return Vect Result of the addition.
-     */
-    Vect AddScaledVect(const t_cplx& alpha, const Vect& A) const;
+  /**
+   * @brief Overloaded multiplication operator for scalar multiplication.
+   *
+   * @param alpha Scalar value to multiply.
+   * @return Vect Result of the scalar multiplication.
+   */
+  Vect operator*(const t_cplx &alpha) const;
 
-    /**
-     * @brief Computes the conjugate of the Vect.
-     * 
-     * @return Vect Conjugated vector.
-     */
-    Vect Conj() const;
+  /**
+   * @brief Overloaded subscript operator to access vector elements.
+   *
+   * @param i Index of the element.
+   * @return std::complex<double> Element at the specified position.
+   */
+  std::complex<double> operator[](unsigned int i) const;
 
-    /**
-     * @brief Overloaded addition operator for Vect objects.
-     * 
-     * @param A Another Vect object to add.
-     * @return Vect Result of the addition.
-     */
-    Vect operator + (const Vect& A) const;
+  /**
+   * @brief Computes the dot product of two Vect objects.
+   *
+   * @param A Another Vect object.
+   * @return double Dot product result.
+   */
+  std::complex<double> Dot(const Vect &A) const;
 
-    /**
-     * @brief Overloaded subtraction operator for Vect objects.
-     * 
-     * @param A Another Vect object to subtract.
-     * @return Vect Result of the subtraction.
-     */
-    Vect operator - (const Vect& A) const;
+  /**
+   * @brief Computes the norm of the Vect.
+   *
+   * @return double Norm of the vector.
+   */
+  double Norm() const;
 
-    /**
-     * @brief Overloaded multiplication operator for scalar multiplication.
-     * 
-     * @param alpha Scalar value to multiply.
-     * @return Vect Result of the scalar multiplication.
-     */
-    Vect operator * (const t_cplx& alpha) const;
+  /**
+   * @brief Prints the Vect.
+   *
+   * @param kind Type of data to print (real, imaginary, etc.).
+   */
+  void Print(unsigned int kind) const;
 
-    /**
-     * @brief Overloaded subscript operator to access vector elements.
-     * 
-     * @param i Index of the element.
-     * @return std::complex<double> Element at the specified position.
-     */
-    std::complex<double> operator [] (unsigned int i) const;
+  /**
+   * @brief Prints the real part of the Vect.
+   */
+  void PrintRe() const;
 
-    /**
-     * @brief Computes the dot product of two Vect objects.
-     * 
-     * @param A Another Vect object.
-     * @return double Dot product result.
-     */
-    double Dot(const Vect& A) const;
+  /**
+   * @brief Prints the imaginary part of the Vect.
+   */
+  void PrintIm() const;
 
-    /**
-     * @brief Computes the norm of the Vect.
-     * 
-     * @return double Norm of the vector.
-     */
-    double Norm() const;
+  /**
+   * @brief Prints the absolute value of the Vect.
+   */
+  void PrintAbs() const;
 
-    /**
-     * @brief Prints the Vect.
-     * 
-     * @param kind Type of data to print (real, imaginary, etc.).
-     */
-    void Print(unsigned int kind) const;
+  /**
+   * @brief Gets the size of the Vect.
+   *
+   * @return int Size of the vector.
+   */
+  int size() const;
 
-    /**
-     * @brief Prints the real part of the Vect.
-     */
-    void PrintRe() const;
-
-    /**
-     * @brief Prints the imaginary part of the Vect.
-     */
-    void PrintIm() const;
-
-    /**
-     * @brief Prints the absolute value of the Vect.
-     */
-    void PrintAbs() const;
-
-    /**
-     * @brief Gets the size of the Vect.
-     * 
-     * @return int Size of the vector.
-     */
-    int size() const;
-
-    /**
-     * @brief Gets the data of the Vect.
-     * 
-     * @return std::vector<std::complex<double>> Data of the vector.
-     */
-    std::vector<std::complex<double>> GetData() const;
+  /**
+   * @brief Gets the data of the Vect.
+   *
+   * @return std::vector<std::complex<double>> Data of the vector.
+   */
+  std::vector<std::complex<double>> GetData() const;
 
 private:
-    std::unique_ptr<VectImpl> pImpl;
+  std::unique_ptr<VectImpl> pImpl;
+  Vect(std::unique_ptr<VectImpl> pImpl);
 };
 
 /**
  * @brief Overloaded multiplication operator for scalar multiplication.
- * 
+ *
  * @param alpha Scalar value to multiply.
  * @param rhs Vect object to multiply.
  * @return Vect Result of the scalar multiplication.
  */
-Vect operator * (const t_cplx& alpha, const Vect& rhs);
+Vect operator*(const t_cplx &alpha, const Vect &rhs);
 
-#endif //MAIN_VECT_CUH
+#endif // MAIN_VECT_CUH

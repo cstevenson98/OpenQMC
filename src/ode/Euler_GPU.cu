@@ -13,7 +13,7 @@ Euler_GPU::Euler_GPU(th_hostVect &y0, double t0, SparseELL &M, double tol)
     : Tol(tol), D_x(y0.size(), 0), D_dx(y0.size(), 0) {
 
   D_M_Values = M.Values.FlattenedData();
-  D_M_Indices = M.Indices.FlattenedDataInt();
+  // D_M_Indices = M.Indices.FlattenedDataInt();
   n_columns = M.EntriesPerRow;
 
   x = y0;

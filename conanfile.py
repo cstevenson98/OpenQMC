@@ -22,6 +22,11 @@ class helloRecipe(ConanFile):
     # Sources are located in the same place as this recipe, copy them to the recipe
     exports_sources = "CMakeLists.txt", "src/*", "include/*"
 
+    # requirements are gtest and benchmark 
+    def requirements(self):
+        self.requires("gtest/1.16.0")
+        self.requires("benchmark/1.9.1")
+
     def config_options(self):
         if self.settings.os == "Windows":
             self.options.rm_safe("fPIC")

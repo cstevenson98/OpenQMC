@@ -13,7 +13,7 @@ RK4_GPU::RK4_GPU(th_hostVect &y0, double t0, SparseELL &M, double tol)
 
 {
     D_M_Values  = M.Values.FlattenedData();
-    D_M_Indices = M.Indices.FlattenedDataInt();
+    // D_M_Indices = M.Indices.FlattenedDataInt();
     n_columns   = M.EntriesPerRow;
 
     x = y0;

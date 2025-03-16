@@ -4,6 +4,7 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 #include <complex>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -56,10 +57,10 @@ VectImpl VectImpl::Scale(const th_cplx &alpha) const {
   return out;
 }
 
-double VectImpl::Dot(const VectImpl &A) const {
-  double dot = 0;
+std::complex<double> VectImpl::Dot(const VectImpl &A) const {
+  th_cplx dot = 0;
   for (unsigned int i = 0; i < this->Data.size(); ++i) {
-    dot += (conj(this->Data[i]) * A.Data[i]).real();
+    dot += this->Data[i] * A.Data[i];
   }
 
   return dot;
@@ -68,7 +69,7 @@ double VectImpl::Dot(const VectImpl &A) const {
 double VectImpl::Norm() const {
   double out = 0;
   for (auto elem : Data) {
-    out += abs(elem);
+    out += abs(elem) * abs(elem);
   }
 
   return sqrt(out);
@@ -136,6 +137,8 @@ void VectImpl::PrintIm() const { this->Print(2); }
 
 void VectImpl::PrintAbs() const { this->Print(3); }
 
+int VectImpl::size() const { return Data.size(); }
+
 std::vector<std::complex<double>> VectImpl::GetData() const {
   // convert thrust vector to std::vector
   std::vector<std::complex<double>> out;
@@ -153,25 +156,37 @@ Vect::Vect(unsigned int size)
 
 Vect::Vect(t_hostVect &in) : pImpl(std::make_unique<VectImpl>(in)) {}
 
+Vect::Vect(std::unique_ptr<VectImpl> pImpl) : pImpl(std::move(pImpl)) {}
+
 Vect Vect::Conj() const {
   Vect out;
   out.pImpl = std::make_unique<VectImpl>(pImpl->Conj());
   return out;
 }
 
-Vect Vect::operator+(const Vect &A) const { return this->Add(A); }
+Vect Vect::operator+(const Vect &A) const {
+  return Vect(std::make_unique<VectImpl>(pImpl->Add(*A.pImpl)));
+}
 
-Vect Vect::operator-(const Vect &A) const { return this->Subtract(A); }
+Vect Vect::operator-(const Vect &A) const {
+  return Vect(std::make_unique<VectImpl>(pImpl->Subtract(*A.pImpl)));
+}
 
-Vect Vect::operator*(const t_cplx &alpha) const { return this->Scale(alpha); }
+Vect Vect::operator*(const t_cplx &alpha) const {
+  return Vect(std::make_unique<VectImpl>(pImpl->Scale(alpha)));
+}
 
 Vect operator*(const t_cplx &alpha, const Vect &rhs) { return rhs * alpha; }
 
 std::complex<double> Vect::operator[](unsigned int i) const {
-  return (*pImpl)[i];
+  return pImpl->operator[](i);
 }
 
-double Vect::Dot(const Vect &A) const { return pImpl->Dot(*A.pImpl); }
+int Vect::size() const { return pImpl->size(); }
+
+std::complex<double> Vect::Dot(const Vect &A) const {
+  return pImpl->Dot(*A.pImpl);
+}
 
 double Vect::Norm() const { return pImpl->Norm(); }
 
@@ -206,4 +221,4 @@ Vect::Vect(Vect &&rhs) noexcept = default;
 
 Vect &Vect::operator=(Vect &&rhs) noexcept = default;
 
-Vect::Vect() = default;
+Vect::Vect() : pImpl(std::make_unique<VectImpl>()) {}

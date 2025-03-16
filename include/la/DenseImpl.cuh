@@ -19,12 +19,12 @@ public:
   /**
    * @brief Default constructor for DenseImpl.
    */
-  DenseImpl();
+  DenseImpl() noexcept;
 
   /**
    * @brief Destructor for DenseImpl.
    */
-  ~DenseImpl();
+  ~DenseImpl() noexcept;
 
   /**
    * @brief Constructor to initialize DenseImpl matrix with given dimensions.
@@ -39,7 +39,7 @@ public:
    *
    * @param other Another DenseImpl object to copy from.
    */
-  DenseImpl(const DenseImpl &other);
+  DenseImpl(const DenseImpl &other) noexcept;
 
   /**
    * @brief Move constructor for DenseImpl.
@@ -53,7 +53,7 @@ public:
    *
    * @param in Input matrix data.
    */
-  DenseImpl(t_hostMat &in);
+  DenseImpl(t_hostMat &in) noexcept;
 
   /**
    * @brief Copy assignment operator for DenseImpl.
@@ -61,7 +61,7 @@ public:
    * @param other Another DenseImpl object to copy from.
    * @return DenseImpl& Reference to the current object.
    */
-  DenseImpl &operator=(const DenseImpl &other);
+  DenseImpl &operator=(const DenseImpl &other) noexcept;
 
   /**
    * @brief Adds two DenseImpl matrices.
@@ -85,35 +85,28 @@ public:
    * @param alpha Scalar value to multiply.
    * @return DenseImpl Result of the scalar multiplication.
    */
-  DenseImpl Scale(t_cplx alpha) const;
+  DenseImpl Scale(t_cplx alpha) const noexcept;
 
   /**
    * @brief Transposes the DenseImpl matrix.
    *
    * @return DenseImpl Transposed matrix.
    */
-  DenseImpl Transpose() const;
+  DenseImpl Transpose() const noexcept;
 
   /**
    * @brief Computes the Hermitian conjugate of the DenseImpl matrix.
    *
    * @return DenseImpl Hermitian conjugate matrix.
    */
-  DenseImpl HermitianC() const;
+  DenseImpl HermitianC() const noexcept;
 
   /**
    * @brief Flattens the DenseImpl matrix data into a vector.
    *
    * @return t_hostVect Flattened data.
    */
-  t_hostVect FlattenedData() const;
-
-  /**
-   * @brief Flattens the DenseImpl matrix data into a vector of integers.
-   *
-   * @return t_hostVectInt Flattened data as integers.
-   */
-  t_hostVectInt FlattenedDataInt() const;
+  t_hostVect FlattenedData() const noexcept;
 
   /**
    * @brief Prints the DenseImpl matrix.
@@ -121,5 +114,5 @@ public:
    * @param kind Type of data to print (real, imaginary, etc.).
    * @param prec Precision of the printed data.
    */
-  void Print(unsigned int kind, unsigned int prec) const;
+  void Print(unsigned int kind, unsigned int prec) const noexcept;
 };

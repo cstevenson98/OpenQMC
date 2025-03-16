@@ -4,10 +4,11 @@
 // Created by Conor Stevenson on 03/04/2022.
 //
 
+#include "core/types.cuh"
+#include "core/types.h"
 #include "la/Dense.h"
 #include "la/DenseImpl.cuh"
-#include "core/types.h"
-#include "core/types.cuh"
+
 #include <cassert>
 #include <complex>
 #include <iostream>
@@ -15,13 +16,16 @@
 #include <vector>
 
 // DenseImpl constructor
-DenseImpl::DenseImpl() = default;
+DenseImpl::DenseImpl() noexcept : DimX(0), DimY(0) {}
 
 // DenseImpl destructor
-DenseImpl::~DenseImpl() = default;
+DenseImpl::~DenseImpl() noexcept = default;
 
 // DenseImpl constructor
 DenseImpl::DenseImpl(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
+  if (DimX < 0 || DimY < 0) {
+    throw std::invalid_argument("Invalid dimensions for Dense matrix.");
+  }
   CPUData.resize(DimX);
   for (int i = 0; i < DimX; ++i) {
     CPUData[i].resize(DimY);
@@ -29,7 +33,7 @@ DenseImpl::DenseImpl(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
 }
 
 // DenseImpl copy constructor
-DenseImpl::DenseImpl(const DenseImpl &other)
+DenseImpl::DenseImpl(const DenseImpl &other) noexcept
     : DimX(other.DimX), DimY(other.DimY), CPUData(other.CPUData) {}
 
 // DenseImpl move constructor
@@ -37,14 +41,13 @@ DenseImpl::DenseImpl(DenseImpl &&other) noexcept
     : DimX(other.DimX), DimY(other.DimY), CPUData(std::move(other.CPUData)) {}
 
 // DenseImpl constructor
-DenseImpl::DenseImpl(t_hostMat &in) {
-  DimX = in.size();
-  DimY = in[0].size();
+DenseImpl::DenseImpl(t_hostMat &in) noexcept
+    : DimX(in.size()), DimY(in[0].size()) {
   CPUData = in;
 }
 
 // Copy assignment operator
-DenseImpl &DenseImpl::operator=(const DenseImpl &other) {
+DenseImpl &DenseImpl::operator=(const DenseImpl &other) noexcept {
   if (this == &other) {
     return *this;
   }
@@ -57,8 +60,10 @@ DenseImpl &DenseImpl::operator=(const DenseImpl &other) {
 }
 
 DenseImpl DenseImpl::Add(const DenseImpl &A) const {
-  std::cout << "DenseImpl Add" << std::endl;
-  assert(DimX == A.DimX && DimY == A.DimY);
+  // if dimensions don't match, throw
+  if (DimX != A.DimX || DimY != A.DimY) {
+    throw std::invalid_argument("Dimensions do not match for Dense matrix.");
+  }
 
   DenseImpl out(DimX, DimY);
   for (int i = 0; i < DimX; ++i) {
@@ -66,12 +71,14 @@ DenseImpl DenseImpl::Add(const DenseImpl &A) const {
       out.CPUData[i][j] = CPUData[i][j] + A.CPUData[i][j];
     }
   }
-  std::cout << "DenseImpl Add returning..." << std::endl;
   return out;
 }
 
 DenseImpl DenseImpl::RightMult(const DenseImpl &A) const {
-  assert(DimY == A.DimX);
+  // if dimensions don't match, throw
+  if (DimY != A.DimX) {
+    throw std::invalid_argument("Dimensions do not match for Dense matrix.");
+  }
 
   DenseImpl out(DimX, A.DimY);
   for (int i = 0; i < DimX; ++i) {
@@ -87,7 +94,7 @@ DenseImpl DenseImpl::RightMult(const DenseImpl &A) const {
   return out;
 }
 
-DenseImpl DenseImpl::Scale(t_cplx alpha) const {
+DenseImpl DenseImpl::Scale(t_cplx alpha) const noexcept {
   DenseImpl out(DimX, DimY);
 
   for (int i = 0; i < out.CPUData.size(); ++i) {
@@ -99,7 +106,7 @@ DenseImpl DenseImpl::Scale(t_cplx alpha) const {
   return out;
 }
 
-DenseImpl DenseImpl::Transpose() const {
+DenseImpl DenseImpl::Transpose() const noexcept {
   DenseImpl out(DimY, DimX);
 
   for (int i = 0; i < DimY; ++i) {
@@ -111,7 +118,7 @@ DenseImpl DenseImpl::Transpose() const {
   return out;
 }
 
-DenseImpl DenseImpl::HermitianC() const {
+DenseImpl DenseImpl::HermitianC() const noexcept {
   DenseImpl out(DimY, DimX);
 
   for (int i = 0; i < DimY; ++i) {
@@ -123,7 +130,7 @@ DenseImpl DenseImpl::HermitianC() const {
   return out;
 }
 
-t_hostVect DenseImpl::FlattenedData() const {
+t_hostVect DenseImpl::FlattenedData() const noexcept {
   t_hostVect out;
   out.resize(DimX * DimY);
 
@@ -136,21 +143,7 @@ t_hostVect DenseImpl::FlattenedData() const {
   return out;
 }
 
-t_hostVectInt DenseImpl::FlattenedDataInt() const {
-  std::vector<int> out;
-
-  out.resize(DimX * DimY);
-
-  for (int i = 0; i < DimX; i++) {
-    for (int j = 0; j < DimY; j++) {
-      out[j + i * DimY] = round(abs(CPUData[i][j]));
-    }
-  }
-
-  return out;
-}
-
-void DenseImpl::Print(unsigned int kind, unsigned int prec) const {
+void DenseImpl::Print(unsigned int kind, unsigned int prec) const noexcept {
   std::string s;
   std::stringstream stream;
   stream.setf(std::ios::fixed);
@@ -196,13 +189,30 @@ void DenseImpl::Print(unsigned int kind, unsigned int prec) const {
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
+// Default constructor
+Dense::Dense() noexcept : pImpl(std::make_unique<DenseImpl>()) {}
+
+// Dense constructor
+Dense::Dense(int dimX, int dimY)
+    : pImpl(std::make_unique<DenseImpl>(dimX, dimY)) {
+  // throw if dimensions are invalid
+  if (dimX < 0 || dimY < 0) {
+    throw std::invalid_argument("Invalid dimensions for Dense matrix.");
+  }
+}
+
+// Dense constructor
+Dense::Dense(t_hostMat &in) noexcept : pImpl(std::make_unique<DenseImpl>(in)) {
+  pImpl->CPUData = in;
+}
+
 // Destructor
-Dense::~Dense() = default;
+Dense::~Dense() noexcept = default;
 
 /**
  * @brief Dense copy constructor
  */
-Dense::Dense(const Dense &other)
+Dense::Dense(const Dense &other) noexcept
     : pImpl(std::make_unique<DenseImpl>(*other.pImpl)) {}
 
 /*
@@ -210,18 +220,14 @@ Dense::Dense(const Dense &other)
  */
 Dense::Dense(Dense &&other) noexcept : pImpl(std::move(other.pImpl)) {}
 
-/*
- * @brief Dense non-empty constructor
- */
-Dense::Dense(t_hostMat &in) : pImpl(std::make_unique<DenseImpl>(in)) {}
-
 /**
  * @brief Dense non-empty constructor
  */
-Dense::Dense(std::unique_ptr<DenseImpl> impl) : pImpl(std::move(impl)) {}
+Dense::Dense(std::unique_ptr<DenseImpl> impl) noexcept
+    : pImpl(std::move(impl)) {}
 
 // Copy assignment operator
-Dense &Dense::operator=(const Dense &other) {
+Dense &Dense::operator=(const Dense &other) noexcept {
   if (this == &other) {
     return *this;
   }
@@ -254,6 +260,19 @@ int Dense::DimY() const { return pImpl->DimY; }
  * @return std::complex<double> Element at the specified position.
  */
 std::complex<double> &Dense::GetData(int i, int j) const {
+  // if out of bounds, throw
+  if (i < 0 || i >= pImpl->DimX || j < 0 || j >= pImpl->DimY) {
+    throw std::out_of_range("Index out of bounds for Dense matrix.");
+  }
+  return pImpl->CPUData[i][j];
+}
+
+// at access, which will never throw
+std::complex<double> Dense::at(int i, int j) const noexcept {
+  // make sure in range
+  if (i < 0 || i >= pImpl->DimX || j < 0 || j >= pImpl->DimY) {
+    return {-1337., -1337.};
+  }
   return pImpl->CPUData[i][j];
 }
 
@@ -336,7 +355,7 @@ Dense Dense::operator-(const Dense &A) const {
  * @param alpha Scalar value to multiply.
  * @return Dense Result of the scalar multiplication.
  */
-Dense Dense::operator*(const t_cplx &alpha) const {
+Dense Dense::operator*(const t_cplx &alpha) const noexcept {
   return Dense(std::make_unique<DenseImpl>(pImpl->Scale(alpha)));
 }
 
@@ -347,14 +366,16 @@ Dense Dense::operator*(const t_cplx &alpha) const {
  * @param rhs Dense object to multiply.
  * @return Dense Result of the scalar multiplication.
  */
-Dense operator*(const t_cplx &alpha, const Dense &rhs) { return rhs * alpha; }
+Dense operator*(const t_cplx &alpha, const Dense &rhs) noexcept {
+  return rhs * alpha;
+}
 
 /**
  * @brief Transpose the Dense matrix.
  *
  * @return Dense Transposed matrix.
  */
-Dense Dense::Transpose() const {
+Dense Dense::Transpose() const noexcept {
   return Dense(std::make_unique<DenseImpl>(pImpl->Transpose()));
 }
 
@@ -363,7 +384,7 @@ Dense Dense::Transpose() const {
  *
  * @return Dense Hermitian conjugate matrix.
  */
-Dense Dense::HermitianC() const {
+Dense Dense::HermitianC() const noexcept {
   return Dense(std::make_unique<DenseImpl>(pImpl->HermitianC()));
 }
 
@@ -372,15 +393,8 @@ Dense Dense::HermitianC() const {
  *
  * @return t_hostVect Flattened data.
  */
-t_hostVect Dense::FlattenedData() const { return pImpl->FlattenedData(); }
-
-/**
- * @brief Flatten the Dense matrix data into a vector of integers.
- *
- * @return t_hostVectInt Flattened data as integers.
- */
-t_hostVectInt Dense::FlattenedDataInt() const {
-  return pImpl->FlattenedDataInt();
+t_hostVect Dense::FlattenedData() const noexcept {
+  return pImpl->FlattenedData();
 }
 
 /**

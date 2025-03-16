@@ -62,7 +62,7 @@ void SPMV_ELL_CALL(const SparseELL &M, Vect &v) {
   t_devcVect D_MdotVect;
 
   D_M_Values = M.Values.FlattenedData();
-  D_M_Indices = M.Indices.FlattenedDataInt();
+  // D_M_Indices = M.Indices.FlattenedDataInt();
   D_Vect = v.GetData();
   D_MdotVect = v.GetData();
 

@@ -11,3 +11,6 @@ add_subdirectory(src)
 set(main_files main.cpp)
 add_executable(main ${main_files})
 target_link_libraries(main oqmc)
+
+# testing directory
+add_subdirectory(test)
