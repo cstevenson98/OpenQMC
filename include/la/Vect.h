@@ -20,7 +20,7 @@ class VectImpl;
  * complex numbers.
  */
 class Vect {
-public:
+ public:
   /**
    * @brief Default constructor to initialize an empty Vect.
    */
@@ -165,9 +165,10 @@ public:
    */
   std::vector<std::complex<double>> GetData() const;
 
-private:
+ private:
   std::unique_ptr<VectImpl> pImpl;
   Vect(std::unique_ptr<VectImpl> pImpl);
+  friend class Sparse;  // Allow Sparse to access private members
 };
 
 /**
@@ -179,4 +180,4 @@ private:
  */
 Vect operator*(const t_cplx &alpha, const Vect &rhs);
 
-#endif // MAIN_VECT_CUH
+#endif  // MAIN_VECT_CUH

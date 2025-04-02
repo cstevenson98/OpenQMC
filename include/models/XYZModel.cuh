@@ -7,7 +7,7 @@
 #ifndef MAIN_XYZMODEL_CUH
 #define MAIN_XYZMODEL_CUH
 
-#include "la/Sparse.cuh"
+#include "la/Sparse.h"
 
 // XYZ model of N coupled 2LS
 struct XYZModel {

@@ -8,7 +8,7 @@
 #define MAIN_ELASTICCHAIN1D_CUH
 
 
-#include "la/Sparse.cuh"
+#include "la/SparseImpl.cuh"
 
 class ElasticChain1D {
     int N;
@@ -18,7 +18,7 @@ public:
     ElasticChain1D(int n, double w0, double kappa, double delta) : 
     N(n), w0(w0),kappa(kappa), delta(delta) { };
 
-    Sparse Dx();
+    SparseImpl Dx();
 };
 
 

@@ -7,7 +7,7 @@
 #ifndef MAIN_OPEN_CUH
 #define MAIN_OPEN_CUH
 
-#include "la/Sparse.cuh"
+#include "la/Sparse.h"
 
 Sparse Lindblad(const Sparse& A);
 Sparse Lindblad(const Sparse& A, const Sparse& B);

@@ -7,32 +7,32 @@
 #ifndef MAIN_SUPER_CUH
 #define MAIN_SUPER_CUH
 
-#include "la/Sparse.cuh"
+#include "la/SparseImpl.cuh"
 
 /**
  * @brief Computes the Kronecker product of two sparse matrices.
- * 
+ *
  * @param A First sparse matrix.
  * @param B Second sparse matrix.
- * @return Sparse Resulting sparse matrix from the Kronecker product.
+ * @return SparseImpl Resulting sparse matrix from the Kronecker product.
  */
-Sparse Kronecker(const Sparse& A, const Sparse& B);
+SparseImpl Kronecker(const SparseImpl &A, const SparseImpl &B);
 
 /**
  * @brief Computes the tensor product of a vector of sparse matrices.
- * 
+ *
  * @param matrices Vector of sparse matrices.
- * @return Sparse Resulting sparse matrix from the tensor product.
+ * @return SparseImpl Resulting sparse matrix from the tensor product.
  */
-Sparse Tensor(const std::vector<Sparse>& matrices);
+SparseImpl Tensor(const std::vector<SparseImpl> &matrices);
 
 /**
  * @brief Converts two sparse matrices into a super matrix.
- * 
+ *
  * @param A First sparse matrix.
  * @param B Second sparse matrix.
- * @return Sparse Resulting super sparse matrix.
+ * @return SparseImpl Resulting super sparse matrix.
  */
-Sparse ToSuper(const Sparse& A, const Sparse& B);
+SparseImpl ToSuper(const SparseImpl &A, const SparseImpl &B);
 
-#endif //MAIN_SUPER_CUH
+#endif // MAIN_SUPER_CUH

@@ -9,13 +9,32 @@ skinparam class {
 }
 
 package "la" {
-    ' Vect class (existing PIMPL)
-    class VectImpl {
-        - std::vector<std::complex<double>> data
-        + VectImpl()
-        + VectImpl(unsigned int N)
-        + VectImpl(t_hostVect& in)
-        + ... other methods ...
+    package "CUDA/Thrust Implementation" as cuda #LightCyan {
+        ' Vect class (existing PIMPL)
+        class VectImpl {
+            - std::vector<std::complex<double>> data
+            + VectImpl()
+            + VectImpl(unsigned int N)
+            + VectImpl(t_hostVect& in)
+            + ... other methods ...
+        }
+
+        ' Dense class (existing PIMPL)
+        class DenseImpl {
+            - std::vector<std::complex<double>> data
+            + DenseImpl()
+            + DenseImpl(int dimX, int dimY)
+            + DenseImpl(t_hostMat& in)
+            + ... other methods ...
+        }
+
+        ' SparseELL class (existing PIMPL)
+        class SparseELLImpl {
+            - std::vector<std::complex<double>> data
+            + SparseELLImpl()
+            + SparseELLImpl(int dimX, int dimY, int maxNnzPerRow)
+            + ... other methods ...
+        }
     }
 
     class Vect {
@@ -34,15 +53,6 @@ package "la" {
       - Reduces compilation dependencies
       - Provides ABI stability
     end note
-
-    ' Dense class (existing PIMPL)
-    class DenseImpl {
-        - std::vector<std::complex<double>> data
-        + DenseImpl()
-        + DenseImpl(int dimX, int dimY)
-        + DenseImpl(t_hostMat& in)
-        + ... other methods ...
-    }
 
     class Dense {
         - std::unique_ptr<DenseImpl> pImpl
@@ -69,14 +79,6 @@ package "la" {
       - Will improve ABI stability
       - Will reduce compilation dependencies
     end note
-
-    ' SparseELL class (existing PIMPL)
-    class SparseELLImpl {
-        - std::vector<std::complex<double>> data
-        + SparseELLImpl()
-        + SparseELLImpl(int dimX, int dimY, int maxNnzPerRow)
-        + ... other methods ...
-    }
 
     class SparseELL {
         - std::unique_ptr<SparseELLImpl> pImpl

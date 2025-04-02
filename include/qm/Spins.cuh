@@ -7,10 +7,10 @@
 #ifndef MAIN_SPINS_CUH
 #define MAIN_SPINS_CUH
 
-#include "la/Sparse.cuh"
+#include "la/Sparse.h"
 
 // Defines 2 level systems
-Sparse Identity(unsigned int N);
+SparseImpl Identity(unsigned int N);
 
 // Single spin
 Sparse SigmaX();
@@ -26,4 +26,4 @@ Sparse SigmaZ(unsigned int N, unsigned int j);
 Sparse SigmaPlus(unsigned int N, unsigned int j);
 Sparse SigmaMinus(unsigned int N, unsigned int j);
 
-#endif //MAIN_SPINS_CUH
+#endif // MAIN_SPINS_CUH

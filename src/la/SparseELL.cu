@@ -5,38 +5,38 @@
 //
 
 #include "core/types.cuh"
-#include "la/Sparse.cuh"
+#include "la/Sparse.h"
 #include "la/SparseELL.h"
 
-SparseELL ToSparseELL(const Sparse &A) {
-  auto rows = SparseRowsCOO(A);
+// SparseELL ToSparseELL(const Sparse &A) {
+//   auto rows = SparseRowsCOO(A);
 
-  // determine length of longest row
-  unsigned int highestCount = 0;
-  for (auto row : rows) {
-    unsigned int len = row.RowData.size();
-    if (len > highestCount) {
-      highestCount = len;
-    }
-  }
+//   // determine length of longest row
+//   unsigned int highestCount = 0;
+//   for (auto row : rows) {
+//     unsigned int len = row.RowData.size();
+//     if (len > highestCount) {
+//       highestCount = len;
+//     }
+//   }
 
-  SparseELL out(A.DimX, A.DimY, highestCount);
-  for (auto row : rows) {
-    for (int i = 0; i < row.RowData.size(); i++) {
-      // Change to denseimpls
-      // out.Values.GetDataRef(row.Index, i) = row.RowData[i].Val;
-      // out.Indices.GetDataRef(row.Index, i) = row.RowData[i].Coords[1];
-    }
+//   SparseELL out(A.DimX, A.DimY, highestCount);
+//   for (auto row : rows) {
+//     for (int i = 0; i < row.RowData.size(); i++) {
+//       // Change to denseimpls
+//       // out.Values.GetDataRef(row.Index, i) = row.RowData[i].Val;
+//       // out.Indices.GetDataRef(row.Index, i) = row.RowData[i].Coords[1];
+//     }
 
-    // padding with '-1'
-    for (int i = row.RowData.size(); i < highestCount; i++) {
-      // out.Values.GetDataRef(row.Index, i) = 0;
-      // out.Indices.GetDataRef(row.Index, i) = -1;
-    }
-  }
+//     // padding with '-1'
+//     for (int i = row.RowData.size(); i < highestCount; i++) {
+//       // out.Values.GetDataRef(row.Index, i) = 0;
+//       // out.Indices.GetDataRef(row.Index, i) = -1;
+//     }
+//   }
 
-  return out;
-}
+//   return out;
+// }
 
 // TODO: Figure out a way to let underlying pimpls communicate with each other
 //  in order to implement this function.

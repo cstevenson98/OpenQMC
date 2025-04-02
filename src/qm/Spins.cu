@@ -5,11 +5,11 @@
 //
 
 #include "core/types.h"
-#include "la/Super.cuh"
+#include "la/SparseImpl.cuh"
 #include "qm/Spins.cuh"
 
-Sparse Identity(unsigned int N) {
-  Sparse out(N, N);
+SparseImpl Identity(unsigned int N) {
+  SparseImpl out(N, N);
   for (int i = 0; i < N; ++i) {
     out.Data.emplace_back(i, i, 1);
   }
@@ -52,13 +52,14 @@ Sparse SigmaX(unsigned int N, unsigned int j) {
 
   for (int i = 0; i < N; ++i) {
     if (i == j) {
-      operators.emplace_back(SigmaX());
+      // operators.emplace_back(SigmaX());
     } else {
-      operators.emplace_back(Identity(2));
+      // operators.emplace_back(Identity(2));
     }
   }
 
-  return Tensor(operators);
+  // return Tensor(operators);
+  return Sparse(pow(2, N), pow(2, N));
 }
 
 Sparse SigmaY(unsigned int N, unsigned int j) {
@@ -66,13 +67,14 @@ Sparse SigmaY(unsigned int N, unsigned int j) {
 
   for (int i = 0; i < N; ++i) {
     if (i == j) {
-      operators.emplace_back(SigmaY());
+      // operators.emplace_back(SigmaY());
     } else {
-      operators.emplace_back(Identity(2));
+      // operators.emplace_back(Identity(2));
     }
   }
 
-  return Tensor(operators);
+  // return Tensor(operators);
+  return Sparse(pow(2, N), pow(2, N));
 }
 
 Sparse SigmaZ(unsigned int N, unsigned int j) {
@@ -80,13 +82,14 @@ Sparse SigmaZ(unsigned int N, unsigned int j) {
 
   for (int i = 0; i < N; ++i) {
     if (i == j) {
-      operators.emplace_back(SigmaZ());
+      // operators.emplace_back(SigmaZ());
     } else {
-      operators.emplace_back(Identity(2));
+      // operators.emplace_back(Identity(2));
     }
   }
 
-  return Tensor(operators);
+  // return Tensor(operators);
+  return Sparse(pow(2, N), pow(2, N));
 }
 
 Sparse SigmaPlus(unsigned int N, unsigned int j) {
@@ -94,13 +97,14 @@ Sparse SigmaPlus(unsigned int N, unsigned int j) {
 
   for (int i = 0; i < N; ++i) {
     if (i == j) {
-      operators.emplace_back(SigmaPlus());
+      // operators.emplace_back(SigmaPlus());
     } else {
-      operators.emplace_back(Identity(2));
+      // operators.emplace_back(Identity(2));
     }
   }
 
-  return Tensor(operators);
+  // return Tensor(operators);
+  return Sparse(pow(2, N), pow(2, N));
 }
 
 Sparse SigmaMinus(unsigned int N, unsigned int j) {
@@ -108,11 +112,12 @@ Sparse SigmaMinus(unsigned int N, unsigned int j) {
 
   for (int i = 0; i < N; ++i) {
     if (i == j) {
-      operators.emplace_back(SigmaMinus());
+      // operators.emplace_back(SigmaMinus());
     } else {
-      operators.emplace_back(Identity(2));
+      // operators.emplace_back(Identity(2));
     }
   }
 
-  return Tensor(operators);
+  // return Tensor(operators);
+  return Sparse(pow(2, N), pow(2, N));
 }

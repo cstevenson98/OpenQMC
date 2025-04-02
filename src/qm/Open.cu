@@ -4,26 +4,27 @@
 // Created by conor on 16/04/22.
 //
 
-#include "qm/Open.cuh"
+#include "core/types.h"
+#include "la/SparseImpl.cuh"
 #include "la/Super.cuh"
 #include "qm/Spins.cuh"
 
-Sparse Lindblad(const Sparse& A) {
-    auto id = Identity(A.DimY);
+SparseImpl Lindblad(const SparseImpl &A) {
+  auto id = Identity(A.DimY);
 
-    auto AdagA = A.HermitianC() * A;
-    return 2 * ToSuper(A, A.HermitianC()) - ToSuper(AdagA, id) - ToSuper(id, AdagA);
+  auto AdagA = A.HermitianC() * A;
+  return ToSuper(A, A.HermitianC()) * t_cplx(2.0) - ToSuper(AdagA, id) -
+         ToSuper(id, AdagA);
 }
 
+SparseImpl Lindblad(const SparseImpl &A, const SparseImpl &B) {
+  auto id = Identity(A.DimY);
+  auto BA = B * A;
 
-Sparse Lindblad(const Sparse& A, const Sparse& B) {
-    auto id = Identity(A.DimY);
-    auto BA = B * A;
-
-    return 2 * ToSuper(A, B) - ToSuper(BA, id) - ToSuper(id, BA);
+  return ToSuper(A, B) * t_cplx(2.0) - ToSuper(BA, id) - ToSuper(id, BA);
 }
 
-Sparse SuperComm(const Sparse& A) {
-    auto id = Identity(A.DimY);
-    return ToSuper(A, id) - ToSuper(id, A);
+SparseImpl SuperComm(const SparseImpl &A) {
+  auto id = Identity(A.DimY);
+  return ToSuper(A, id) - ToSuper(id, A);
 }
