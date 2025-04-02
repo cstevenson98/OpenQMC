@@ -1,0 +1,91 @@
+@startuml Matrix Classes PIMPL Structure
+
+' Style settings
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+package "la" {
+    ' Vect class (existing PIMPL)
+    class VectImpl {
+        - std::vector<std::complex<double>> data
+        + VectImpl()
+        + VectImpl(unsigned int N)
+        + VectImpl(t_hostVect& in)
+        + ... other methods ...
+    }
+
+    class Vect {
+        - std::unique_ptr<VectImpl> pImpl
+        + Vect()
+        + Vect(unsigned int N)
+        + Vect(t_hostVect& in)
+        + ... other methods ...
+    }
+
+    Vect --> VectImpl : pImpl
+
+    note right of Vect
+      PIMPL Idiom:
+      - Hides implementation details
+      - Reduces compilation dependencies
+      - Provides ABI stability
+    end note
+
+    ' Dense class (existing PIMPL)
+    class DenseImpl {
+        - std::vector<std::complex<double>> data
+        + DenseImpl()
+        + DenseImpl(int dimX, int dimY)
+        + DenseImpl(t_hostMat& in)
+        + ... other methods ...
+    }
+
+    class Dense {
+        - std::unique_ptr<DenseImpl> pImpl
+        + Dense()
+        + Dense(int dimX, int dimY)
+        + Dense(t_hostMat& in)
+        + ... other methods ...
+    }
+
+    Dense --> DenseImpl : pImpl
+
+    ' Sparse class (to be converted to PIMPL)
+    class Sparse {
+        + int DimX
+        + int DimY
+        + std::vector<COOTuple> Data
+        + Sparse(int dimX, int dimY)
+        + ... other methods ...
+    }
+
+    note right of Sparse
+      To be converted to PIMPL:
+      - Will hide COO format implementation
+      - Will improve ABI stability
+      - Will reduce compilation dependencies
+    end note
+
+    ' SparseELL class (existing PIMPL)
+    class SparseELLImpl {
+        - std::vector<std::complex<double>> data
+        + SparseELLImpl()
+        + SparseELLImpl(int dimX, int dimY, int maxNnzPerRow)
+        + ... other methods ...
+    }
+
+    class SparseELL {
+        - std::unique_ptr<SparseELLImpl> pImpl
+        + SparseELL()
+        + SparseELL(int dimX, int dimY, int maxNnzPerRow)
+        + ... other methods ...
+    }
+
+    SparseELL --> SparseELLImpl : pImpl
+}
+
+@enduml

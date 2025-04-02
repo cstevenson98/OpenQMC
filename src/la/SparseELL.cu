@@ -6,7 +6,7 @@
 
 #include "core/types.cuh"
 #include "la/Sparse.cuh"
-#include "la/SparseELL.cuh"
+#include "la/SparseELL.h"
 
 SparseELL ToSparseELL(const Sparse &A) {
   auto rows = SparseRowsCOO(A);
@@ -37,6 +37,9 @@ SparseELL ToSparseELL(const Sparse &A) {
 
   return out;
 }
+
+// TODO: Figure out a way to let underlying pimpls communicate with each other
+//  in order to implement this function.
 
 // Vect SparseELL::VectMult(const Vect::Impl &vect) const {
 //   Vect out(vect.Data.size());

@@ -1,6 +1,8 @@
-#include "la/Vect.h"
-#include <complex>
 #include <gtest/gtest.h>
+
+#include <complex>
+
+#include "la/Vect.h"
 
 TEST(VectTests, DefaultConstructorTest) {
   Vect A;

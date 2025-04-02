@@ -12,8 +12,8 @@
 #include <thrust/host_vector.h>
 
 #include "core/types.cuh"
-#include "la/SparseELL.cuh"
-
+#include "la/SparseELL.h"
+#include "la/Vect.h"
 
 void xpy_fast(t_devcVect &X, t_devcVect &Y);
 void saxpy_fast(th_cplx A, t_devcVect &X, t_devcVect &Y);

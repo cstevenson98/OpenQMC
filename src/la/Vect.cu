@@ -16,7 +16,6 @@
 VectImpl VectImpl::Conj() const {
   VectImpl out(Data.size());
   out.Data.resize(Data.size());
-
   for (int i = 0; i < Data.size(); ++i) {
     out.Data[i] = thrust::conj(Data[i]);
   }

@@ -61,7 +61,10 @@ void SPMV_ELL_CALL(const SparseELL &M, Vect &v) {
   t_devcVect D_Vect;
   t_devcVect D_MdotVect;
 
-  D_M_Values = M.Values.FlattenedData();
+  // TODO: Implement a GPU half of the underlying SparseELLImpl class,
+  // so that all we need to do is ask for the gpu raw pointer which we pass
+  // to the kernel.
+  // D_M_Values = M.Values.FlattenedData();
   // D_M_Indices = M.Indices.FlattenedDataInt();
   D_Vect = v.GetData();
   D_MdotVect = v.GetData();
@@ -77,12 +80,11 @@ void SPMV_ELL_CALL(const SparseELL &M, Vect &v) {
   numThreads = 128;
   numBlocks = ceil(v.size() / 128.);
 
-    spmv_ell_kernel<<< numThreads, numBlocks >>>(v.size(),
-                                            M.EntriesPerRow,
-                                            D_MIndicesArray,
-                                            D_MValuesArray,
-                                            D_xArray,
-                                            D_dxArray);
+  // TODO: Uncomment once the SparseEll provides access to the internal
+  // device pointers
+  // spmv_ell_kernel<<<numThreads, numBlocks>>>(v.size(), M.EntriesPerRow,
+  //                                            D_MIndicesArray, D_MValuesArray,
+  //                                            D_xArray, D_dxArray);
 
   thrust::copy(D_MdotVect.begin(), D_MdotVect.end(), D_Vect.begin());
 }

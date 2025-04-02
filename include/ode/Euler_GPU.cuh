@@ -11,7 +11,8 @@
 #include <thrust/complex.h>
 
 #include "ode/Integrator.cuh"
-#include "la/SparseELL.cuh"
+#include "la/SparseELL.h"
+#include "core/types.cuh"
 
 class Euler_GPU : public Integrator {
     th_hostVect    x, dx;

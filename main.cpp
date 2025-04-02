@@ -13,6 +13,7 @@
 // #include "utils/CSV.cuh"
 
 #include "la/Dense.h"
+#include "la/SparseELL.h"
 // complex literals
 #include <complex>
 #include <cstdio>
@@ -31,6 +32,8 @@ int main() { //
 
   auto d2 = 222 * dense * dense;
   d2.Print();
+
+  auto ell = SparseELL();
 
   // auto d2 = dense + dense;
 
