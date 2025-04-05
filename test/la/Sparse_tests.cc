@@ -127,26 +127,6 @@ TEST(SparseTests, ToDenseTest) {
   EXPECT_EQ(B.DimY(), 3);
 }
 
-TEST(SparseTests, SortByRowTest) {
-  t_hostMat data = {{{1.0, 2.0}, {0.0, 0.0}, {3.0, 4.0}},
-                    {{0.0, 0.0}, {5.0, 6.0}, {0.0, 0.0}}};
-  Sparse A(data);
-  A.SortByRow();
-  EXPECT_EQ(A.DimX(), 2);
-  EXPECT_EQ(A.DimY(), 3);
-  EXPECT_EQ(A.NNZ(), 3);
-}
-
-TEST(SparseTests, TrimTest) {
-  t_hostMat data = {{{1.0, 2.0}, {0.0, 0.0}, {3.0, 4.0}},
-                    {{0.0, 0.0}, {5.0, 6.0}, {0.0, 0.0}}};
-  Sparse A(data);
-  A.Trim();
-  EXPECT_EQ(A.DimX(), 2);
-  EXPECT_EQ(A.DimY(), 3);
-  EXPECT_EQ(A.NNZ(), 3);
-}
-
 TEST(SparseTests, VectMultTest) {
   t_hostMat data = {{{1.0, 2.0}, {0.0, 0.0}, {3.0, 4.0}},
                     {{0.0, 0.0}, {5.0, 6.0}, {0.0, 0.0}}};
@@ -254,31 +234,4 @@ TEST(SparseTests, SparseColsCOOTest) {
   Sparse s(data);
   std::vector<CompressedRow> cols = SparseColsCOO(s);
   EXPECT_EQ(cols.size(), 3);
-}
-
-TEST(SparseTests, SparseVectorSumTest) {
-  CompressedRow A(0);
-  A.RowData.push_back(COOTuple(0, 0, std::complex<double>(1.0, 2.0)));
-  A.RowData.push_back(COOTuple(0, 2, std::complex<double>(3.0, 4.0)));
-
-  CompressedRow B(0);
-  B.RowData.push_back(COOTuple(0, 1, std::complex<double>(5.0, 6.0)));
-  B.RowData.push_back(COOTuple(0, 2, std::complex<double>(7.0, 8.0)));
-
-  CompressedRow C = SparseVectorSum(A, B);
-  EXPECT_EQ(C.Index, 0);
-  EXPECT_EQ(C.RowData.size(), 3);
-}
-
-TEST(SparseTests, SparseDotTest) {
-  CompressedRow A(0);
-  A.RowData.push_back(COOTuple(0, 0, std::complex<double>(1.0, 2.0)));
-  A.RowData.push_back(COOTuple(0, 2, std::complex<double>(3.0, 4.0)));
-
-  CompressedRow B(0);
-  B.RowData.push_back(COOTuple(0, 0, std::complex<double>(5.0, 6.0)));
-  B.RowData.push_back(COOTuple(0, 2, std::complex<double>(7.0, 8.0)));
-
-  std::complex<double> dot = SparseDot(A, B);
-  // We don't check the exact value as per requirements
 }

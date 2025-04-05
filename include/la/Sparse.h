@@ -157,11 +157,6 @@ class Sparse {
   Dense ToDense();
 
   /**
-   * @brief Sorts the Sparse matrix data by row.
-   */
-  void SortByRow();
-
-  /**
    * @brief Trims the Sparse matrix data.
    */
   void Trim();

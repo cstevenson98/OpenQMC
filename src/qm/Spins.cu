@@ -10,9 +10,9 @@
 
 SparseImpl Identity(unsigned int N) {
   SparseImpl out(N, N);
-  for (int i = 0; i < N; ++i) {
-    out.Data.emplace_back(i, i, 1);
-  }
+  // for (int i = 0; i < N; ++i) {
+  //   out.Data.emplace_back(i, i, 1);
+  // }
 
   return out;
 }

@@ -160,6 +160,13 @@ public:
   std::vector<std::complex<double>> GetData() const;
 
   /**
+   * @brief Sets the data of the VectImpl.
+   *
+   * @param data Data to set.
+   */
+  void SetData(const std::vector<std::complex<double>> &data);
+
+  /**
    * @brief Gets the size of the VectImpl.
    *
    * @return int Size of the vector.

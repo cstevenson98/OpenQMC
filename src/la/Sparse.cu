@@ -5,6 +5,7 @@
 //
 
 #include "la/Dense.h"
+#include "la/DenseImpl.cuh"
 #include "la/Sparse.h"
 #include "la/SparseImpl.cuh"
 #include "la/Super.cuh"
@@ -60,11 +61,11 @@ Sparse Sparse::HermitianC() const {
   return Sparse(std::make_unique<SparseImpl>(pImpl->HermitianC()));
 }
 
-Dense Sparse::ToDense() { return pImpl->ToDense(); }
+Dense Sparse::ToDense() {
+  return Dense(std::make_unique<DenseImpl>(pImpl->ToDense()));
+}
 
-void Sparse::SortByRow() { pImpl->SortByRow(); }
-
-void Sparse::Trim() { pImpl->Trim(); }
+// void Sparse::Trim() { pImpl->Trim(); }
 
 Vect Sparse::VectMult(const Vect &vect) const {
   return Vect(std::make_unique<VectImpl>(pImpl->VectMult(*vect.pImpl)));

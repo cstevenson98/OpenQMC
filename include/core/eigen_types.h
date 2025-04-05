@@ -8,9 +8,14 @@
 #define EIGEN_TYPES_H
 
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 
 // Eigen types
 using t_eigenVect = Eigen::VectorXcd;
 using t_eigenMat = Eigen::MatrixXcd;
+
+// Define Eigen sparse matrix type with row-major storage
+using t_eigenSparseMat =
+    Eigen::SparseMatrix<std::complex<double>, Eigen::RowMajor>;
 
 #endif  // EIGEN_TYPES_H

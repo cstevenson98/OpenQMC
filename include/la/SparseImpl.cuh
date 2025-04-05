@@ -6,22 +6,23 @@
 
 #pragma once
 
+#include "core/eigen_types.h"
 #include "core/types.h"
 #include "la/Dense.h"
 #include "la/Sparse.h"
 #include "la/VectImpl.cuh"
+#include <Eigen/Sparse>
 #include <complex>
-#include <vector>
 
 /**
- * @brief A class representing the implementation of sparse matrices in COO
- * format. Supports matrix algebra and uses complex numbers.
+ * @brief A class representing the implementation of sparse matrices using
+ * Eigen. Supports matrix algebra and uses complex numbers.
  */
 class SparseImpl {
 public:
-  int DimX;                   ///< Number of rows
-  int DimY;                   ///< Number of columns
-  std::vector<COOTuple> Data; ///< Matrix data stored in COO format
+  int DimX;                 ///< Number of rows
+  int DimY;                 ///< Number of columns
+  t_eigenSparseMat CPUData; ///< Matrix data stored in Eigen sparse matrix
 
   /**
    * @brief Constructor to initialize SparseImpl matrix with given dimensions.
@@ -29,7 +30,8 @@ public:
    * @param dimX Number of rows.
    * @param dimY Number of columns.
    */
-  SparseImpl(int dimX, int dimY) : DimX(dimX), DimY(dimY) {};
+  SparseImpl(int dimX, int dimY)
+      : DimX(dimX), DimY(dimY), CPUData(dimX, dimY) {};
 
   /**
    * @brief Constructor to initialize SparseImpl matrix from a host matrix.
@@ -79,9 +81,9 @@ public:
   /**
    * @brief Converts the SparseImpl matrix to a Dense matrix.
    *
-   * @return Dense Dense matrix.
+   * @return DenseImpl Dense matrix.
    */
-  Dense ToDense();
+  DenseImpl ToDense();
 
   /**
    * @brief Sorts the SparseImpl matrix data by row.
@@ -100,20 +102,6 @@ public:
    * @return Vect Result of the multiplication.
    */
   VectImpl VectMult(const VectImpl &vect) const;
-
-  /**
-   * @brief Gets the rows of the matrix in compressed row format.
-   *
-   * @return std::vector<CompressedRow> Vector of compressed rows.
-   */
-  std::vector<CompressedRow> GetRows() const;
-
-  /**
-   * @brief Gets the columns of the matrix in compressed column format.
-   *
-   * @return std::vector<CompressedRow> Vector of compressed columns.
-   */
-  std::vector<CompressedRow> GetCols() const;
 
   /**
    * @brief Overloaded addition operator for SparseImpl matrices.
@@ -186,7 +174,7 @@ public:
   /**
    * @brief Gets the host data of the SparseImpl matrix.
    *
-   * @return const std::vector<COOTuple>& Reference to the COO data.
+   * @return const t_hostMat The host data.
    */
   const t_hostMat GetHostData() const;
 

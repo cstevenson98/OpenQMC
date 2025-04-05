@@ -13,6 +13,7 @@
 #include "core/types.h"
 
 class DenseImpl;
+class Sparse;
 
 /**
  * @brief A class representing dense matrices. Supports matrix algebra and uses
@@ -186,6 +187,8 @@ class Dense {
    * @param prec Precision of the printed data.
    */
   void Print(unsigned int kind = 0, unsigned int prec = 2) const;
+
+  friend class Sparse;
 
  private:
   std::unique_ptr<DenseImpl> pImpl;
