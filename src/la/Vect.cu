@@ -15,64 +15,33 @@
 
 VectImpl VectImpl::Conj() const {
   VectImpl out(Data.size());
-  out.Data.resize(Data.size());
-  for (int i = 0; i < Data.size(); ++i) {
-    out.Data[i] = thrust::conj(Data[i]);
-  }
-
+  out.Data = Data.conjugate();
   return out;
 }
 
 VectImpl VectImpl::Add(const VectImpl &A) const {
   VectImpl out(Data.size());
-  out.Data.resize(Data.size());
-
-  for (int i = 0; i < Data.size(); ++i) {
-    out.Data[i] = Data[i] + A.Data[i];
-  }
-
+  out.Data = Data + A.Data;
   return out;
 }
 
 VectImpl VectImpl::Subtract(const VectImpl &A) const {
   VectImpl out(Data.size());
-  out.Data.resize(Data.size());
-
-  for (int i = 0; i < A.Data.size(); ++i) {
-    out.Data[i] = Data[i] - A.Data[i];
-  }
-
+  out.Data = Data - A.Data;
   return out;
 }
 
 VectImpl VectImpl::Scale(const th_cplx &alpha) const {
   VectImpl out(Data.size());
-  out.Data.resize(Data.size());
-
-  for (int i = 0; i < Data.size(); ++i) {
-    out.Data[i] = alpha * Data[i];
-  }
-
+  out.Data = Data * alpha;
   return out;
 }
 
 std::complex<double> VectImpl::Dot(const VectImpl &A) const {
-  th_cplx dot = 0;
-  for (unsigned int i = 0; i < this->Data.size(); ++i) {
-    dot += this->Data[i] * A.Data[i];
-  }
-
-  return dot;
+  return Data.dot(A.Data);
 }
 
-double VectImpl::Norm() const {
-  double out = 0;
-  for (auto elem : Data) {
-    out += abs(elem) * abs(elem);
-  }
-
-  return sqrt(out);
-}
+double VectImpl::Norm() const { return Data.norm(); }
 
 VectImpl VectImpl::operator+(const VectImpl &A) const { return this->Add(A); }
 
@@ -84,12 +53,8 @@ VectImpl VectImpl::operator*(const th_cplx &alpha) const {
   return this->Scale(alpha);
 }
 
-//   Impl operator*(const th_cplx &alpha, const Vect::Impl &rhs) {
-//     return rhs * alpha;
-//   }
-
 std::complex<double> VectImpl::operator[](unsigned int i) const {
-  return this->Data[i];
+  return this->Data(i);
 }
 
 void VectImpl::Print(unsigned int kind) const {
@@ -99,25 +64,25 @@ void VectImpl::Print(unsigned int kind) const {
   stream.precision(2);
 
   stream << " Vector [" << Data.size() << " x " << 1 << "]:" << std::endl;
-  for (const auto &X : Data) {
+  for (int i = 0; i < Data.size(); ++i) {
     stream << "   ";
-    std::string spaceCharRe = !std::signbit(X.real()) ? " " : "";
-    std::string spaceCharIm = !std::signbit(X.imag()) ? " " : "";
-    std::string spaceCharAbs = !std::signbit(X.imag()) ? " + " : " - ";
+    std::string spaceCharRe = !std::signbit(Data(i).real()) ? " " : "";
+    std::string spaceCharIm = !std::signbit(Data(i).imag()) ? " " : "";
+    std::string spaceCharAbs = !std::signbit(Data(i).imag()) ? " + " : " - ";
 
     switch (kind) {
     case 0: // re + im
-      stream << spaceCharRe << X.real() << spaceCharAbs << abs(X.imag())
-             << "i  ";
+      stream << spaceCharRe << Data(i).real() << spaceCharAbs
+             << abs(Data(i).imag()) << "i  ";
       break;
     case 1: // re
-      stream << spaceCharRe << X.real() << " ";
+      stream << spaceCharRe << Data(i).real() << " ";
       break;
     case 2: // im
-      stream << spaceCharIm << X.imag() << "i  ";
+      stream << spaceCharIm << Data(i).imag() << "i  ";
       break;
     case 3: // abs
-      stream << " " << abs(X);
+      stream << " " << abs(Data(i));
       break;
     default:
       stream << "[e]";
@@ -139,10 +104,12 @@ void VectImpl::PrintAbs() const { this->Print(3); }
 int VectImpl::size() const { return Data.size(); }
 
 std::vector<std::complex<double>> VectImpl::GetData() const {
-  // convert thrust vector to std::vector
+  // convert Eigen vector to std::vector
   std::vector<std::complex<double>> out;
   out.resize(Data.size());
-  thrust::copy(Data.begin(), Data.end(), out.begin());
+  for (int i = 0; i < Data.size(); ++i) {
+    out[i] = Data(i);
+  }
   return out;
 }
 
@@ -223,4 +190,3 @@ Vect::Vect(Vect &&rhs) noexcept = default;
 Vect &Vect::operator=(Vect &&rhs) noexcept = default;
 
 Vect::Vect() : pImpl(std::make_unique<VectImpl>()) {}
-

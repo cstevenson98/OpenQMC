@@ -9,14 +9,14 @@
 #include "la/Dense.h"
 #include "la/DenseImpl.cuh"
 
+#include <Eigen/Dense>
 #include <cassert>
 #include <complex>
 #include <iostream>
 #include <memory>
-#include <vector>
 
 // DenseImpl constructor
-DenseImpl::DenseImpl() noexcept : DimX(0), DimY(0) {}
+DenseImpl::DenseImpl() noexcept : DimX(0), DimY(0), CPUData(0, 0) {}
 
 // DenseImpl destructor
 DenseImpl::~DenseImpl() noexcept = default;
@@ -26,10 +26,7 @@ DenseImpl::DenseImpl(int dimX, int dimY) : DimX(dimX), DimY(dimY) {
   if (DimX < 0 || DimY < 0) {
     throw std::invalid_argument("Invalid dimensions for Dense matrix.");
   }
-  CPUData.resize(DimX);
-  for (int i = 0; i < DimX; ++i) {
-    CPUData[i].resize(DimY);
-  }
+  CPUData = Eigen::MatrixXcd::Zero(DimX, DimY);
 }
 
 // DenseImpl copy constructor
@@ -43,7 +40,12 @@ DenseImpl::DenseImpl(DenseImpl &&other) noexcept
 // DenseImpl constructor
 DenseImpl::DenseImpl(t_hostMat &in) noexcept
     : DimX(in.size()), DimY(in[0].size()) {
-  CPUData = in;
+  CPUData = Eigen::MatrixXcd::Zero(DimX, DimY);
+  for (int i = 0; i < DimX; ++i) {
+    for (int j = 0; j < DimY; ++j) {
+      CPUData(i, j) = in[i][j];
+    }
+  }
 }
 
 // Copy assignment operator
@@ -66,11 +68,7 @@ DenseImpl DenseImpl::Add(const DenseImpl &A) const {
   }
 
   DenseImpl out(DimX, DimY);
-  for (int i = 0; i < DimX; ++i) {
-    for (int j = 0; j < DimY; ++j) {
-      out.CPUData[i][j] = CPUData[i][j] + A.CPUData[i][j];
-    }
-  }
+  out.CPUData = CPUData + A.CPUData;
   return out;
 }
 
@@ -81,52 +79,25 @@ DenseImpl DenseImpl::RightMult(const DenseImpl &A) const {
   }
 
   DenseImpl out(DimX, A.DimY);
-  for (int i = 0; i < DimX; ++i) {
-    for (int j = 0; j < DimY; ++j) {
-      t_cplx sum = 0;
-      for (int k = 0; k < DimY; ++k) {
-        sum += CPUData[i][k] * A.CPUData[k][j];
-      }
-      out.CPUData[i][j] = sum;
-    }
-  }
-
+  out.CPUData = CPUData * A.CPUData;
   return out;
 }
 
 DenseImpl DenseImpl::Scale(t_cplx alpha) const noexcept {
   DenseImpl out(DimX, DimY);
-
-  for (int i = 0; i < out.CPUData.size(); ++i) {
-    for (int j = 0; j < out.CPUData[0].size(); ++j) {
-      out.CPUData[i][j] = alpha * CPUData[i][j];
-    }
-  }
-
+  out.CPUData = CPUData * alpha;
   return out;
 }
 
 DenseImpl DenseImpl::Transpose() const noexcept {
   DenseImpl out(DimY, DimX);
-
-  for (int i = 0; i < DimY; ++i) {
-    for (int j = 0; j < DimX; ++j) {
-      out.CPUData[i][j] = CPUData[j][i];
-    }
-  }
-
+  out.CPUData = CPUData.transpose();
   return out;
 }
 
 DenseImpl DenseImpl::HermitianC() const noexcept {
   DenseImpl out(DimY, DimX);
-
-  for (int i = 0; i < DimY; ++i) {
-    for (int j = 0; j < DimX; ++j) {
-      out.CPUData[i][j] = conj(CPUData[j][i]);
-    }
-  }
-
+  out.CPUData = CPUData.adjoint();
   return out;
 }
 
@@ -134,11 +105,9 @@ t_hostVect DenseImpl::FlattenedData() const noexcept {
   t_hostVect out;
   out.resize(DimX * DimY);
 
-  for (int i = 0; i < DimX; i++) {
-    for (int j = 0; j < DimY; j++) {
-      out[j + i * DimY] = CPUData[i][j];
-    }
-  }
+  // Eigen stores matrices in column-major order, so we need to transpose
+  Eigen::Map<Eigen::VectorXcd> eigenVec(out.data(), out.size());
+  eigenVec = Eigen::Map<const Eigen::VectorXcd>(CPUData.data(), CPUData.size());
 
   return out;
 }
@@ -150,9 +119,10 @@ void DenseImpl::Print(unsigned int kind, unsigned int prec) const noexcept {
   stream.precision(prec);
 
   stream << " Matrix [" << DimX << " x " << DimY << "]:" << std::endl;
-  for (const auto &X : CPUData) {
+  for (int i = 0; i < DimX; ++i) {
     stream << "   ";
-    for (auto Y : X) {
+    for (int j = 0; j < DimY; ++j) {
+      t_cplx Y = CPUData(i, j);
       std::string spaceCharRe = !std::signbit(Y.real()) ? " " : "";
       std::string spaceCharIm = !std::signbit(Y.imag()) ? " " : "";
       std::string spaceCharAbs = !std::signbit(Y.imag()) ? " + " : "-";
@@ -179,7 +149,6 @@ void DenseImpl::Print(unsigned int kind, unsigned int prec) const noexcept {
   }
 
   s = stream.str();
-
   std::cout << s << std::endl;
 }
 
@@ -202,9 +171,7 @@ Dense::Dense(int dimX, int dimY)
 }
 
 // Dense constructor
-Dense::Dense(t_hostMat &in) noexcept : pImpl(std::make_unique<DenseImpl>(in)) {
-  pImpl->CPUData = in;
-}
+Dense::Dense(t_hostMat &in) noexcept : pImpl(std::make_unique<DenseImpl>(in)) {}
 
 // Destructor
 Dense::~Dense() noexcept = default;
@@ -252,7 +219,18 @@ int Dense::DimX() const { return pImpl->DimX; }
  */
 int Dense::DimY() const { return pImpl->DimY; }
 
-const t_hostMat &Dense::GetHostData() const { return pImpl->CPUData; }
+t_hostMat Dense::GetHostData() const {
+  // Convert the Eigen matrix to a t_hostMat
+  t_hostMat result;
+  result.resize(pImpl->DimX);
+  for (int i = 0; i < pImpl->DimX; ++i) {
+    result[i].resize(pImpl->DimY);
+    for (int j = 0; j < pImpl->DimY; ++j) {
+      result[i][j] = pImpl->CPUData(i, j);
+    }
+  }
+  return result;
+}
 
 /**
  * @brief Get the data at a specific position in the Dense matrix.
@@ -266,7 +244,8 @@ std::complex<double> &Dense::GetData(int i, int j) const {
   if (i < 0 || i >= pImpl->DimX || j < 0 || j >= pImpl->DimY) {
     throw std::out_of_range("Index out of bounds for Dense matrix.");
   }
-  return pImpl->CPUData[i][j];
+  // Return a copy of the element
+  return pImpl->CPUData.coeffRef(i, j);
 }
 
 // at access, which will never throw
@@ -275,7 +254,7 @@ std::complex<double> Dense::at(int i, int j) const noexcept {
   if (i < 0 || i >= pImpl->DimX || j < 0 || j >= pImpl->DimY) {
     return {-1337., -1337.};
   }
-  return pImpl->CPUData[i][j];
+  return pImpl->CPUData(i, j);
 }
 
 /**
@@ -284,11 +263,12 @@ std::complex<double> Dense::at(int i, int j) const noexcept {
  *
  * @param i Row index.
  * @param j Column index.
- * @return std::complex<double>& Reference to the element at the specified
- * position.
+ * @return std::complex<double> Element at the specified position.
  */
-std::complex<double> &Dense::GetDataRef(int i, int j) const {
-  return pImpl->CPUData[i][j];
+std::complex<double> Dense::GetDataRef(int i, int j) const {
+  // Return a copy of the element since Eigen doesn't provide non-const
+  // references
+  return pImpl->CPUData(i, j);
 }
 
 /**
@@ -300,7 +280,7 @@ std::complex<double> &Dense::GetDataRef(int i, int j) const {
  */
 std::complex<double> Dense::operator[](int col, int row) {
   if (pImpl != nullptr) {
-    return pImpl->CPUData[col][row];
+    return pImpl->CPUData(col, row);
   }
   return -1337.;
 }

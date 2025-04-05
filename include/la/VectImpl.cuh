@@ -4,6 +4,7 @@
 // Created by Conor Stevenson on 15/3/2025.
 //
 
+#include "core/eigen_types.h"
 #include "core/types.cuh"
 #include "la/Vect.h"
 
@@ -23,14 +24,19 @@ public:
    *
    * @param size Size of the vector.
    */
-  VectImpl(unsigned int size) { Data.resize(size); }
+  VectImpl(unsigned int size) : Data(t_eigenVect::Zero(size)) {}
 
   /**
    * @brief Constructor to initialize VectImpl with given data.
    *
    * @param in Input vector data.
    */
-  explicit VectImpl(t_hostVect &in) { Data = in; }
+  explicit VectImpl(t_hostVect &in) {
+    Data.resize(in.size());
+    for (size_t i = 0; i < in.size(); ++i) {
+      Data(i) = in[i];
+    }
+  }
 
   /**
    * @brief Gets the host data of the VectImpl.
@@ -40,7 +46,9 @@ public:
   const t_hostVect &GetHostData() const {
     static t_hostVect hostData;
     hostData.resize(Data.size());
-    thrust::copy(Data.begin(), Data.end(), hostData.begin());
+    for (int i = 0; i < Data.size(); ++i) {
+      hostData[i] = Data(i);
+    }
     return hostData;
   }
 
@@ -159,7 +167,7 @@ public:
   int size() const;
 
 private:
-  th_hostVect Data; ///< Vector data
+  t_eigenVect Data; ///< Vector data using Eigen
 };
 
 /**

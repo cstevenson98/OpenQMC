@@ -1,0 +1,13 @@
+{
+    "version": "0.5",
+    "requires": [
+        "gtest/1.16.0#b79e331e44bc2ce4fca3cf59c56387b6%1741011059.386",
+        "eigen/3.4.0#2e192482a8acff96fe34766adca2b24c%1680436083.8",
+        "benchmark/1.9.1#73d267daf0371b7f6605edef1594a681%1736524768.274"
+    ],
+    "build_requires": [
+        "cmake/3.31.5#e3bab375e96b9be619fd62f6e406c5cf%1739197479.641"
+    ],
+    "python_requires": [],
+    "config_requires": []
+}

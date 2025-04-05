@@ -94,29 +94,28 @@ class Dense {
   /**
    * @brief Gets the host data of the Dense matrix.
    *
-   * @return const t_hostMat& Reference to the host data.
+   * @return t_hostMat The host data.
    */
-  const t_hostMat &GetHostData() const;
+  t_hostMat GetHostData() const;
 
   /**
    * @brief Get the data at a specific position in the Dense matrix.
    *
-   * @param col Column index.
-   * @param row Row index.
-   * @return std::complex<double>& Element at the specified position.
+   * @param i Row index.
+   * @param j Column index.
+   * @return std::complex<double> Element at the specified position.
    */
-  std::complex<double> &GetData(int col, int row) const;
+  std::complex<double> &GetData(int i, int j) const;
 
   /**
    * @brief Get a reference to the data at a specific position in the Dense
    * matrix.
    *
-   * @param col Column index.
-   * @param row Row index.
-   * @return std::complex<double>& Reference to the element at the specified
-   * position.
+   * @param i Row index.
+   * @param j Column index.
+   * @return std::complex<double> Element at the specified position.
    */
-  std::complex<double> &GetDataRef(int col, int row) const;
+  std::complex<double> GetDataRef(int i, int j) const;
 
   /**
    * @brief Overloaded addition operator for Dense matrices.

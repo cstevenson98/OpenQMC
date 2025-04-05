@@ -4,17 +4,19 @@
 // Created by Conor Stevenson on 15/3/2025.
 //
 
+#include <Eigen/Dense>
 #include <vector>
 
+#include "core/eigen_types.h"
 #include "core/types.cuh"
 #include "core/types.h"
 #include "la/Dense.h"
 
 class DenseImpl {
 public:
-  int DimX;          ///< Number of rows
-  int DimY;          ///< Number of columns
-  t_hostMat CPUData; ///< Matrix data stored in a 2D vector
+  int DimX;           ///< Number of rows
+  int DimY;           ///< Number of columns
+  t_eigenMat CPUData; ///< Matrix data stored in Eigen matrix
 
   /**
    * @brief Default constructor for DenseImpl.

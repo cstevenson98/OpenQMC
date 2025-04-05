@@ -26,6 +26,7 @@ class helloRecipe(ConanFile):
     def requirements(self):
         self.requires("gtest/1.16.0")
         self.requires("benchmark/1.9.1")
+        self.requires("eigen/3.4.0")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -43,6 +44,9 @@ class helloRecipe(ConanFile):
         deps.generate()
         tc = CMakeToolchain(self)
         tc.variables["CMAKE_EXPORT_COMPILE_COMMANDS"] = "ON"
+        # Configure Eigen to use OpenBLAS
+        tc.variables["EIGEN_USE_BLAS"] = "ON"
+        tc.variables["EIGEN_USE_LAPACK"] = "ON"
         tc.generate()
 
     def build(self):

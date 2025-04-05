@@ -118,15 +118,19 @@ TEST(VectTests, DotProductTest) {
   auto a1 = std::complex<double>(1.0, 2.0);
   auto a2 = std::complex<double>(3.0, 4.0);
   auto a3 = std::complex<double>(5.0, 6.0);
+
   auto b1 = std::complex<double>(7.0, 8.0);
   auto b2 = std::complex<double>(9.0, 10.0);
   auto b3 = std::complex<double>(11.0, 12.0);
+  
   t_hostVect data1 = {a1, a2, a3};
   t_hostVect data2 = {b1, b2, b3};
   Vect A(data1);
   Vect B(data2);
+
   std::complex<double> dotProduct = A.Dot(B);
-  EXPECT_EQ(dotProduct, a1 * b1 + a2 * b2 + a3 * b3);
+  EXPECT_EQ(dotProduct, std::conj(a1) * b1 + std::conj(a2) * b2 +
+                            std::conj(a3) * b3);
 }
 
 TEST(VectTests, NormTest) {

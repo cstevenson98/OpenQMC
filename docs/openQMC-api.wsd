@@ -28,6 +28,14 @@ package "la" {
             + ... other methods ...
         }
 
+        class SparseImpl {
+            - std::vector<std::complex<double>> data
+            + SparseImpl()
+            + SparseImpl(int dimX, int dimY)
+            + SparseImpl(t_hostMat& in)
+            + ... other methods ...
+        }
+
         ' SparseELL class (existing PIMPL)
         class SparseELLImpl {
             - std::vector<std::complex<double>> data
@@ -73,12 +81,7 @@ package "la" {
         + ... other methods ...
     }
 
-    note right of Sparse
-      To be converted to PIMPL:
-      - Will hide COO format implementation
-      - Will improve ABI stability
-      - Will reduce compilation dependencies
-    end note
+    Sparse --> SparseImpl : pImpl
 
     class SparseELL {
         - std::unique_ptr<SparseELLImpl> pImpl
