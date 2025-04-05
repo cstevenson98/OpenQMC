@@ -12,15 +12,16 @@
 // #include "qm/Spins.cuh"
 // #include "utils/CSV.cuh"
 
-#include "la/Dense.h"
-#include "la/SparseELL.h"
-// complex literals
 #include <complex>
 #include <cstdio>
 #include <iostream>
+
+#include "la/Dense.h"
+#include "la/Sparse.h"
+#include "la/SparseELL.h"
 #include "la/Vect.h"
 
-int main() { //
+int main() {  //
   using namespace std::complex_literals;
   auto d = t_hostMat{{1., 2. - 3.i}, {3., 4. + 1.i}};
 
@@ -35,7 +36,9 @@ int main() { //
 
   auto ell = SparseELL();
 
-  
+  Sparse sparse(d);
+
+  t_hostMat dense2 = sparse.GetHostData();
 
   // auto d2 = dense + dense;
 

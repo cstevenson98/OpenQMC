@@ -159,6 +159,13 @@ class Vect {
   int size() const;
 
   /**
+   * @brief Gets the host data of the Vect.
+   *
+   * @return const t_hostVect& Reference to the host data.
+   */
+  const t_hostVect &GetHostData() const;
+
+  /**
    * @brief Gets the data of the Vect.
    *
    * @return std::vector<std::complex<double>> Data of the vector.

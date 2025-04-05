@@ -3,7 +3,7 @@
 ## PIMPL Implementation Tasks
 
 ### High Priority
-- [ ] Convert `Sparse` class to use PIMPL idiom
+- [X] Convert `Sparse` class to use PIMPL idiom
   - Create `SparseImpl` class in CUDA/Thrust implementation package
   - Move COO format implementation details to `SparseImpl`
   - Update `Sparse` interface to use `std::unique_ptr<SparseImpl>`

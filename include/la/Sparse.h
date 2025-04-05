@@ -78,6 +78,13 @@ class Sparse {
   Sparse(int dimX, int dimY);
 
   /**
+   * @brief Constructor to initialize Sparse matrix from a host matrix.
+   *
+   * @param in Host matrix to initialize from.
+   */
+  explicit Sparse(const t_hostMat& in);
+
+  /**
    * @brief Destructor for Sparse matrix.
    */
   ~Sparse() noexcept;
@@ -235,11 +242,25 @@ class Sparse {
   unsigned int NNZ() const;
 
   /**
-   * @brief Gets the host data of the Sparse matrix.
+   * @brief Gets the number of rows in the Sparse matrix.
    *
-   * @return const std::vector<COOTuple>& Reference to the COO data.
+   * @return int Number of rows.
    */
-  const std::vector<COOTuple>& GetHostData() const;
+  int DimX() const;
+
+  /**
+   * @brief Gets the number of columns in the Sparse matrix.
+   *
+   * @return int Number of columns.
+   */
+  int DimY() const;
+
+  /**
+   * @brief Gets the host data of the Sparse matrix in COO format.
+   *
+   * @return const t_hostMat, the host data.
+   */
+  const t_hostMat GetHostData() const;
 
   /**
    * @brief Gets a reference to a coefficient in the matrix.

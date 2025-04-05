@@ -24,6 +24,8 @@
 Sparse::Sparse(int dimX, int dimY)
     : pImpl(std::make_unique<SparseImpl>(dimX, dimY)) {}
 
+Sparse::Sparse(const t_hostMat &in) : pImpl(std::make_unique<SparseImpl>(in)) {}
+
 Sparse::~Sparse() noexcept = default;
 
 Sparse::Sparse(const Sparse &other) noexcept
@@ -98,16 +100,95 @@ void Sparse::PrintAbs() const { pImpl->PrintAbs(); }
 
 unsigned int Sparse::NNZ() const { return pImpl->NNZ(); }
 
-const std::vector<COOTuple> &Sparse::GetHostData() const {
-  return pImpl->GetHostData();
-}
+int Sparse::DimX() const { return pImpl->DimX; }
 
-std::complex<double> &Sparse::CoeffRef(int i, int j) {
-  return pImpl->CoeffRef(i, j);
-}
+int Sparse::DimY() const { return pImpl->DimY; }
+
+const t_hostMat Sparse::GetHostData() const { return pImpl->GetHostData(); }
 
 Sparse::Sparse(std::unique_ptr<SparseImpl> pImpl) : pImpl(std::move(pImpl)) {}
 
 Sparse operator*(const std::complex<double> &alpha, const Sparse &rhs) {
   return rhs * alpha;
+}
+
+Sparse ToSparseCOO(const Dense &d) {
+  // Get the dimensions of the dense matrix
+  int dimX = d.DimX();
+  int dimY = d.DimY();
+
+  // Create a host matrix to store the data
+  t_hostMat hostData(dimX, std::vector<std::complex<double>>(dimY));
+
+  // Copy the data from the dense matrix to the host matrix
+  for (int i = 0; i < dimX; ++i) {
+    for (int j = 0; j < dimY; ++j) {
+      hostData[i][j] = d.GetData(i, j);
+    }
+  }
+
+  // Create a sparse matrix from the host matrix
+  return Sparse(hostData);
+}
+
+std::vector<CompressedRow> SparseRowsCOO(const Sparse &s) {
+  // Get the dimensions of the sparse matrix
+  int dimX = s.DimX();
+  int dimY = s.DimY();
+
+  // Get the host data of the sparse matrix
+  const t_hostMat hostData = s.GetHostData();
+
+  // Create a vector of CompressedRow objects
+  std::vector<CompressedRow> rows;
+
+  // For each row in the matrix
+  for (int i = 0; i < dimX; ++i) {
+    // Create a CompressedRow object for the current row
+    CompressedRow row(i);
+
+    // For each column in the row
+    for (int j = 0; j < dimY; ++j) {
+      // If the element is non-zero, add it to the row data
+      if (std::abs(hostData[i][j]) > 1e-10) {
+        row.RowData.emplace_back(i, j, hostData[i][j]);
+      }
+    }
+
+    // Add the row to the vector of rows
+    rows.push_back(row);
+  }
+
+  return rows;
+}
+
+std::vector<CompressedRow> SparseColsCOO(const Sparse &s) {
+  // Get the dimensions of the sparse matrix
+  int dimX = s.DimX();
+  int dimY = s.DimY();
+
+  // Get the host data of the sparse matrix
+  const t_hostMat hostData = s.GetHostData();
+
+  // Create a vector of CompressedRow objects
+  std::vector<CompressedRow> cols;
+
+  // For each column in the matrix
+  for (int j = 0; j < dimY; ++j) {
+    // Create a CompressedRow object for the current column
+    CompressedRow col(j);
+
+    // For each row in the column
+    for (int i = 0; i < dimX; ++i) {
+      // If the element is non-zero, add it to the column data
+      if (std::abs(hostData[i][j]) > 1e-10) {
+        col.RowData.emplace_back(i, j, hostData[i][j]);
+      }
+    }
+
+    // Add the column to the vector of columns
+    cols.push_back(col);
+  }
+
+  return cols;
 }

@@ -33,6 +33,18 @@ public:
   explicit VectImpl(t_hostVect &in) { Data = in; }
 
   /**
+   * @brief Gets the host data of the VectImpl.
+   *
+   * @return const t_hostVect& Reference to the host data.
+   */
+  const t_hostVect &GetHostData() const {
+    static t_hostVect hostData;
+    hostData.resize(Data.size());
+    thrust::copy(Data.begin(), Data.end(), hostData.begin());
+    return hostData;
+  }
+
+  /**
    * @brief Computes the conjugate of the VectImpl.
    *
    * @return VectImpl Conjugated vector.

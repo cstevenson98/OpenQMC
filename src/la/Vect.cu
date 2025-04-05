@@ -201,6 +201,8 @@ std::vector<std::complex<double>> Vect::GetData() const {
   return pImpl->GetData();
 }
 
+const t_hostVect &Vect::GetHostData() const { return pImpl->GetHostData(); }
+
 // Destructor
 Vect::~Vect() = default;
 
@@ -221,3 +223,4 @@ Vect::Vect(Vect &&rhs) noexcept = default;
 Vect &Vect::operator=(Vect &&rhs) noexcept = default;
 
 Vect::Vect() : pImpl(std::make_unique<VectImpl>()) {}
+

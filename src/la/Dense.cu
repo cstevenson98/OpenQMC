@@ -252,6 +252,8 @@ int Dense::DimX() const { return pImpl->DimX; }
  */
 int Dense::DimY() const { return pImpl->DimY; }
 
+const t_hostMat &Dense::GetHostData() const { return pImpl->CPUData; }
+
 /**
  * @brief Get the data at a specific position in the Dense matrix.
  *

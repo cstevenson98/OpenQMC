@@ -32,6 +32,13 @@ public:
   SparseImpl(int dimX, int dimY) : DimX(dimX), DimY(dimY) {};
 
   /**
+   * @brief Constructor to initialize SparseImpl matrix from a host matrix.
+   *
+   * @param in Host matrix to initialize from.
+   */
+  explicit SparseImpl(const t_hostMat &in);
+
+  /**
    * @brief Scales the SparseImpl matrix by a scalar value.
    *
    * @param alpha Scalar value to multiply.
@@ -181,7 +188,7 @@ public:
    *
    * @return const std::vector<COOTuple>& Reference to the COO data.
    */
-  const std::vector<COOTuple> &GetHostData() const;
+  const t_hostMat GetHostData() const;
 
   /**
    * @brief Gets a reference to a coefficient in the matrix.

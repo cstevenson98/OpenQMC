@@ -7,6 +7,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "core/types.h"
 
@@ -124,6 +125,13 @@ class SparseELL {
    * @return int Maximum number of non-zero elements per row.
    */
   int MaxNnzPerRow() const;
+
+  /**
+   * @brief Gets the host data of the SparseELL matrix.
+   *
+   * @return const std::vector<t_hostVect>& Reference to the host data.
+   */
+  const std::vector<t_hostVect> &GetHostData() const;
 
  private:
   std::unique_ptr<SparseELLImpl> pImpl;  ///< Pointer to implementation

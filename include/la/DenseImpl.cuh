@@ -12,9 +12,9 @@
 
 class DenseImpl {
 public:
-  int DimX;                        ///< Number of rows
-  int DimY;                        ///< Number of columns
-  std::vector<t_hostVect> CPUData; ///< Matrix data stored in a 2D vector
+  int DimX;          ///< Number of rows
+  int DimY;          ///< Number of columns
+  t_hostMat CPUData; ///< Matrix data stored in a 2D vector
 
   /**
    * @brief Default constructor for DenseImpl.

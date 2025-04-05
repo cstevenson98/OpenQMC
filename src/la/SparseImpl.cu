@@ -8,28 +8,51 @@
 #include "la/SparseImpl.cuh"
 #include "la/Vect.h"
 
+// Constructor that takes a t_hostMat
+SparseImpl::SparseImpl(const t_hostMat &in)
+    : DimX(in.size()), DimY(in[0].size()) {
+  // Convert the dense matrix to COO format
+  for (int i = 0; i < DimX; ++i) {
+    for (int j = 0; j < DimY; ++j) {
+      if (std::abs(in[i][j]) > 1e-10) { // Only add non-zero elements
+        Data.emplace_back(i, j, in[i][j]);
+      }
+    }
+  }
+
+  // Sort the data by row and column
+  SortByRow();
+}
+
 SparseImpl SparseImpl::Add(const SparseImpl &B) const {
   SparseImpl out(B.DimX, B.DimY);
 
-  int i = 0;
-  int I = B.Data.size();
-  for (auto elemA : Data) {
-    while (i < I - 1 && B.Data[i].Coords[0] != elemA.Coords[0] &&
-           B.Data[i].Coords[1] != elemA.Coords[1]) {
-      out.Data.emplace_back(
-          COOTuple(B.Data[i].Coords[0], B.Data[i].Coords[1], B.Data[i].Val));
-      i++;
-    }
+  // for (auto &row : this->GetRows()) {
+  //   for (auto &col :  B.GetRows()) {
+  //     std::vector<COOTuple> sumResult = SparseVectorSum(row, col).RowData;
+  //     for (auto &elem : sumResult) {
+  //       out.Data.emplace_back(elem);
+  //     }
+  //   }
+  // }
+  // int I = B.Data.size();
+  // for (auto elemA : Data) {
+  //   while (i < I - 1 && B.Data[i].Coords[0] != elemA.Coords[0] &&
+  //          B.Data[i].Coords[1] != elemA.Coords[1]) {
+  //     out.Data.emplace_back(
+  //         COOTuple(B.Data[i].Coords[0], B.Data[i].Coords[1], B.Data[i].Val));
+  //     i++;
+  //   }
 
-    if (i < I && B.Data[i].Coords[0] == elemA.Coords[0] &&
-        B.Data[i].Coords[1] == elemA.Coords[1]) {
-      out.Data.emplace_back(COOTuple(elemA.Coords[0], elemA.Coords[1],
-                                     elemA.Val + B.Data[i].Val));
-    } else {
-      out.Data.emplace_back(
-          COOTuple(elemA.Coords[0], elemA.Coords[1], B.Data[i].Val));
-    }
-  }
+  //   if (i < I && B.Data[i].Coords[0] == elemA.Coords[0] &&
+  //       B.Data[i].Coords[1] == elemA.Coords[1]) {
+  //     out.Data.emplace_back(COOTuple(elemA.Coords[0], elemA.Coords[1],
+  //                                    elemA.Val + B.Data[i].Val));
+  //   } else {
+  //     out.Data.emplace_back(
+  //         COOTuple(elemA.Coords[0], elemA.Coords[1], B.Data[i].Val));
+  //   }
+  // }
 
   return out;
 }
@@ -52,7 +75,7 @@ SparseImpl SparseImpl::RightMult(const SparseImpl &A) const {
 }
 
 SparseImpl SparseImpl::Transpose() const {
-  SparseImpl out(DimX, DimY);
+  SparseImpl out(DimY, DimX);
   out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
   for (int i = 0; i < Data.size(); i++) {
@@ -67,7 +90,7 @@ SparseImpl SparseImpl::Transpose() const {
 }
 
 SparseImpl SparseImpl::HermitianC() const {
-  SparseImpl out(DimX, DimY);
+  SparseImpl out(DimY, DimX);
   out.Data.resize(Data.size(), COOTuple(0, 0, 0));
 
   for (int i = 0; i < Data.size(); i++) {
@@ -93,20 +116,6 @@ void SparseImpl::SortByRow() {
 }
 
 void SparseImpl::Trim() {}
-
-SparseImpl ToSparseCOO(const Dense &d) {
-  SparseImpl out(d.DimX(), d.DimY());
-
-  for (int i = 0; i < d.DimX(); i++) {
-    for (int j = 0; j < d.DimY(); j++) {
-      if (d.GetData(i, j) != 0.) {
-        out.Data.emplace_back(i, j, d.GetData(i, j));
-      }
-    }
-  }
-
-  return out;
-}
 
 std::vector<CompressedRow> SparseImpl::GetRows() const {
   std::vector<CompressedRow> sRows;
@@ -282,7 +291,73 @@ SparseImpl SparseImpl::operator*(const SparseImpl &A) const {
 }
 
 SparseImpl SparseImpl::operator%(const SparseImpl &A) const {
-  return Kronecker(*this, A);
+  SparseImpl out(DimX * A.DimX, DimY * A.DimY);
+  return out;
+  // return Kronecker(*this, A);
 }
 
 unsigned int SparseImpl::NNZ() const { return Data.size(); }
+
+SparseImpl SparseImpl::Scale(const t_cplx &alpha) const {
+  SparseImpl out(DimX, DimY);
+
+  for (size_t i = 0; i < Data.size(); ++i) {
+    out.Data.emplace_back(
+        COOTuple(Data[i].Coords[0], Data[i].Coords[1], Data[i].Val * alpha));
+  }
+
+  return out;
+}
+
+void SparseImpl::Print() const {
+  for (const auto &elem : Data) {
+    std::cout << "(" << elem.Coords[0] << "," << elem.Coords[1]
+              << "): " << elem.Val << std::endl;
+  }
+}
+
+void SparseImpl::PrintRe() const {
+  for (const auto &elem : Data) {
+    std::cout << "(" << elem.Coords[0] << "," << elem.Coords[1]
+              << "): " << elem.Val.real() << std::endl;
+  }
+}
+
+void SparseImpl::PrintIm() const {
+  for (const auto &elem : Data) {
+    std::cout << "(" << elem.Coords[0] << "," << elem.Coords[1]
+              << "): " << elem.Val.imag() << std::endl;
+  }
+}
+
+void SparseImpl::PrintAbs() const {
+  for (const auto &elem : Data) {
+    std::cout << "(" << elem.Coords[0] << "," << elem.Coords[1]
+              << "): " << std::abs(elem.Val) << std::endl;
+  }
+}
+
+std::complex<double> &SparseImpl::CoeffRef(int i, int j) {
+  // First try to find existing element
+  for (auto &elem : Data) {
+    if (elem.Coords[0] == i && elem.Coords[1] == j) {
+      return elem.Val;
+    }
+  }
+
+  // If element doesn't exist, add it with zero value
+  Data.emplace_back(i, j, 0.0);
+  SortByRow(); // Keep data sorted
+  return Data.back().Val;
+}
+
+const t_hostMat SparseImpl::GetHostData() const {
+  t_hostMat out;
+  for (int i = 0; i < DimX; ++i) {
+    out.emplace_back(std::vector<std::complex<double>>(DimY));
+  }
+  for (const auto &elem : Data) {
+    out[elem.Coords[0]][elem.Coords[1]] = elem.Val;
+  }
+  return out;
+}

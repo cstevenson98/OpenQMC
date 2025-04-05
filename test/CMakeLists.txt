@@ -7,7 +7,7 @@ find_package(GTest REQUIRED)
 enable_testing()
 
 # gather all test sources and headers 
-file(GLOB_RECURSE test_sources "*.cc")
+file(GLOB_RECURSE test_sources "*.cc" "*.cu")
 file(GLOB_RECURSE test_headers "*.h")
 
 # message the tests to compile
