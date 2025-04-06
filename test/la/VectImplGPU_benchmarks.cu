@@ -9,7 +9,7 @@
 #include "la/VectImplGPU.cuh"
 
 // Helper function to generate random complex vectors
-t_hostVect generateRandomVector(size_t size) {
+t_hostVect generateRandomVector2(size_t size) {
   std::random_device rd;
   std::mt19937 gen(rd());
   std::uniform_real_distribution<> dis(-1.0, 1.0);
@@ -24,8 +24,8 @@ t_hostVect generateRandomVector(size_t size) {
 // Benchmark vector addition
 static void BM_VectorAdditionGPU(benchmark::State &state) {
   const size_t size = state.range(0);
-  auto vec1_data = generateRandomVector(size);
-  auto vec2_data = generateRandomVector(size);
+  auto vec1_data = generateRandomVector2(size);
+  auto vec2_data = generateRandomVector2(size);
 
   VectImplGPU vec1(vec1_data);
   VectImplGPU vec2(vec2_data);
@@ -48,8 +48,8 @@ static void BM_VectorAdditionGPU(benchmark::State &state) {
 // Benchmark vector dot product
 static void BM_VectorDotProductGPU(benchmark::State &state) {
   const size_t size = state.range(0);
-  auto vec1_data = generateRandomVector(size);
-  auto vec2_data = generateRandomVector(size);
+  auto vec1_data = generateRandomVector2(size);
+  auto vec2_data = generateRandomVector2(size);
 
   VectImplGPU vec1(vec1_data);
   VectImplGPU vec2(vec2_data);
@@ -71,7 +71,7 @@ static void BM_VectorDotProductGPU(benchmark::State &state) {
 // Benchmark vector scaling
 static void BM_VectorScalingGPU(benchmark::State &state) {
   const size_t size = state.range(0);
-  auto vec_data = generateRandomVector(size);
+  auto vec_data = generateRandomVector2(size);
   th_cplx scale_factor(2.0, 1.0);
 
   VectImplGPU vec(vec_data);
@@ -94,7 +94,7 @@ static void BM_VectorScalingGPU(benchmark::State &state) {
 // Benchmark vector norm
 static void BM_VectorNormGPU(benchmark::State &state) {
   const size_t size = state.range(0);
-  auto vec_data = generateRandomVector(size);
+  auto vec_data = generateRandomVector2(size);
 
   VectImplGPU vec(vec_data);
 
@@ -115,7 +115,7 @@ static void BM_VectorNormGPU(benchmark::State &state) {
 // Benchmark vector conjugate
 static void BM_VectorConjugateGPU(benchmark::State &state) {
   const size_t size = state.range(0);
-  auto vec_data = generateRandomVector(size);
+  auto vec_data = generateRandomVector2(size);
 
   VectImplGPU vec(vec_data);
   VectImplGPU result(size); // Pre-allocate result vector

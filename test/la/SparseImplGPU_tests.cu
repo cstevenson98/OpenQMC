@@ -284,3 +284,41 @@ TEST(SparseImplGPUTests, VectMultLargeTest) {
     EXPECT_NEAR(hostData[i].imag(), cpuY[i].imag(), 1e-10);
   }
 }
+
+// Test VectMultInPlace method
+TEST(SparseImplGPUTests, VectMultInPlaceTest) {
+  // Create a sparse matrix
+  t_hostMat dataA(2, std::vector<std::complex<double>>(3));
+  dataA[0][0] = std::complex<double>(1.0, 0.0);
+  dataA[0][2] = std::complex<double>(2.0, 0.0);
+  dataA[1][1] = std::complex<double>(3.0, 0.0);
+
+  // Create a vector
+  t_hostVect dataX(3);
+  dataX[0] = std::complex<double>(4.0, 0.0);
+  dataX[1] = std::complex<double>(5.0, 0.0);
+  dataX[2] = std::complex<double>(6.0, 0.0);
+
+  SparseImplGPU A(dataA);
+  VectImplGPU X(dataX);
+  VectImplGPU Y(2); // Pre-allocate output vector
+
+  // Multiply matrix by vector and store in Y
+  A.VectMultInPlace(X, Y);
+
+  // Expected result: Y = A * X
+  // A = [1 0 2]
+  //     [0 3 0]
+  // X = [4]
+  //     [5]
+  //     [6]
+  // Y = [16]
+  //     [15]
+
+  EXPECT_EQ(Y.Dim, 2);
+
+  // Check that the values are correctly computed
+  t_hostVect hostData = Y.GetHostData();
+  EXPECT_EQ(hostData[0], std::complex<double>(16.0, 0.0));
+  EXPECT_EQ(hostData[1], std::complex<double>(15.0, 0.0));
+}

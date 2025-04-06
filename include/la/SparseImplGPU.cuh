@@ -35,6 +35,11 @@ public:
   // cuSPARSE descriptor
   cusparseSpMatDescr_t matDescr_; // cuSPARSE matrix descriptor
 
+  // Persistent buffer for SpMV operations
+  mutable thrust::device_vector<char>
+      spmvBuffer_;                ///< Buffer for SpMV operations
+  mutable size_t spmvBufferSize_; ///< Size of the SpMV buffer
+
   /**
    * @brief Constructor to initialize SparseImplGPU matrix with given
    * dimensions.
@@ -81,12 +86,12 @@ public:
   SparseImplGPU Add(const SparseImplGPU &B) const;
 
   /**
-   * @brief Multiplies two SparseImplGPU matrices.
+   * @brief Multiply two matrices.
    *
-   * @param A Another SparseImplGPU object to multiply.
-   * @return SparseImplGPU Result of the multiplication.
+   * @param other The matrix to multiply with.
+   * @return SparseImplGPU The result of the multiplication.
    */
-  SparseImplGPU RightMult(const SparseImplGPU &A) const;
+  SparseImplGPU RightMult(const SparseImplGPU &other) const;
 
   /**
    * @brief Transposes the SparseImplGPU matrix.
@@ -109,6 +114,15 @@ public:
    * @return VectImplGPU Result of the multiplication.
    */
   VectImplGPU VectMult(const VectImplGPU &vect) const;
+
+  /**
+   * @brief Multiplies the SparseImplGPU matrix by a vector and stores the
+   * result in the output vector.
+   *
+   * @param vect Vector to multiply.
+   * @param output Vector to store the result.
+   */
+  void VectMultInPlace(const VectImplGPU &vect, VectImplGPU &output) const;
 
   /**
    * @brief Overloaded addition operator for SparseImplGPU matrices.
@@ -216,6 +230,18 @@ public:
   cusparseHandle_t GetHandle() const {
     return CuSparseSingleton::getInstance().getHandle();
   }
+
+  /**
+   * @brief Ensure the SpMV buffer is allocated with sufficient size.
+   *
+   * @param requiredSize The required size of the buffer.
+   */
+  void EnsureSpMVBuffer(size_t requiredSize) const;
+
+  /**
+   * @brief Free the SpMV buffer.
+   */
+  void FreeSpMVBuffer() const;
 
 private:
   /**

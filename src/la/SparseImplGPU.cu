@@ -6,6 +6,7 @@
 
 #include "la/SparseImpl.cuh"
 #include "la/SparseImplGPU.cuh"
+#include <cusparse.h>
 #include <thrust/copy.h>
 #include <thrust/execution_policy.h>
 #include <thrust/fill.h>
@@ -22,7 +23,7 @@
 
 // Constructor with dimensions
 SparseImplGPU::SparseImplGPU(int dimX, int dimY)
-    : DimX(dimX), DimY(dimY), nnz(0) {
+    : DimX(dimX), DimY(dimY), nnz(0), spmvBufferSize_(0) {
   // Initialize row pointers with zeros
   rowPtr.resize(DimX + 1, 0);
 
@@ -54,9 +55,8 @@ void SparseImplGPU::InitializeCuSparse() {
 
 // Constructor from host matrix
 SparseImplGPU::SparseImplGPU(const t_hostMat &in)
-    : DimX(in.size()), DimY(in[0].size()) {
+    : DimX(in.size()), DimY(in[0].size()), nnz(0), spmvBufferSize_(0) {
   // Count non-zero elements
-  nnz = 0;
   for (int i = 0; i < DimX; ++i) {
     for (int j = 0; j < DimY; ++j) {
       if (std::abs(in[i][j]) > 1e-10) {
@@ -90,7 +90,8 @@ SparseImplGPU::SparseImplGPU(const t_hostMat &in)
 
 // Constructor from CPU SparseImpl
 SparseImplGPU::SparseImplGPU(const SparseImpl &cpuMatrix)
-    : DimX(cpuMatrix.DimX), DimY(cpuMatrix.DimY) {
+    : DimX(cpuMatrix.DimX), DimY(cpuMatrix.DimY),
+      nnz(cpuMatrix.CPUData.nonZeros()), spmvBufferSize_(0) {
   // Convert from Eigen sparse matrix to CSR format
   ConvertFromEigen(cpuMatrix);
 
@@ -215,19 +216,17 @@ SparseImplGPU SparseImplGPU::RightMult(const SparseImplGPU &other) const {
       &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
       &bufferSize_, nullptr));
 
-  // Allocate buffer using Thrust
-  thrust::device_vector<char> dBuffer1_(bufferSize_);
-  void *dBuffer1_ptr = thrust::raw_pointer_cast(dBuffer1_.data());
+  // Ensure the buffer is allocated with sufficient size
+  EnsureSpMVBuffer(bufferSize_);
 
   // Get buffer size
   CUSPARSE_CHECK(cusparseSpGEMM_workEstimation(
       GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
       CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_, other.matDescr_,
       &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
-      &bufferSize_, dBuffer1_ptr));
+      &bufferSize_, thrust::raw_pointer_cast(spmvBuffer_.data())));
 
   size_t bufferSize2_ = 0;
-
   // Compute the number of non-zero elements
   CUSPARSE_CHECK(cusparseSpGEMM_compute(
       GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
@@ -235,16 +234,14 @@ SparseImplGPU SparseImplGPU::RightMult(const SparseImplGPU &other) const {
       &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
       &bufferSize2_, nullptr));
 
-  // Allocate buffer using Thrust
-  thrust::device_vector<char> dBuffer2_(bufferSize2_);
-  void *dBuffer2_ptr = thrust::raw_pointer_cast(dBuffer2_.data());
+  other.EnsureSpMVBuffer(bufferSize2_);
 
   // Compute the number of non-zero elements
   CUSPARSE_CHECK(cusparseSpGEMM_compute(
       GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
       CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_, other.matDescr_,
       &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
-      &bufferSize2_, dBuffer2_ptr));
+      &bufferSize2_, thrust::raw_pointer_cast(other.spmvBuffer_.data())));
 
   // Get the number of non-zero elements
   int64_t rows_, cols_, nnz_;
@@ -333,33 +330,82 @@ VectImplGPU SparseImplGPU::VectMult(const VectImplGPU &vect) const {
   const th_cplx *d_valuesA_ = GetValuesPtr();
   const th_cplx *d_x_ = thrust::raw_pointer_cast(vect.GetDeviceData().data());
 
-  // Get the vector descriptors
-
   // Create alpha and beta values
   th_cplx alpha_(1.0, 0.0);
   th_cplx beta_(0.0, 0.0);
 
-  // Allocate buffer for SpMV
+  // Get buffer size for SpMV
   size_t bufferSize_ = 0;
   CUSPARSE_CHECK(cusparseSpMV_bufferSize(
       GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_,
       vect.vecDescr_, &beta_, out.vecDescr_, CUDA_C_64F,
       CUSPARSE_SPMV_ALG_DEFAULT, &bufferSize_));
 
-  // Allocate buffer
-  void *dBuffer_ = nullptr;
-  cudaMalloc(&dBuffer_, bufferSize_);
+  // Ensure the buffer is allocated with sufficient size
+  EnsureSpMVBuffer(bufferSize_);
 
-  // Execute SpMV
-  CUSPARSE_CHECK(cusparseSpMV(GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
-                              &alpha_, matDescr_, vect.vecDescr_, &beta_,
-                              out.vecDescr_, CUDA_C_64F,
-                              CUSPARSE_SPMV_ALG_DEFAULT, dBuffer_));
-
-  // Clean up
-  cudaFree(dBuffer_);
+  // Execute SpMV using the persistent buffer
+  CUSPARSE_CHECK(cusparseSpMV(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_,
+      vect.vecDescr_, &beta_, out.vecDescr_, CUDA_C_64F,
+      CUSPARSE_SPMV_ALG_DEFAULT, thrust::raw_pointer_cast(spmvBuffer_.data())));
 
   return out;
+}
+
+// Ensure SpMV buffer is allocated with sufficient size
+void SparseImplGPU::EnsureSpMVBuffer(size_t requiredSize) const {
+  // If the buffer is already allocated and large enough, do nothing
+  if (!spmvBuffer_.empty() && spmvBufferSize_ >= requiredSize) {
+    return;
+  }
+
+  // Resize the buffer to the required size
+  spmvBuffer_.resize(requiredSize);
+  spmvBufferSize_ = requiredSize;
+}
+
+// Free the SpMV buffer
+void SparseImplGPU::FreeSpMVBuffer() const {
+  // Clear the buffer
+  spmvBuffer_.clear();
+  spmvBufferSize_ = 0;
+}
+
+// Multiply the matrix by a vector and store result in output
+void SparseImplGPU::VectMultInPlace(const VectImplGPU &vect,
+                                    VectImplGPU &output) const {
+  // Ensure output has correct size
+  if (output.size() != DimX) {
+    output = VectImplGPU(DimX);
+  }
+
+  // Get raw pointers
+  const int *d_rowPtrA_ = GetRowPtr();
+  const int *d_colIndA_ = GetColIndPtr();
+  const th_cplx *d_valuesA_ = GetValuesPtr();
+  const th_cplx *d_x_ = thrust::raw_pointer_cast(vect.GetDeviceData().data());
+  const th_cplx *d_y_ = thrust::raw_pointer_cast(output.GetDeviceData().data());
+
+  // Create alpha and beta values
+  th_cplx alpha_(1.0, 0.0);
+  th_cplx beta_(0.0, 0.0);
+
+  // Get buffer size for SpMV
+  size_t bufferSize_ = 0;
+  CUSPARSE_CHECK(cusparseSpMV_bufferSize(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_,
+      vect.vecDescr_, &beta_, output.vecDescr_, CUDA_C_64F,
+      CUSPARSE_SPMV_ALG_DEFAULT, &bufferSize_));
+
+  // Ensure the buffer is allocated with sufficient size
+  EnsureSpMVBuffer(bufferSize_);
+
+  // Execute SpMV using the persistent buffer
+  CUSPARSE_CHECK(cusparseSpMV(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_,
+      vect.vecDescr_, &beta_, output.vecDescr_, CUDA_C_64F,
+      CUSPARSE_SPMV_ALG_DEFAULT, thrust::raw_pointer_cast(spmvBuffer_.data())));
 }
 
 // Overloaded addition operator

@@ -31,7 +31,7 @@ target_include_directories(oqmc_test PUBLIC "${PROJECT_SOURCE_DIR}/include")
 include(GoogleTest)
 gtest_discover_tests(oqmc_test)
 
-file(GLOB_RECURSE benchmark_sources "*_benchmarks.cu")
+file(GLOB_RECURSE benchmark_sources "SparseImplGPU_benchmarks.cu")
 
 # Create benchmark executable
 add_executable(
