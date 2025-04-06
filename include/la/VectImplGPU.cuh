@@ -66,12 +66,28 @@ public:
   VectImplGPU Conj() const;
 
   /**
+   * @brief Computes the conjugate of the VectImplGPU and stores result in
+   * output.
+   *
+   * @param output Vector to store the result.
+   */
+  void ConjInPlace(VectImplGPU &output) const;
+
+  /**
    * @brief Adds two VectImplGPU objects.
    *
    * @param A Another VectImplGPU object to add.
    * @return VectImplGPU Result of the addition.
    */
   VectImplGPU Add(const VectImplGPU &A) const;
+
+  /**
+   * @brief Adds two VectImplGPU objects and stores result in output.
+   *
+   * @param A Another VectImplGPU object to add.
+   * @param output Vector to store the result.
+   */
+  void AddInPlace(const VectImplGPU &A, VectImplGPU &output) const;
 
   /**
    * @brief Subtracts one VectImplGPU object from another.
@@ -82,12 +98,30 @@ public:
   VectImplGPU Subtract(const VectImplGPU &A) const;
 
   /**
+   * @brief Subtracts one VectImplGPU object from another and stores result in
+   * output.
+   *
+   * @param A Another VectImplGPU object to subtract.
+   * @param output Vector to store the result.
+   */
+  void SubtractInPlace(const VectImplGPU &A, VectImplGPU &output) const;
+
+  /**
    * @brief Scales the VectImplGPU by a scalar value.
    *
    * @param alpha Scalar value to multiply.
    * @return VectImplGPU Result of the scalar multiplication.
    */
   VectImplGPU Scale(const th_cplx &alpha) const;
+
+  /**
+   * @brief Scales the VectImplGPU by a scalar value and stores result in
+   * output.
+   *
+   * @param alpha Scalar value to multiply.
+   * @param output Vector to store the result.
+   */
+  void ScaleInPlace(const th_cplx &alpha, VectImplGPU &output) const;
 
   /**
    * @brief Computes the dot product of two VectImplGPU objects.

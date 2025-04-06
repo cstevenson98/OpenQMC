@@ -205,3 +205,53 @@ t_hostVect VectImplGPU::GetHostData() const {
 VectImplGPU operator*(const th_cplx &alpha, const VectImplGPU &rhs) {
   return rhs * alpha;
 }
+
+void VectImplGPU::ConjInPlace(VectImplGPU &output) const {
+  // Ensure output has correct size
+  if (output.size() != deviceData_.size()) {
+    output = VectImplGPU(deviceData_.size());
+  }
+  thrust::transform(deviceData_.begin(), deviceData_.end(),
+                    output.deviceData_.begin(), conjugate_functor());
+}
+
+void VectImplGPU::AddInPlace(const VectImplGPU &A, VectImplGPU &output) const {
+  // Ensure output has correct size
+  if (output.size() != deviceData_.size()) {
+    output = VectImplGPU(deviceData_.size());
+  }
+  thrust::transform(deviceData_.begin(), deviceData_.end(),
+                    A.deviceData_.begin(), output.deviceData_.begin(),
+                    thrust::plus<th_cplx>());
+}
+
+void VectImplGPU::SubtractInPlace(const VectImplGPU &A,
+                                  VectImplGPU &output) const {
+  // Ensure output has correct size
+  if (output.size() != deviceData_.size()) {
+    output = VectImplGPU(deviceData_.size());
+  }
+  thrust::transform(deviceData_.begin(), deviceData_.end(),
+                    A.deviceData_.begin(), output.deviceData_.begin(),
+                    thrust::minus<th_cplx>());
+}
+
+void VectImplGPU::ScaleInPlace(const th_cplx &alpha,
+                               VectImplGPU &output) const {
+  // Ensure output has correct size
+  if (output.size() != deviceData_.size()) {
+    output = VectImplGPU(deviceData_.size());
+  }
+
+  // Create a functor for scaling
+  struct scale_functor {
+    const th_cplx alpha;
+    scale_functor(const th_cplx &a) : alpha(a) {}
+    __host__ __device__ th_cplx operator()(const th_cplx &x) const {
+      return alpha * x;
+    }
+  };
+
+  thrust::transform(deviceData_.begin(), deviceData_.end(),
+                    output.deviceData_.begin(), scale_functor(alpha));
+}
