@@ -12,10 +12,15 @@
 #include <vector>
 
 #include "core/types.cuh"
+#include "la/VectImpl.cuh"
 #include "la/VectImplGPU.cuh"
 #include <thrust/copy.h>
 #include <thrust/device_vector.h>
+#include <thrust/execution_policy.h>
+#include <thrust/fill.h>
+#include <thrust/functional.h>
 #include <thrust/inner_product.h>
+#include <thrust/transform.h>
 #include <thrust/transform_reduce.h>
 
 // Functor for computing conjugate
@@ -39,6 +44,58 @@ struct dot_product_functor {
     return thrust::conj(x) * y;
   }
 };
+
+// Constructor with dimension
+VectImplGPU::VectImplGPU(int dim) : Dim(dim) {
+  // Initialize device data with zeros
+  deviceData_.resize(Dim, th_cplx(0.0, 0.0));
+
+  // Initialize cuSPARSE
+  InitializeCuSparse();
+}
+
+// Destructor
+VectImplGPU::~VectImplGPU() {
+  // Clean up cuSPARSE resources
+  cusparseDestroyDnVec(vecDescr_);
+}
+
+// Initialize cuSPARSE resources
+void VectImplGPU::InitializeCuSparse() {
+  // Create dense vector descriptor
+  cusparseCreateDnVec(&vecDescr_, Dim,
+                      thrust::raw_pointer_cast(deviceData_.data()), CUDA_C_64F);
+}
+
+// Constructor from host vector
+VectImplGPU::VectImplGPU(const t_hostVect &in) : Dim(in.size()) {
+  // Convert std::complex to thrust::complex
+  th_hostVect hostData(in.size());
+  for (size_t i = 0; i < in.size(); ++i) {
+    hostData[i] = th_cplx(in[i].real(), in[i].imag());
+  }
+
+  // Copy to device
+  deviceData_ = hostData;
+
+  // Initialize cuSPARSE
+  InitializeCuSparse();
+}
+
+// Constructor from CPU VectImpl
+VectImplGPU::VectImplGPU(const VectImpl &cpuVector) : Dim(cpuVector.size()) {
+  // Convert std::complex to thrust::complex
+  th_hostVect hostData(cpuVector.size());
+  for (size_t i = 0; i < cpuVector.size(); ++i) {
+    hostData[i] = th_cplx(cpuVector[i].real(), cpuVector[i].imag());
+  }
+
+  // Copy to device
+  deviceData_ = hostData;
+
+  // Initialize cuSPARSE
+  InitializeCuSparse();
+}
 
 VectImplGPU VectImplGPU::Conj() const {
   VectImplGPU out(deviceData_.size());
@@ -64,23 +121,17 @@ VectImplGPU VectImplGPU::Subtract(const VectImplGPU &A) const {
 }
 
 VectImplGPU VectImplGPU::Scale(const th_cplx &alpha) const {
-  VectImplGPU out(deviceData_.size());
+  VectImplGPU out(Dim);
 
-  // Create a functor for scaling
-  struct scale_functor {
-    const th_cplx alpha;
-    scale_functor(const th_cplx &a) : alpha(a) {}
-    __host__ __device__ th_cplx operator()(const th_cplx &x) const {
-      return alpha * x;
-    }
-  };
-
+  // Scale values
   thrust::transform(deviceData_.begin(), deviceData_.end(),
-                    out.deviceData_.begin(), scale_functor(alpha));
+                    out.deviceData_.begin(),
+                    [alpha] __device__(const th_cplx &x) { return alpha * x; });
+
   return out;
 }
 
-std::complex<double> VectImplGPU::Dot(const VectImplGPU &A) const {
+th_cplx VectImplGPU::Dot(const VectImplGPU &A) const {
   // Compute the dot product
   th_cplx result = thrust::inner_product(
       deviceData_.begin(), deviceData_.end(), A.deviceData_.begin(),
@@ -104,7 +155,14 @@ VectImplGPU VectImplGPU::operator+(const VectImplGPU &A) const {
 }
 
 VectImplGPU VectImplGPU::operator-(const VectImplGPU &A) const {
-  return this->Subtract(A);
+  VectImplGPU out(Dim);
+
+  // Subtract values
+  thrust::transform(deviceData_.begin(), deviceData_.end(),
+                    A.deviceData_.begin(), out.deviceData_.begin(),
+                    thrust::minus<th_cplx>());
+
+  return out;
 }
 
 VectImplGPU VectImplGPU::operator*(const th_cplx &alpha) const {
@@ -170,8 +228,6 @@ void VectImplGPU::PrintRe() const { this->Print(1); }
 void VectImplGPU::PrintIm() const { this->Print(2); }
 
 void VectImplGPU::PrintAbs() const { this->Print(3); }
-
-int VectImplGPU::size() const { return deviceData_.size(); }
 
 std::vector<std::complex<double>> VectImplGPU::GetData() const {
   // Copy from device to host

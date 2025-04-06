@@ -4,6 +4,8 @@
 // Created by Conor Stevenson on 15/3/2025.
 //
 
+#pragma once
+
 #include <Eigen/Dense>
 #include <vector>
 

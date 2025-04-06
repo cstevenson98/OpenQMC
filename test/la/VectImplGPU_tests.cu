@@ -4,10 +4,6 @@
 
 #include "la/VectImplGPU.cuh"
 
-TEST(VectImplGPUTests, DefaultConstructorTest) {
-  VectImplGPU A;
-  EXPECT_EQ(A.size(), 0);
-}
 
 TEST(VectImplGPUTests, ConstructorWithSizeTest) {
   VectImplGPU A(5);
@@ -112,7 +108,7 @@ TEST(VectImplGPUTests, GetDataTest) {
 
 TEST(VectImplGPUTests, SetDataTest) {
   std::vector<std::complex<double>> data = {{1.0, 2.0}, {3.0, 4.0}, {5.0, 6.0}};
-  VectImplGPU A;
+  VectImplGPU A(3);
   A.SetData(data);
   EXPECT_EQ(A.size(), 3);
   EXPECT_EQ(A[0], data[0]);

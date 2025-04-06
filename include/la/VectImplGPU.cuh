@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <cusparse.h>
 #include <thrust/complex.h>
 #include <thrust/device_vector.h>
 #include <thrust/execution_policy.h>
@@ -15,41 +16,49 @@
 #include <thrust/transform.h>
 
 #include "core/types.cuh"
+#include "la/CuSparseSingleton.cuh"
 #include "la/Vect.h"
+#include <complex>
 
 /**
- * @brief A class representing the GPU implementation of vectors. Supports
- * vector algebra and uses complex numbers.
+ * @brief A class representing the GPU implementation of vectors using Thrust.
+ * Supports vector algebra and uses complex numbers.
  */
 class VectImplGPU {
 public:
-  /**
-   * @brief Default constructor to initialize an empty VectImplGPU.
-   */
-  explicit VectImplGPU() = default;
+  int Dim; ///< Dimension of the vector
+
+  // Device data
+  t_devcVect deviceData_; ///< Device vector data
+
+  // cuSPARSE descriptor
+  cusparseDnVecDescr_t vecDescr_; ///< cuSPARSE dense vector descriptor
 
   /**
-   * @brief Constructor to initialize VectImplGPU with given size.
+   * @brief Constructor to initialize VectImplGPU vector with given dimension.
    *
-   * @param size Size of the vector.
+   * @param dim Dimension of the vector.
    */
-  VectImplGPU(unsigned int size) : deviceData_(size, th_cplx(0.0, 0.0)) {}
+  VectImplGPU(int dim);
 
   /**
-   * @brief Constructor to initialize VectImplGPU with given data.
-   *
-   * @param in Input vector data.
+   * @brief Destructor to clean up cuSPARSE resources.
    */
-  explicit VectImplGPU(const t_hostVect &in) {
-    // Convert std::complex to thrust::complex
-    th_hostVect hostData(in.size());
-    for (size_t i = 0; i < in.size(); ++i) {
-      hostData[i] = th_cplx(in[i].real(), in[i].imag());
-    }
+  ~VectImplGPU();
 
-    // Copy to device
-    deviceData_ = hostData;
-  }
+  /**
+   * @brief Constructor to initialize VectImplGPU vector from a host vector.
+   *
+   * @param in Host vector to initialize from.
+   */
+  explicit VectImplGPU(const t_hostVect &in);
+
+  /**
+   * @brief Constructor to initialize VectImplGPU vector from a CPU VectImpl.
+   *
+   * @param cpuVector CPU vector to initialize from.
+   */
+  explicit VectImplGPU(const class VectImpl &cpuVector);
 
   /**
    * @brief Gets the host data of the VectImplGPU.
@@ -124,22 +133,22 @@ public:
   void ScaleInPlace(const th_cplx &alpha, VectImplGPU &output) const;
 
   /**
-   * @brief Computes the dot product of two VectImplGPU objects.
+   * @brief Computes the dot product of two VectImplGPU vectors.
    *
-   * @param A Another VectImplGPU object.
-   * @return double Dot product result.
+   * @param B Another VectImplGPU object to compute dot product with.
+   * @return th_cplx Result of the dot product.
    */
-  std::complex<double> Dot(const VectImplGPU &A) const;
+  th_cplx Dot(const VectImplGPU &B) const;
 
   /**
-   * @brief Computes the norm of the VectImplGPU.
+   * @brief Computes the norm of the VectImplGPU vector.
    *
-   * @return double Norm of the vector.
+   * @return double The norm of the vector.
    */
   double Norm() const;
 
   /**
-   * @brief Overloaded addition operator for VectImplGPU objects.
+   * @brief Overloaded addition operator for VectImplGPU vectors.
    *
    * @param A Another VectImplGPU object to add.
    * @return VectImplGPU Result of the addition.
@@ -147,7 +156,7 @@ public:
   VectImplGPU operator+(const VectImplGPU &A) const;
 
   /**
-   * @brief Overloaded subtraction operator for VectImplGPU objects.
+   * @brief Overloaded subtraction operator for VectImplGPU vectors.
    *
    * @param A Another VectImplGPU object to subtract.
    * @return VectImplGPU Result of the subtraction.
@@ -161,6 +170,14 @@ public:
    * @return VectImplGPU Result of the scalar multiplication.
    */
   VectImplGPU operator*(const th_cplx &alpha) const;
+
+  /**
+   * @brief Overloaded multiplication operator for VectImplGPU vectors.
+   *
+   * @param A Another VectImplGPU object to multiply.
+   * @return th_cplx Result of the multiplication.
+   */
+  th_cplx operator*(const VectImplGPU &A) const;
 
   /**
    * @brief Overloaded subscript operator to access vector elements.
@@ -214,30 +231,40 @@ public:
   void CopyFromHost(const t_hostVect &hostData);
 
   /**
-   * @brief Gets the size of the VectImplGPU.
+   * @brief Gets the size of the VectImplGPU vector.
    *
-   * @return int Size of the vector.
+   * @return int The size of the vector.
    */
-  int size() const;
+  int size() const { return Dim; }
 
   /**
-   * @brief Gets the device data pointer.
+   * @brief Gets the device data of the VectImplGPU vector.
    *
-   * @return th_cplx* Raw pointer to device data.
-   */
-  th_cplx *GetDeviceDataPtr() noexcept {
-    return thrust::raw_pointer_cast(deviceData_.data());
-  }
-
-  /**
-   * @brief Gets the device data.
-   *
-   * @return const t_devcVect& Reference to device data.
+   * @return const t_devcVect& The device data.
    */
   const t_devcVect &GetDeviceData() const { return deviceData_; }
 
+  /**
+   * @brief Gets the cuSPARSE dense vector descriptor.
+   *
+   * @return cusparseDnVecDescr_t The cuSPARSE dense vector descriptor.
+   */
+  cusparseDnVecDescr_t GetVecDescr() const { return vecDescr_; }
+
+  /**
+   * @brief Gets the cuSPARSE handle from the singleton.
+   *
+   * @return cusparseHandle_t The cuSPARSE handle.
+   */
+  cusparseHandle_t GetHandle() const {
+    return CuSparseSingleton::getInstance().getHandle();
+  }
+
 private:
-  t_devcVect deviceData_; ///< Vector data stored on device
+  /**
+   * @brief Initializes cuSPARSE resources.
+   */
+  void InitializeCuSparse();
 };
 
 /**

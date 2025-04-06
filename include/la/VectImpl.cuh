@@ -4,6 +4,7 @@
 // Created by Conor Stevenson on 15/3/2025.
 //
 
+#pragma once
 #include "core/eigen_types.h"
 #include "core/types.cuh"
 #include "la/Vect.h"
