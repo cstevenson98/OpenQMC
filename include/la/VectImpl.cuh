@@ -43,7 +43,7 @@ public:
    *
    * @return const t_hostVect& Reference to the host data.
    */
-  const t_hostVect &GetHostData() const {
+  const t_hostVect GetHostData() const {
     static t_hostVect hostData;
     hostData.resize(Data.size());
     for (int i = 0; i < Data.size(); ++i) {

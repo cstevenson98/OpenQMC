@@ -180,7 +180,7 @@ std::vector<std::complex<double>> Vect::GetData() const {
   return pImpl->GetData();
 }
 
-const t_hostVect &Vect::GetHostData() const { return pImpl->GetHostData(); }
+const t_hostVect Vect::GetHostData() const { return pImpl->GetHostData(); }
 
 // Destructor
 Vect::~Vect() = default;

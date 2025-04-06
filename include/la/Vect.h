@@ -163,7 +163,7 @@ class Vect {
    *
    * @return const t_hostVect& Reference to the host data.
    */
-  const t_hostVect &GetHostData() const;
+  const t_hostVect GetHostData() const;
 
   /**
    * @brief Gets the data of the Vect.
