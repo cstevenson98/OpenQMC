@@ -11,6 +11,14 @@
 #include <thrust/fill.h>
 #include <thrust/functional.h>
 #include <thrust/transform.h>
+#define CUSPARSE_CHECK(call)                                                   \
+  do {                                                                         \
+    cusparseStatus_t status = call;                                            \
+    if (status != CUSPARSE_STATUS_SUCCESS) {                                   \
+      printf("cuSPARSE error at %s:%d: %d\n", __FILE__, __LINE__, status);     \
+      exit(1);                                                                 \
+    }                                                                          \
+  } while (0)
 
 // Constructor with dimensions
 SparseImplGPU::SparseImplGPU(int dimX, int dimY)
@@ -31,17 +39,17 @@ SparseImplGPU::~SparseImplGPU() {
 // Initialize cuSPARSE resources
 void SparseImplGPU::InitializeCuSparse() {
   // Create matrix descriptor
-  cusparseCreateCsr(&matDescr_,
-                    DimX,                     // rows
-                    DimY,                     // cols
-                    values.size(),            // nnz
-                    rowPtr.data().get(),      // row offsets array
-                    colInd.data().get(),      // column indices array
-                    values.data().get(),      // values array
-                    CUSPARSE_INDEX_32I,       // row offsets type
-                    CUSPARSE_INDEX_32I,       // column indices type
-                    CUSPARSE_INDEX_BASE_ZERO, // index base
-                    CUDA_C_64F);              // values type (complex double)
+  CUSPARSE_CHECK(cusparseCreateCsr(&matDescr_,
+                                   DimX,                // rows
+                                   DimY,                // cols
+                                   values.size(),       // nnz
+                                   rowPtr.data().get(), // row offsets array
+                                   colInd.data().get(), // column indices array
+                                   values.data().get(), // values array
+                                   CUSPARSE_INDEX_32I,  // row offsets type
+                                   CUSPARSE_INDEX_32I,  // column indices type
+                                   CUSPARSE_INDEX_BASE_ZERO, // index base
+                                   CUDA_C_64F)); // values type (complex double)
 }
 
 // Constructor from host matrix
@@ -178,49 +186,69 @@ SparseImplGPU SparseImplGPU::Add(const SparseImplGPU &B) const {
 }
 
 // Multiply two matrices
-SparseImplGPU SparseImplGPU::RightMult(const SparseImplGPU &A) const {
-  SparseImplGPU out(DimX, A.DimY);
+SparseImplGPU SparseImplGPU::RightMult(const SparseImplGPU &other) const {
+  SparseImplGPU out(DimX, other.DimY);
 
   // Get raw pointers for matrix A
-  const int *rowPtrA = A.GetRowPtr();
-  const int *colIndA = A.GetColIndPtr();
-  const th_cplx *valuesA = A.GetValuesPtr();
+  const int *rowPtrA = GetRowPtr();
+  const int *colIndA = GetColIndPtr();
+  const th_cplx *valuesA = GetValuesPtr();
 
   // Get raw pointers for matrix B (this)
-  const int *rowPtrB = GetRowPtr();
-  const int *colIndB = GetColIndPtr();
-  const th_cplx *valuesB = GetValuesPtr();
+  const int *rowPtrB = other.GetRowPtr();
+  const int *colIndB = other.GetColIndPtr();
+  const th_cplx *valuesB = other.GetValuesPtr();
 
   // Compute the number of non-zero elements in the result
   size_t bufferSize_ = 0;
   cusparseSpGEMMDescr_t spgemmDesc_;
-  cusparseSpGEMM_createDescr(&spgemmDesc_);
+  CUSPARSE_CHECK(cusparseSpGEMM_createDescr(&spgemmDesc_));
 
   // Create alpha and beta values
   th_cplx alpha_(1.0, 0.0);
   th_cplx beta_(0.0, 0.0);
 
   // Get buffer size
-  cusparseSpGEMM_workEstimation(GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
-                                CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_,
-                                A.matDescr_, matDescr_, &beta_, out.matDescr_,
-                                CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT,
-                                spgemmDesc_, &bufferSize_, nullptr);
+  CUSPARSE_CHECK(cusparseSpGEMM_workEstimation(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
+      CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_, other.matDescr_,
+      &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
+      &bufferSize_, nullptr));
 
-  // Allocate buffer
-  void *dBuffer_ = nullptr;
-  cudaMalloc(&dBuffer_, bufferSize_);
+  // Allocate buffer using Thrust
+  thrust::device_vector<char> dBuffer1_(bufferSize_);
+  void *dBuffer1_ptr = thrust::raw_pointer_cast(dBuffer1_.data());
+
+  // Get buffer size
+  CUSPARSE_CHECK(cusparseSpGEMM_workEstimation(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
+      CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_, other.matDescr_,
+      &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
+      &bufferSize_, dBuffer1_ptr));
+
+  size_t bufferSize2_ = 0;
 
   // Compute the number of non-zero elements
-  cusparseSpGEMM_compute(GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
-                         CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, A.matDescr_,
-                         matDescr_, &beta_, out.matDescr_, CUDA_C_64F,
-                         CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_, &bufferSize_,
-                         dBuffer_);
+  CUSPARSE_CHECK(cusparseSpGEMM_compute(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
+      CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_, other.matDescr_,
+      &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
+      &bufferSize2_, nullptr));
+
+  // Allocate buffer using Thrust
+  thrust::device_vector<char> dBuffer2_(bufferSize2_);
+  void *dBuffer2_ptr = thrust::raw_pointer_cast(dBuffer2_.data());
+
+  // Compute the number of non-zero elements
+  CUSPARSE_CHECK(cusparseSpGEMM_compute(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
+      CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_, other.matDescr_,
+      &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_,
+      &bufferSize2_, dBuffer2_ptr));
 
   // Get the number of non-zero elements
   int64_t rows_, cols_, nnz_;
-  cusparseSpMatGetSize(out.matDescr_, &rows_, &cols_, &nnz_);
+  CUSPARSE_CHECK(cusparseSpMatGetSize(out.matDescr_, &rows_, &cols_, &nnz_));
   out.nnz = static_cast<int>(nnz_);
 
   // Allocate memory for the result
@@ -233,19 +261,17 @@ SparseImplGPU SparseImplGPU::RightMult(const SparseImplGPU &A) const {
   th_cplx *d_valuesC_ = thrust::raw_pointer_cast(out.values.data());
 
   // Update the matrix C with the actual data
-  cusparseCsrSetPointers(out.matDescr_, d_rowPtrC_, d_colIndC_, d_valuesC_);
+  CUSPARSE_CHECK(cusparseCsrSetPointers(out.matDescr_, d_rowPtrC_, d_colIndC_,
+                                        d_valuesC_));
 
   // Copy the result
-  cusparseSpGEMM_copy(GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
-                      CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, A.matDescr_,
-                      out.matDescr_, &beta_, out.matDescr_, CUDA_C_64F,
-                      CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_);
+  CUSPARSE_CHECK(cusparseSpGEMM_copy(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
+      CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_, other.matDescr_,
+      &beta_, out.matDescr_, CUDA_C_64F, CUSPARSE_SPGEMM_DEFAULT, spgemmDesc_));
 
   // Clean up
-  cudaFree(dBuffer_);
-
-  // Initialize cuSPARSE
-  out.InitializeCuSparse();
+  CUSPARSE_CHECK(cusparseSpGEMM_destroyDescr(spgemmDesc_));
 
   return out;
 }
@@ -266,14 +292,7 @@ SparseImplGPU SparseImplGPU::Transpose() const {
   const int *d_colIndA = GetColIndPtr();
   const th_cplx *d_valuesA = GetValuesPtr();
 
-  // Use cuSPARSE to compute the transpose
-  // Note: Using cusparseXcsr2csc instead of cusparseZcsr2csc for better
-  // compatibility
-  //   cusparseXcsr2csc(GetHandle(), DimX, DimY, nnz, d_valuesA, d_rowPtrA,
-  //                    d_colIndA, thrust::raw_pointer_cast(out.values.data()),
-  //                    thrust::raw_pointer_cast(out.colInd.data()),
-  //                    out.GetRowPtrPtr(), CUSPARSE_ACTION_NUMERIC,
-  //                    CUSPARSE_INDEX_BASE_ZERO);
+  // todo: implement
 
   return out;
 }
@@ -294,16 +313,8 @@ SparseImplGPU SparseImplGPU::HermitianC() const {
   const int *d_colIndA = GetColIndPtr();
   const th_cplx *d_valuesA = GetValuesPtr();
 
-  // Use cuSPARSE to compute the transpose
-  // Note: Using cusparseXcsr2csc instead of cusparseZcsr2csc for better
-  // compatibility
-  //   cusparseXcsr2csc(GetHandle(), DimX, DimY, nnz, d_valuesA, d_rowPtrA,
-  //                    d_colIndA, thrust::raw_pointer_cast(out.values.data()),
-  //                    thrust::raw_pointer_cast(out.colInd.data()),
-  //                    out.GetRowPtrPtr(), CUSPARSE_ACTION_NUMERIC,
-  //                    CUSPARSE_INDEX_BASE_ZERO);
+  // todo: implement
 
-  // Compute the conjugate of the values
   thrust::transform(
       out.values.begin(), out.values.end(), out.values.begin(),
       [] __device__(const th_cplx &x) { return thrust::conj(x); });
@@ -322,18 +333,7 @@ VectImplGPU SparseImplGPU::VectMult(const VectImplGPU &vect) const {
   const th_cplx *d_valuesA_ = GetValuesPtr();
   const th_cplx *d_x_ = thrust::raw_pointer_cast(vect.GetDeviceData().data());
 
-  // Create cuSPARSE matrix descriptor
-  cusparseSpMatDescr_t matA_;
-
-  // Create sparse matrix A in CSR format
-  cusparseCreateCsr(&matA_, DimX, DimY, nnz, const_cast<int *>(d_rowPtrA_),
-                    const_cast<int *>(d_colIndA_),
-                    const_cast<th_cplx *>(d_valuesA_), CUSPARSE_INDEX_32I,
-                    CUSPARSE_INDEX_32I, CUSPARSE_INDEX_BASE_ZERO, CUDA_C_64F);
-
   // Get the vector descriptors
-  cusparseDnVecDescr_t vecX_ = vect.GetVecDescr();
-  cusparseDnVecDescr_t vecY_ = out.GetVecDescr();
 
   // Create alpha and beta values
   th_cplx alpha_(1.0, 0.0);
@@ -341,22 +341,23 @@ VectImplGPU SparseImplGPU::VectMult(const VectImplGPU &vect) const {
 
   // Allocate buffer for SpMV
   size_t bufferSize_ = 0;
-  cusparseSpMV_bufferSize(GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
-                          &alpha_, matA_, vecX_, &beta_, vecY_, CUDA_C_64F,
-                          CUSPARSE_SPMV_ALG_DEFAULT, &bufferSize_);
+  CUSPARSE_CHECK(cusparseSpMV_bufferSize(
+      GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matDescr_,
+      vect.vecDescr_, &beta_, out.vecDescr_, CUDA_C_64F,
+      CUSPARSE_SPMV_ALG_DEFAULT, &bufferSize_));
 
   // Allocate buffer
   void *dBuffer_ = nullptr;
   cudaMalloc(&dBuffer_, bufferSize_);
 
   // Execute SpMV
-  cusparseSpMV(GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE, &alpha_, matA_,
-               vecX_, &beta_, vecY_, CUDA_C_64F, CUSPARSE_SPMV_ALG_DEFAULT,
-               dBuffer_);
+  CUSPARSE_CHECK(cusparseSpMV(GetHandle(), CUSPARSE_OPERATION_NON_TRANSPOSE,
+                              &alpha_, matDescr_, vect.vecDescr_, &beta_,
+                              out.vecDescr_, CUDA_C_64F,
+                              CUSPARSE_SPMV_ALG_DEFAULT, dBuffer_));
 
   // Clean up
   cudaFree(dBuffer_);
-  cusparseDestroySpMat(matA_);
 
   return out;
 }
