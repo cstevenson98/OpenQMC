@@ -25,4 +25,4 @@ set_property(TARGET oqmc  PROPERTY CUDA_ARCHITECTURES native)
 # target_link_libraries(elastic ${utils_lib} ${la_lib} ${qm_lib} ${models_lib} ${ode_lib})
 
 # # Add the modules-test directory
-# add_subdirectory(modules-test)
+add_subdirectory(modules-test)

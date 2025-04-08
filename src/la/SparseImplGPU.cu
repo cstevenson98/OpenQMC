@@ -182,7 +182,7 @@ SparseImplGPU SparseImplGPU::Add(const SparseImplGPU &B) const {
   // For simplicity, we'll use a placeholder here
   // In a real implementation, you would use the appropriate cuSPARSE function
   // such as cusparseZcsrgeam2 for complex matrices
-
+  cudaFree(d_nnzTotalDevHostPtr);
   return out;
 }
 

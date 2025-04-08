@@ -48,7 +48,7 @@ t_hostVect generateRandomVector3(size_t size) {
 static void BM_SparseMatrixVectorMultGPU(benchmark::State &state) {
   const size_t rows = state.range(0);
   const size_t cols = state.range(0);
-  const double density = 0.01; // 10% non-zero elements
+  const double density = 0.01; // 1% non-zero elements
 
   auto mat_data = generateRandomSparseMatrix(rows, cols, density);
   auto vec_data = generateRandomVector3(cols);
@@ -68,6 +68,7 @@ static void BM_SparseMatrixVectorMultGPU(benchmark::State &state) {
   state.counters["FLOPS"] =
       benchmark::Counter(theoretical_flops, benchmark::Counter::kIsRate,
                          benchmark::Counter::kIs1024);
+  state.counters["NNZ"] = mat.NNZ();
 }
 
 // Benchmark matrix-vector multiplication (in-place)
@@ -89,19 +90,20 @@ static void BM_SparseMatrixVectorMultInPlaceGPU(benchmark::State &state) {
 
   for (auto _ : state) {
     mat.VectMultInPlace(vec, result);
-    // benchmark::DoNotOptimize(result);
+    benchmark::DoNotOptimize(result);
   }
 
-  //   state.counters["FLOPS"] =
-  //       benchmark::Counter(theoretical_flops, benchmark::Counter::kIsRate,
-  //                          benchmark::Counter::kIs1024);
+  state.counters["FLOPS"] =
+      benchmark::Counter(theoretical_flops, benchmark::Counter::kIsRate,
+                         benchmark::Counter::kIs1024);
+  state.counters["NNZ"] = mat.NNZ();
 }
 
 // Benchmark matrix-matrix multiplication
 static void BM_SparseMatrixMultGPU(benchmark::State &state) {
   const size_t rows = state.range(0);
   const size_t cols = state.range(0);
-  const double density = 0.01; // 10% non-zero elements
+  const double density = 0.01; // 1% non-zero elements
 
   auto matA_data = generateRandomSparseMatrix(rows, cols, density);
   auto matB_data = generateRandomSparseMatrix(cols, rows, density);
@@ -121,6 +123,8 @@ static void BM_SparseMatrixMultGPU(benchmark::State &state) {
   state.counters["FLOPS"] =
       benchmark::Counter(theoretical_flops, benchmark::Counter::kIsRate,
                          benchmark::Counter::kIs1024);
+  state.counters["NNZ_A"] = matA.NNZ();
+  state.counters["NNZ_B"] = matB.NNZ();
 }
 
 // Benchmark matrix addition
@@ -147,6 +151,8 @@ static void BM_SparseMatrixAddGPU(benchmark::State &state) {
   state.counters["FLOPS"] =
       benchmark::Counter(theoretical_flops, benchmark::Counter::kIsRate,
                          benchmark::Counter::kIs1024);
+  state.counters["NNZ_A"] = matA.NNZ();
+  state.counters["NNZ_B"] = matB.NNZ();
 }
 
 // Benchmark scalar multiplication
@@ -172,27 +178,33 @@ static void BM_SparseMatrixScaleGPU(benchmark::State &state) {
   state.counters["FLOPS"] =
       benchmark::Counter(theoretical_flops, benchmark::Counter::kIsRate,
                          benchmark::Counter::kIs1024);
+  state.counters["NNZ"] = mat.NNZ();
 }
 
 // Register benchmarks with different matrix sizes
 BENCHMARK(BM_SparseMatrixVectorMultGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
+    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
+    ->MinTime(-5.0);         // Limit to 5 seconds
 
 BENCHMARK(BM_SparseMatrixVectorMultInPlaceGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
+    ->Range(1 << 6, 1 << 13) // Test with matrices from 256x256 to 4096x4096
+    ->MinTime(-5.0);         // Limit to 5 seconds
 
 BENCHMARK(BM_SparseMatrixMultGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
+    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
+    ->MinTime(-5.0);         // Limit to 5 seconds
 
 BENCHMARK(BM_SparseMatrixAddGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
+    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
+    ->MinTime(-5.0);         // Limit to 5 seconds
 
 BENCHMARK(BM_SparseMatrixScaleGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
+    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
+    ->MinTime(-5.0);         // Limit to 5 seconds
 
 BENCHMARK_MAIN();
