@@ -8,19 +8,9 @@
 #include "la/DenseImpl.cuh"
 #include "la/Sparse.h"
 #include "la/SparseImpl.cuh"
-#include "la/Super.cuh"
-#include <vector>
-//
-// Copyright (C) 2025 Conor Stevenson
-// Licensed under the GNU General Public License v3.0
-// Created by Conor Stevenson on 03/04/2022.
-//
-
-#include "la/Dense.h"
-#include "la/Sparse.h"
-#include "la/SparseImpl.cuh"
 #include "la/Vect.h"
 #include <memory>
+#include <vector>
 
 Sparse::Sparse(int dimX, int dimY)
     : pImpl(std::make_unique<SparseImpl>(dimX, dimY)) {}
