@@ -25,7 +25,7 @@ double Euler::Step(double step) {
   int iterations = 0;
   int maxDepth = 100;
   double err1;
-  while (true) {
+  do {
     if (iterations > maxDepth) {
       std::cout << "max depth reached, aborting" << std::endl;
     }
@@ -40,11 +40,8 @@ double Euler::Step(double step) {
 
     if (err1 >= Tol) {
       y0 = y1;
-      continue;
-    } else {
-      break;
     }
-  }
+  } while (err1 >= Tol);
 
   x = y1;
   Err = err1;

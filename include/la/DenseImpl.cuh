@@ -7,7 +7,6 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <vector>
 
 #include "core/eigen_types.h"
 #include "core/types.cuh"

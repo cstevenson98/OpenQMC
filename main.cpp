@@ -30,6 +30,7 @@ int main() {  //
 
   Dense dense(d);
   dense.Print();
+  dense.Print();
 
   auto d2 = 222 * dense * dense;
   d2.Print();

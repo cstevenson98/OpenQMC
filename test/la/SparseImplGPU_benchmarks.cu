@@ -62,6 +62,8 @@ static void BM_SparseMatrixVectorMultGPU(benchmark::State &state) {
 
   for (auto _ : state) {
     auto result = mat.VectMult(vec);
+    // sync
+    cudaDeviceSynchronize();
     benchmark::DoNotOptimize(result);
   }
 
@@ -90,6 +92,8 @@ static void BM_SparseMatrixVectorMultInPlaceGPU(benchmark::State &state) {
 
   for (auto _ : state) {
     mat.VectMultInPlace(vec, result);
+    // sync
+    cudaDeviceSynchronize();
     benchmark::DoNotOptimize(result);
   }
 
@@ -117,6 +121,8 @@ static void BM_SparseMatrixMultGPU(benchmark::State &state) {
 
   for (auto _ : state) {
     auto result = matA.RightMult(matB);
+    // sync
+    cudaDeviceSynchronize();
     benchmark::DoNotOptimize(result);
   }
 
@@ -145,6 +151,8 @@ static void BM_SparseMatrixAddGPU(benchmark::State &state) {
 
   for (auto _ : state) {
     auto result = matA.Add(matB);
+    // sync
+    cudaDeviceSynchronize();
     benchmark::DoNotOptimize(result);
   }
 
@@ -172,6 +180,8 @@ static void BM_SparseMatrixScaleGPU(benchmark::State &state) {
 
   for (auto _ : state) {
     auto result = mat.Scale(alpha);
+    // sync
+    cudaDeviceSynchronize();
     benchmark::DoNotOptimize(result);
   }
 
@@ -184,27 +194,22 @@ static void BM_SparseMatrixScaleGPU(benchmark::State &state) {
 // Register benchmarks with different matrix sizes
 BENCHMARK(BM_SparseMatrixVectorMultGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
-    ->MinTime(-5.0);         // Limit to 5 seconds
+    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
 
 BENCHMARK(BM_SparseMatrixVectorMultInPlaceGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 13) // Test with matrices from 256x256 to 4096x4096
-    ->MinTime(-5.0);         // Limit to 5 seconds
+    ->Range(1 << 6, 1 << 13); // Test with matrices from 256x256 to 4096x4096
 
 BENCHMARK(BM_SparseMatrixMultGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
-    ->MinTime(-5.0);         // Limit to 5 seconds
+    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
 
 BENCHMARK(BM_SparseMatrixAddGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
-    ->MinTime(-5.0);         // Limit to 5 seconds
+    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
 
 BENCHMARK(BM_SparseMatrixScaleGPU)
     ->RangeMultiplier(2)
-    ->Range(1 << 6, 1 << 10) // Test with matrices from 256x256 to 4096x4096
-    ->MinTime(-5.0);         // Limit to 5 seconds
+    ->Range(1 << 6, 1 << 10); // Test with matrices from 256x256 to 4096x4096
 
 BENCHMARK_MAIN();
