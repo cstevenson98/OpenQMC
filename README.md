@@ -26,17 +26,35 @@ To-do
  - Implement a test suite for robustness
  - Include example problems
 
-To build (Cmake)
+Development Environment
 ---
 
-With Cmake installed:
+### Option 1: Dev Container (Recommended)
 
-~~~
-make
+The easiest way to get started is using the provided dev container, which includes all dependencies and GPU access pre-configured:
+
+1. Install Docker and the NVIDIA Container Toolkit (see `.devcontainer/README.md`)
+2. Open this project in VS Code with the Dev Containers extension
+3. Select "Reopen in Container" when prompted
+
+See [.devcontainer/README.md](.devcontainer/README.md) for detailed setup instructions.
+
+### Option 2: Local Build
+
+To build locally with CMake installed:
+
+~~~bash
+# Install dependencies with Conan
+conan install . --output-folder=build --build=missing
+
+# Configure and build
+cd build
+cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+cmake --build . -j$(nproc)
 ~~~
 
-and then run relevant executables as
+Then run executables:
 
-~~~
+~~~bash
 ./build/main
 ~~~
